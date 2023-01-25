@@ -18,6 +18,9 @@ public class DriveTeleop extends CommandBase{
     public DriveTeleop(Drivetrain drivetrain, XboxController controller) {
         drivetrain_ = drivetrain;
         controller_ = controller;
+
+        addRequirements(drivetrain_);
+        System.out.println("in DriveTeleop Constructor");
     }
 
     @Override

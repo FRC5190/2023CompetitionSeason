@@ -5,6 +5,11 @@
 package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.XboxController;
+
+import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.commands.DriveTeleop;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -13,15 +18,23 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+
+  private final Drivetrain drivetrain_ = new Drivetrain();
+  private final XboxController driver_controller_ = new XboxController(0);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
+  }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   @Override
   public void autonomousInit() {}

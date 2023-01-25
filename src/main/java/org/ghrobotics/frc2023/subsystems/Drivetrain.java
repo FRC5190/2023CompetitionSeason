@@ -26,6 +26,7 @@ public class Drivetrain extends SubsystemBase{
     private final PeriodicIO io_ = new PeriodicIO();
 
     public Drivetrain(){
+        super();
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
         left_leader_.setInverted(false);
@@ -52,6 +53,7 @@ public class Drivetrain extends SubsystemBase{
                     MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) : 
                     io_.r_demand);
         }
+        //System.out.println("in drivetrain periodic");
     }
 
     public void setPercent(double l, double r) {
@@ -74,10 +76,10 @@ public class Drivetrain extends SubsystemBase{
 
     public static class Constants {
         //Motor Controller IDs
-        public static final int kLeftLeaderId = 1; 
-        public static final int kLeftFollowerId = 2;
-        public static final int kRightLeaderId = 3;
-        public static final int kRightFollowerId = 4;
+        public static final int kLeftLeaderId = 2; 
+        public static final int kLeftFollowerId = 1;
+        public static final int kRightLeaderId = 4;
+        public static final int kRightFollowerId = 3;
 
         //Output Limit
         public static final double kOutputLimit = 0.3;
