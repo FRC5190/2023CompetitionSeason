@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    //Starts the Command Scheduler to make sure periodic() and such work.
     CommandScheduler.getInstance().run();
   }
 

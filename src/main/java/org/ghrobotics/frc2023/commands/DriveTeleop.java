@@ -20,7 +20,6 @@ public class DriveTeleop extends CommandBase{
         controller_ = controller;
 
         addRequirements(drivetrain_);
-        System.out.println("in DriveTeleop Constructor");
     }
 
     @Override
