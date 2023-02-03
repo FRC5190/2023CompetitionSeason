@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 // package frc.robot;
 //import edu.wpi.first.wpilibj.Joystick;
 //import edu.wpi.first.wpilibj.Spark;
@@ -49,6 +51,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
+    startTime = Timer.getFPGATimestamp();
   }
 
   @Override
@@ -59,25 +62,26 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    startTime = Timer.getFPGATimestamp();
+    
   }
 
   @Override
   public void autonomousPeriodic() {
-    double time = Timer.getFPGATimestamp();
-    System.out.println(time - startTime);
+    
+    // double time = Timer.getFPGATimestamp();
+    // System.out.println(time - startTime);
 
-    if (time - startTime < 1) {
-      leftMotor1.set(0.15);
-      leftMotor2.set(0.15);
-      rightMotor1.set(-0.15);
-      rightMotor2.set(-0.15);
-    } else {
-      leftMotor1.set(0);
-      leftMotor2.set(0);
-      rightMotor1.set(0);
-      rightMotor2.set(0);
-    }
+    // if (time - startTime < 1) {
+    //   leftMotor1.set(0.15);
+    //   leftMotor2.set(0.15);
+    //   rightMotor1.set(-0.15);
+    //   rightMotor2.set(-0.15);
+    // } else {
+    //   leftMotor1.set(0);
+    //   leftMotor2.set(0);
+    //   rightMotor1.set(0);
+    //   rightMotor2.set(0);
+    // }
   }
 
 
@@ -96,6 +100,10 @@ public class Robot extends TimedRobot {
     leftMotor2.set(left);
     rightMotor1.set(-right);
     rightMotor2.set(-right);
+
+    // A: 1 second test
+    new Trigger(driver_controller_::getAButton).whenAc(Drivetrain::moveForwardTest);
+
   }
 
 

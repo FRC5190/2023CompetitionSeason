@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /** Add your docs here. */
@@ -83,5 +85,22 @@ public class Drivetrain extends SubsystemBase{
 
         //Output Limit
         public static final double kOutputLimit = 0.3;
+    }
+
+    public void moveForwardTest(double startTime) {
+        double time = Timer.getFPGATimestamp();
+        System.out.println(time - startTime);
+
+        if (time - startTime < 1) {
+            left_leader_.set(0.15);
+            left_follower_.set(0.15);
+            right_leader_.set(-0.15);
+            right_follower_.set(-0.15);
+        } else {
+            left_leader_.set(0);
+            left_follower_.set(0);
+            right_leader_.set(0);
+            right_follower_.set(0);
+        }
     }
 }
