@@ -19,6 +19,7 @@ public class DriveTeleop extends CommandBase{
         drivetrain_ = drivetrain;
         controller_ = controller;
 
+        // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(drivetrain_);
     }
 

@@ -9,7 +9,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.XboxController;
 
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import org.ghrobotics.frc2023.subsystems.Gyroscope;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
+import org.ghrobotics.frc2023.Telemetry;
+import org.ghrobotics.frc2023.Limelight;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,6 +26,11 @@ public class Robot extends TimedRobot {
 
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final XboxController driver_controller_ = new XboxController(0);
+  private final Limelight limelight_ = new Limelight("limelight");
+  private final Gyroscope gyro_ = new Gyroscope();
+  private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
+
+  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -35,6 +45,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     //Starts the Command Scheduler to make sure periodic() and such work.
     CommandScheduler.getInstance().run();
+
+    telemetry_.periodic();
+
   }
 
   @Override
@@ -50,7 +63,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    drivetrain_.setBrakeMode(false);
+  }
 
   @Override
   public void disabledPeriodic() {}

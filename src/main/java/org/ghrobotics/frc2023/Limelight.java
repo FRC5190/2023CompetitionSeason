@@ -25,6 +25,13 @@ public class Limelight {
         io_.ts = table_.getEntry("ts").getDouble(0);
         io_.tl = table_.getEntry("tl").getDouble(0);
 
+        io_.tid = table_.getEntry("tid").getDoubleArray(new double[6]);
+        io_.botpose = table_.getEntry("botpose").getDoubleArray(new double[6]);
+        io_.botpose_wpiblue = table_.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+        io_.botpose_wpired = table_.getEntry("botpose_wpired").getDoubleArray(new double[6]);
+        io_.camerapose_targetspace = table_.getEntry("camerapose_targetspace").getDoubleArray(new double[6]);
+        io_.targetpose_cameraspace = table_.getEntry("targetpose_cameraspace").getDoubleArray(new double[6]);
+
         table_.getEntry("ledMode").setDouble(io_.led_mode);
         table_.getEntry("pipeline").setDouble(io_.pipeline);
     }
@@ -53,8 +60,24 @@ public class Limelight {
         return 11 + io_.tl;
     }
 
-    public int getID() {
+    public double[] getID() {
         return io_.tid;
+    }
+
+    public double[] getbotpose() {
+        return io_.botpose;
+    }
+
+    public double[] getBlueBotPose(){
+        return io_.botpose_wpiblue;
+    }
+
+    public double[] getCamPosTargetSpace(){
+        return io_.camerapose_targetspace;
+    }
+
+    public double[] getTargetPosCamSpace(){
+        return io_.targetpose_cameraspace;
     }
 
     public void setLED(LEDMode mode) {
@@ -76,7 +99,12 @@ public class Limelight {
         double ta;
         double ts;
         double tl;
-        int tid;
+        double[] tid;
+        double[] botpose;
+        double[] botpose_wpiblue;
+        double[] botpose_wpired;
+        double[] camerapose_targetspace;
+        double[] targetpose_cameraspace;
 
         double led_mode;
         double pipeline;
