@@ -43,16 +43,16 @@ public class Drivetrain extends SubsystemBase{
         super();
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
-        left_leader_.setInverted(false);
+        left_leader_.setInverted(true);
 
-        left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
-        left_follower_.follow(left_leader_);
+        //left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
+        //left_follower_.follow(left_leader_);
 
         right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
-        right_leader_.setInverted(true);
+        right_leader_.setInverted(false);
 
-        right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
-        right_follower_.follow(right_follower_);
+        //right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
+        //right_follower_.follow(right_follower_);
 
         //Initialize encoders
         left_encoder_ = left_leader_.getEncoder();
