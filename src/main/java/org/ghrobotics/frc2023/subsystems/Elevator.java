@@ -22,6 +22,7 @@ public class Elevator extends SubsystemBase {
 
     // Current state
     private final RobotState currentState;
+    private RobotState wantedState;
     // create superstructure object and then initialize?
 
     public Elevator() {
@@ -39,13 +40,13 @@ public class Elevator extends SubsystemBase {
         right_leader_.setInverted(true);
 
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
-        right_follower_.follow(right_follower_);
+        right_follower_.follow(right_leader_);
 
         left_encoder_ = left_leader_.getEncoder();
-        // add conversion factor
+        // add conversion factor based on gear ratio
 
         right_encoder_= right_leader_.getEncoder();
-        // add conversion factor
+        // add conversion factor based on gear ratio
 
         // set state - add logic later
         // get from superstructure object?

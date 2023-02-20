@@ -52,7 +52,7 @@ public class Drivetrain extends SubsystemBase{
         right_leader_.setInverted(true);
 
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
-        right_follower_.follow(right_follower_);
+        right_follower_.follow(right_leader_);
 
         //Initialize encoders
         left_encoder_ = left_leader_.getEncoder();
@@ -150,5 +150,11 @@ public class Drivetrain extends SubsystemBase{
 
         //Output Limit
         public static final double kOutputLimit = 0.3;
+
+        // Elevator Feed Forward 
+        public static double kS; // volts
+        public static double kG; // volts
+        public static double kV; // volts * sec / distance 
+        public static double kA; // volts * sec^2 / distance
     }
 }
