@@ -10,7 +10,7 @@ public class Superstructure {
         RESET
     }
 
-    public RobotState getCurrentState() {
+    public RobotState getWantedState() {
         // add logic
         return RobotState.RESET;  // placeholder
     }

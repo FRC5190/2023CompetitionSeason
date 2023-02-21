@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.ghrobotics.frc2023.Superstructure.RobotState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -20,13 +21,7 @@ public class Elevator extends SubsystemBase {
     private final RelativeEncoder left_encoder_;
     private final RelativeEncoder right_encoder_;
 
-    // Current state
-    private final RobotState currentState;
-    private RobotState wantedState;
-    // create superstructure object and then initialize?
-
     public Elevator() {
-        // super();
 
         // Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
@@ -47,10 +42,6 @@ public class Elevator extends SubsystemBase {
 
         right_encoder_= right_leader_.getEncoder();
         // add conversion factor based on gear ratio
-
-        // set state - add logic later
-        // get from superstructure object?
-        currentState = RobotState.RESET;
     }
 
     public double getLeftPosition() {
@@ -68,6 +59,11 @@ public class Elevator extends SubsystemBase {
 
     public double getRightVelocity() {
         return right_encoder_.getVelocity();
+    }
+
+    public void setVelocity(double l, double r) {
+        left_leader_.set(MathUtil.clamp(l, -Constants.kOutputLimit, Constants.kOutputLimit));
+        right_leader_.set(MathUtil.clamp(r, -Constants.kOutputLimit, Constants.kOutputLimit));
     }
 
     // find values
@@ -92,9 +88,11 @@ public class Elevator extends SubsystemBase {
         public static final int kLeftFollowerId = 0;
         public static final int kLeftLeaderId = 0;
 
-        public static final double minPosition = 0;
-        public static final double maxPosition = 0;
+        public static final double kMinPosition = 0;
+        public static final double kMaxPosition = 0;
         // change based on height
+
+        public static final double kOutputLimit = 0;
     }
 }
 
