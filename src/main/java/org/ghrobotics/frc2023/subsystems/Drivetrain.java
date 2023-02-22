@@ -37,7 +37,7 @@ public class Drivetrain extends SubsystemBase{
     private OutputType output_type_ = OutputType.PERCENT;
     private final PeriodicIO io_ = new PeriodicIO();
 
-    private final PoseEstimator estimator_;
+    // private final PoseEstimator estimator_;
 
     public Drivetrain(){
         super();
