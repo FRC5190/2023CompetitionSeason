@@ -151,10 +151,5 @@ public class Drivetrain extends SubsystemBase{
         //Output Limit
         public static final double kOutputLimit = 0.3;
 
-        // Elevator Feed Forward 
-        public static double kS; // volts
-        public static double kG; // volts
-        public static double kV; // volts * sec / distance 
-        public static double kA; // volts * sec^2 / distance
     }
 }

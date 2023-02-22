@@ -1,73 +1,80 @@
 package org.ghrobotics.frc2023.subsystems;
 
+import org.ghrobotics.frc2023.Superstructure.SuperstructureState;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import org.ghrobotics.frc2023.Superstructure.RobotState;
-
-import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
     // use elevator feedforward
 
     // Motor Controllers
-    private final CANSparkMax left_leader_;
-    private final CANSparkMax left_follower_;
-    private final CANSparkMax right_leader_;
-    private final CANSparkMax right_follower_;
+    private final CANSparkMax leader_;
+    private final CANSparkMax follower_;
 
     // Sensors
-    private final RelativeEncoder left_encoder_;
-    private final RelativeEncoder right_encoder_;
+    private final RelativeEncoder encoder_;
+
+    // Feedforward
+    private final ElevatorFeedforward feedforward;
+
+    // Feedback
+    private final SparkMaxPIDController pid_controller_;
 
     public Elevator() {
 
         // Initialize motor controllers
-        left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
-        left_leader_.setInverted(false);
-        // figure out which motor should be inverted
+        leader_ = new CANSparkMax(Constants.kLeaderId, MotorType.kBrushless);
+        leader_.setInverted(false);
+        // figure out if motor should be inverted
 
-        left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
-        left_follower_.follow(left_leader_);
+        follower_ = new CANSparkMax(Constants.kFollowerId, MotorType.kBrushless);
+        follower_.follow(leader_);
 
-        right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
-        right_leader_.setInverted(true);
-
-        right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
-        right_follower_.follow(right_leader_);
-
-        left_encoder_ = left_leader_.getEncoder();
+        encoder_ = leader_.getEncoder();
         // add conversion factor based on gear ratio
 
-        right_encoder_= right_leader_.getEncoder();
-        // add conversion factor based on gear ratio
+        feedforward = new ElevatorFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
+        pid_controller_ = leader_.getPIDController();
+        pid_controller_.setP(Constants.kP);
+
     }
 
-    public double getLeftPosition() {
-        return left_encoder_.getPosition();
+    public double getPosition() {
+        return encoder_.getPosition();
         // convert from encoder values to elevator position
     }
 
-    public double getRightPosition() {
-        return right_encoder_.getPosition();
+    public void setPosition(SuperstructureState state) {
+        // positive if target above, negative if below
+        double dist = getTargetPosition(state) - getPosition();
+
+        double v = dist / 0.02;
+        double a = (v - getVelocity()) / 0.02;
+        double ff = feedforward.calculate(v, a);
+
+        leader_.setVoltage(feedforward.calculate(v, a));
+
+        pid_controller_.setReference(v, ControlType.kVelocity, 0, ff);
     }
 
-    public double getLeftVelocity() {
-        return left_encoder_.getVelocity();
+    public double getVelocity() {
+        return encoder_.getVelocity();
     }
 
-    public double getRightVelocity() {
-        return right_encoder_.getVelocity();
-    }
+    // public void setVelocity(double v) {
+    //     leader_.set(MathUtil.clamp(v, -Constants.kOutputLimit, Constants.kOutputLimit));
+    // }
 
-    public void setVelocity(double l, double r) {
-        left_leader_.set(MathUtil.clamp(l, -Constants.kOutputLimit, Constants.kOutputLimit));
-        right_leader_.set(MathUtil.clamp(r, -Constants.kOutputLimit, Constants.kOutputLimit));
-    }
 
     // find values
-    public double getTargetPosition(RobotState state) {
+    public double getTargetPosition(SuperstructureState state) {
         switch (state) {
             case SCORE_HIGH:
                 return 0.0;
@@ -83,16 +90,25 @@ public class Elevator extends SubsystemBase {
     }
 
     public static class Constants {
-        public static final int kRightFollowerId = 0;
-        public static final int kRightLeaderId = 0;
-        public static final int kLeftFollowerId = 0;
-        public static final int kLeftLeaderId = 0;
+        public static final int kFollowerId = 0;
+        public static final int kLeaderId = 0;
 
         public static final double kMinPosition = 0;
         public static final double kMaxPosition = 0;
         // change based on height
 
         public static final double kOutputLimit = 0;
+
+        // Feedforward 
+        public static final double kS = 0.26197; // volts
+        public static final double kG = 0; // volts - not in sysid?
+        public static final double kV = 1.3623; // volts * sec / distance 
+        public static final double kA = 0.18601; // volts * sec^2 / distance
+        // kS, kV, kA taken from 2/10 sysid calculations - may need to rerun
+
+        // Feedback
+        public static final double kP = 0;
+
     }
 }
 

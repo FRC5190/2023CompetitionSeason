@@ -2,7 +2,7 @@ package org.ghrobotics.frc2023;
 
 public class Superstructure {
 
-    public static enum RobotState {
+    public static enum SuperstructureState {
         SCORE_HIGH,
         SCORE_MID,
         PICKUP_GROUND,
@@ -10,9 +10,9 @@ public class Superstructure {
         RESET
     }
 
-    public RobotState getWantedState() {
+    public SuperstructureState getWantedState() {
         // add logic
-        return RobotState.RESET;  // placeholder
+        return SuperstructureState.RESET;  // placeholder
     }
 
     
