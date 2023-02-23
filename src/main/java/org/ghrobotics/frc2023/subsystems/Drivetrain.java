@@ -48,12 +48,6 @@ public class Drivetrain extends SubsystemBase{
     private OutputType output_type_ = OutputType.PERCENT;
     private final PeriodicIO io_ = new PeriodicIO();
 
-<<<<<<< HEAD
-    //private final PoseEstimator estimator_;
-=======
-    // private final PoseEstimator estimator_;
->>>>>>> 0b5c3ef4cf33188df3580a28580590662e7a410c
-
     public Drivetrain(){
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
