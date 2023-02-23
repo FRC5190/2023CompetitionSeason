@@ -26,7 +26,7 @@ public class DriveTeleop extends CommandBase{
     @Override
     public void execute(){
         double forward = -controller_.getLeftY();
-        double curvature = controller_.getLeftX();
+        double curvature = -controller_.getLeftX();
         boolean quick_turn = controller_.getXButton();
 
         DifferentialDrive.WheelSpeeds speeds = DifferentialDrive.curvatureDriveIK(

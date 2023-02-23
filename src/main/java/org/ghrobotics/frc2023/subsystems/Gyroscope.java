@@ -17,7 +17,7 @@ public class Gyroscope extends SubsystemBase {
 
   /** Creates a new Gyroscope. */
   public Gyroscope() {
-    gyro_ = new WPI_Pigeon2(0);
+    gyro_ = new WPI_Pigeon2(17);
     
   }
 
