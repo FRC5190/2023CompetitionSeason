@@ -19,6 +19,7 @@ import org.ghrobotics.frc2023.Limelight;
 import org.ghrobotics.frc2023.auto.ScoreConeLeftHigh;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /**
@@ -35,6 +36,8 @@ public class Robot extends TimedRobot {
   private final Gyroscope gyro_ = new Gyroscope();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
   private final SendableChooser<Command> auto_selector_ = new SendableChooser<>();
+  private Command autonomous_command_ = null;
+  private final Timer timer_ = new Timer();
 
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_, auto_selector_);
   /**
@@ -62,7 +65,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-   // ScoreConeLeftHigh.schedule();
+   autonomous_command_ = auto_selector_.getSelected();
+    if (autonomous_command_ != null) {
+      autonomous_command_.schedule();
+    }
   }
 
   @Override
@@ -78,11 +84,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    timer_.start();
+    double t = timer_.get();
+    if (t >= 3) {
     drivetrain_.setBrakeMode(false);
+    }
   }
-
-  @Override
-  public void disabledPeriodic() {}
 
   @Override
   public void testInit() {}
@@ -101,6 +108,6 @@ public class Robot extends TimedRobot {
     /*if (limelight_.hasTarget()){ 
       ID = limelight_.getID();
     }*/
-    
+    auto_selector_.addOption("ScoreLeftHigh", new ScoreConeLeftHigh(pose_estimator_, drivetrain_));
   }
 }
