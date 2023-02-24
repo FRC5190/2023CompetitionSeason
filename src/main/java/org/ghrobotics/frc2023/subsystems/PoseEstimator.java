@@ -5,7 +5,9 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -98,7 +100,11 @@ public class PoseEstimator extends SubsystemBase {
       idValue = limelight_.getID();
       id = idValue[5];
 
-      Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
+      Pose3d bluePose3d = new Pose3d(blueX, blueY, blueZ, new Rotation3d(blueXR, blueYR, blueZR));
+
+      Pose2d botPose = bluePose3d.toPose2d();
+
+      //Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
       poseEstimator.addVisionMeasurement(botPose, timestamp);
       // Transform3d camToTarget = target.getBestCameraToTarget();
       // Pose3d camPose = targetPose.transformBy(camToTarget.inverse());

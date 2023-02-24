@@ -33,8 +33,8 @@ public class Arena {
         new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()),//Right
         }; 
     public static final Transform3d[] highAndMidTransform = {
-        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //High
-        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()) //Mid
+        new Transform3d(new Translation3d(0.554, 0.600, 0.675), new Rotation3d()), //High
+        new Transform3d(new Translation3d(0.270, 0.170, 0.270), new Rotation3d()) //Mid
     };
                     
     
