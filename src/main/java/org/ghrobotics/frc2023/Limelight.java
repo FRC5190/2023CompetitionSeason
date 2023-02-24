@@ -6,6 +6,7 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+//import org.json.*;
 
 /** Add your docs here. */
 public class Limelight {
@@ -24,6 +25,23 @@ public class Limelight {
         io_.ta = table_.getEntry("ta").getDouble(0);
         io_.ts = table_.getEntry("ts").getDouble(0);
         io_.tl = table_.getEntry("tl").getDouble(0);
+        io_.cl = table_.getEntry("cl").getDouble(0);
+        io_.jsonString = table_.getEntry("json").getString("");
+
+        System.out.println(io_.jsonString);
+        System.out.println("Inside limelight periodic");
+
+        
+/*
+    String jsonString = io_.jsonString ; //assign your JSON String here
+    JSONObject obj = new JSONObject(jsonString);
+    String pageName = obj.getJSONObject("Results");
+
+    JSONArray arr = obj.getJSONArray("Fiducial"); // notice that `"posts": [...]`
+    for (int i = 0; i < arr.length(); i++)
+    {
+        String post_id = arr.getJSONObject(i).getString("fID");
+    }*/
 
         io_.tid = table_.getEntry("tid").getDoubleArray(new double[6]);
         io_.botpose = table_.getEntry("botpose").getDoubleArray(new double[6]);
@@ -57,11 +75,20 @@ public class Limelight {
     }
 
     public double getLatency() {
-        return 11 + io_.tl;
+        return io_.tl;
+    }
+
+    public double getCaptureLatency(){
+        return io_.cl;
     }
 
     public double[] getID() {
         return io_.tid;
+    }
+    
+
+    public int getFID() {
+        return io_.fid;
     }
 
     public double[] getbotpose() {
@@ -99,6 +126,9 @@ public class Limelight {
         double ta;
         double ts;
         double tl;
+        double cl;
+        String jsonString;
+        int fid;
         double[] tid;
         double[] botpose;
         double[] botpose_wpiblue;

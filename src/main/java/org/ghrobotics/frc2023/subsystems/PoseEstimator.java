@@ -80,12 +80,13 @@ public class PoseEstimator extends SubsystemBase {
     limelight_.periodic();
 
     double latency = limelight_.getLatency();
+    double captureLatency = limelight_.getCaptureLatency();
     is_alive_ = alive_filter_.calculate(latency) > 11;
 
     tracking_target_ = limelight_.hasTarget();
     
     if (tracking_target_) {
-      //double timestamp = Timer.getFPGATimestamp() - latency / 1000;
+      double timestamp = Timer.getFPGATimestamp() - (latency / 1000)  - (captureLatency / 1000);
       bluePose = limelight_.getBlueBotPose();
       blueX = bluePose[0];
       blueY = bluePose[1];
@@ -98,15 +99,14 @@ public class PoseEstimator extends SubsystemBase {
       id = idValue[5];
 
       Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
-      poseEstimator.addVisionMeasurement(botPose, latency);
+      poseEstimator.addVisionMeasurement(botPose, timestamp);
       // Transform3d camToTarget = target.getBestCameraToTarget();
       // Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
     }
-    else{
     poseEstimator.update(gyro_.getGyroRotation(), 
       drivetrain_.getLeftPosition(), 
       drivetrain_.getRightPosition());
-    }
+    
   }
 
   public Pose2d getCurrentPose(){
@@ -125,7 +125,7 @@ public class PoseEstimator extends SubsystemBase {
     return id;
   }
 
-  public static void setCurrentPose(Pose2d newPose){
+  public void setCurrentPose(Pose2d newPose){
     poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(), 
       drivetrain_.getRightPosition(), newPose);
   }

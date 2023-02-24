@@ -21,9 +21,9 @@ import static com.revrobotics.CANSparkMax.ControlType;
 public class Drivetrain extends SubsystemBase{
     //Motor Controllers
     private final CANSparkMax left_leader_;
-    //private final CANSparkMax left_follower_;
+    private final CANSparkMax left_follower_;
     private final CANSparkMax right_leader_;
-    //private final CANSparkMax right_follower_;
+    private final CANSparkMax right_follower_;
 
     //Sensors
     private final RelativeEncoder left_encoder_;
@@ -52,16 +52,16 @@ public class Drivetrain extends SubsystemBase{
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
         left_leader_.setInverted(true);
-/*
+
         left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
         left_follower_.follow(left_leader_);
-*/
+
         right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
         right_leader_.setInverted(false);
-/*
+
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
         right_follower_.follow(right_follower_);
-*/
+
         //Initialize encoders
         left_encoder_ = left_leader_.getEncoder();
         left_encoder_.setPositionConversionFactor(
@@ -132,9 +132,9 @@ public class Drivetrain extends SubsystemBase{
     public void setBrakeMode(boolean value){
         IdleMode mode = value ? IdleMode.kBrake : IdleMode.kCoast;
         left_leader_.setIdleMode(mode);
-        //left_follower_.setIdleMode(mode);
+        left_follower_.setIdleMode(mode);
         right_leader_.setIdleMode(mode);
-        //right_follower_.setIdleMode(mode);
+        right_follower_.setIdleMode(mode);
     }
 
     public void setVelocity(double l, double r) {

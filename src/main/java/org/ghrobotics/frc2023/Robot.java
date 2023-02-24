@@ -6,7 +6,9 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
@@ -14,6 +16,9 @@ import org.ghrobotics.frc2023.subsystems.Gyroscope;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.Telemetry;
 import org.ghrobotics.frc2023.Limelight;
+import org.ghrobotics.frc2023.auto.ScoreConeLeftHigh;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 
 
 /**
@@ -29,8 +34,9 @@ public class Robot extends TimedRobot {
   private final Limelight limelight_ = new Limelight("limelight");
   private final Gyroscope gyro_ = new Gyroscope();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
+  private final SendableChooser<Command> auto_selector_ = new SendableChooser<>();
 
-  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_);
+  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_, auto_selector_);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -39,6 +45,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
+    setUpAuto();
   }
 
   @Override
@@ -47,11 +54,16 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     telemetry_.periodic();
+    limelight_.periodic();
+
+    new Trigger(driver_controller_::getBButton).onTrue(new ScoreConeLeftHigh(pose_estimator_,drivetrain_));
 
   }
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+   // ScoreConeLeftHigh.schedule();
+  }
 
   @Override
   public void autonomousPeriodic() {}
@@ -60,7 +72,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {}
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+  }
 
   @Override
   public void disabledInit() {
@@ -81,4 +95,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void setUpAuto(){
+    //public static int ID;
+    /*if (limelight_.hasTarget()){ 
+      ID = limelight_.getID();
+    }*/
+    
+  }
 }

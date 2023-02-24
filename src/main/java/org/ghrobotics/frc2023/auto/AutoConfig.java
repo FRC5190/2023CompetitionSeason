@@ -45,7 +45,7 @@ public class AutoConfig {
           .addConstraint(new CentripetalAccelerationConstraint(kMaxCentripetalAcceleration));
 
   public final Trajectory kStartToLeftOfBlueTag = TrajectoryGenerator.generateTrajectory
-    (pose_estimator_.getCurrentPose(), List.of(), Arena.tagPositions[0].transformBy(Arena.blueTransform[0][0]).toPose2d(), 
+    (pose_estimator_.getCurrentPose(), List.of(), Arena.tagPositions[0].transformBy(Arena.blueTransform[0]).toPose2d(), 
     kForwardConfig);
 
 

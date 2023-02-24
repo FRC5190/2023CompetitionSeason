@@ -21,29 +21,21 @@ public class Arena {
         new Pose3d(0, 0, 0, null), //8
     };
 
-   public static final Transform3d[][] blueTransform = {
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //0
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //1
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())},//2
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //3
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //4
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())}, //5
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //6
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //7
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())} //8
+   public static final Transform3d[] blueTransform = {
+                    new Transform3d(new Translation3d(0.6096, -0.7366, -0.4953), new Rotation3d()), //Left
+                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //Center
+                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()),//Right
                     }; 
 
-    public static final Transform3d[][] redTransform = {
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //0
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //1
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())}, //2
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //3
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //4
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())}, //5
-                    {new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //6
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //7
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())} //8
-                    };
+    public static final Transform3d[] redTransform = {
+        new Transform3d(new Translation3d(-0.6096, 0.7366, -0.4953), new Rotation3d()), //Left
+        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //Center
+        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()),//Right
+        }; 
+    public static final Transform3d[] highAndMidTransform = {
+        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //High
+        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()) //Mid
+    };
                     
     
 
