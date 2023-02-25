@@ -53,7 +53,7 @@ public class Drivetrain extends SubsystemBase{
         left_leader_.restoreFactoryDefaults();
         left_leader_.setIdleMode(IdleMode.kBrake);
         left_leader_.enableVoltageCompensation(12);
-        left_leader_.setInverted(true);
+        left_leader_.setInverted(false);
 
         left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
         left_follower_.restoreFactoryDefaults();
@@ -65,7 +65,7 @@ public class Drivetrain extends SubsystemBase{
         right_leader_.restoreFactoryDefaults();
         right_leader_.setIdleMode(IdleMode.kBrake);
         right_leader_.enableVoltageCompensation(12);
-        right_leader_.setInverted(false);
+        right_leader_.setInverted(true);
 
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
         right_follower_.restoreFactoryDefaults();
