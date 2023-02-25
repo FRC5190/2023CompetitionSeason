@@ -13,6 +13,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
@@ -60,7 +61,6 @@ public class Drivetrain extends SubsystemBase{
         left_follower_.restoreFactoryDefaults();
         left_follower_.setIdleMode(IdleMode.kBrake);
         left_follower_.enableVoltageCompensation(12);
-        left_follower_.setInverted(true);
         left_follower_.follow(left_leader_);
 
         right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
@@ -73,7 +73,7 @@ public class Drivetrain extends SubsystemBase{
         right_follower_.restoreFactoryDefaults();
         right_follower_.setIdleMode(IdleMode.kBrake);
         right_follower_.enableVoltageCompensation(12);
-        right_follower_.follow(right_follower_);
+        right_follower_.follow(right_leader_);
 
         //Initialize encoders
         left_encoder_ = left_leader_.getEncoder();
@@ -108,23 +108,21 @@ public class Drivetrain extends SubsystemBase{
         io_.l_position = left_encoder_.getPosition();
         io_.r_position = right_encoder_.getPosition();
 
-        System.out.println("LL Output: " + left_leader_.getOutputCurrent());
-        System.out.println("LF Output: " + left_follower_.getOutputCurrent());
-        System.out.println("RL Output: " + right_leader_.getOutputCurrent());
-        System.out.println("RF Output: " + right_follower_.getOutputCurrent());
-
-
-
+        SmartDashboard.putNumber("LL Output", left_leader_.getOutputCurrent());
+        SmartDashboard.putNumber("LF Output", left_follower_.getOutputCurrent());
+        SmartDashboard.putNumber("RL Output", right_leader_.getOutputCurrent());
+        SmartDashboard.putNumber("RF Output", right_follower_.getOutputCurrent());
 
         switch (output_type_){
             case PERCENT:
-                left_leader_.set(limit_output ? 
-                    MathUtil.clamp(io_.l_demand, -Constants.kOutputLimit, Constants.kOutputLimit) : 
+                left_leader_.set(limit_output ?
+                    MathUtil.clamp(io_.l_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
                     io_.l_demand);
-                right_leader_.set(limit_output ? 
-                    MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) : 
+                right_leader_.set(limit_output ?
+                    MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
                     io_.r_demand);
-            case VELOCITY: 
+                break;
+            case VELOCITY:
                 // Calculate feedforward value and add to built-in motor controller PID.
             double l_feedforward = left_feedforward_.calculate(io_.l_demand,
                  (io_.l_demand - last_l_velocity_setpoint_) / 0.02);
@@ -192,7 +190,7 @@ public class Drivetrain extends SubsystemBase{
         io_.r_position = RPosition;
         //io_.angle = angle;
     }
-    
+
 
     enum OutputType {
         PERCENT, VELOCITY
@@ -213,7 +211,7 @@ public class Drivetrain extends SubsystemBase{
 
     public static class Constants {
         //Motor Controller IDs
-        public static final int kLeftLeaderId = 1; 
+        public static final int kLeftLeaderId = 1;
         public static final int kLeftFollowerId = 2;
         public static final int kRightLeaderId = 3;
         public static final int kRightFollowerId = 4;
