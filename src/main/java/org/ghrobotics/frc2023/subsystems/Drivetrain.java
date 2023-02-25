@@ -51,15 +51,28 @@ public class Drivetrain extends SubsystemBase{
     public Drivetrain(){
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
+        left_leader_.restoreFactoryDefaults();
+        left_leader_.setIdleMode(IdleMode.kBrake);
+        left_leader_.enableVoltageCompensation(12);
         left_leader_.setInverted(true);
 
         left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
+        left_follower_.restoreFactoryDefaults();
+        left_follower_.setIdleMode(IdleMode.kBrake);
+        left_follower_.enableVoltageCompensation(12);
+        left_follower_.setInverted(true);
         left_follower_.follow(left_leader_);
 
         right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
+        right_leader_.restoreFactoryDefaults();
+        right_leader_.setIdleMode(IdleMode.kBrake);
+        right_leader_.enableVoltageCompensation(12);
         right_leader_.setInverted(false);
 
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
+        right_follower_.restoreFactoryDefaults();
+        right_follower_.setIdleMode(IdleMode.kBrake);
+        right_follower_.enableVoltageCompensation(12);
         right_follower_.follow(right_follower_);
 
         //Initialize encoders
@@ -94,6 +107,13 @@ public class Drivetrain extends SubsystemBase{
         //Read inputs
         io_.l_position = left_encoder_.getPosition();
         io_.r_position = right_encoder_.getPosition();
+
+        System.out.println("LL Output: " + left_leader_.getOutputCurrent());
+        System.out.println("LF Output: " + left_follower_.getOutputCurrent());
+        System.out.println("RL Output: " + right_leader_.getOutputCurrent());
+        System.out.println("RF Output: " + right_follower_.getOutputCurrent());
+
+
 
 
         switch (output_type_){
