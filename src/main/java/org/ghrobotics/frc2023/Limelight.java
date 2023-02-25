@@ -28,10 +28,10 @@ public class Limelight {
         io_.cl = table_.getEntry("cl").getDouble(0);
         io_.jsonString = table_.getEntry("json").getString("");
 
-        System.out.println(io_.jsonString);
-        System.out.println("Inside limelight periodic");
+//        System.out.println(io_.jsonString);
+//        System.out.println("Inside limelight periodic");
 
-        
+
 /*
     String jsonString = io_.jsonString ; //assign your JSON String here
     JSONObject obj = new JSONObject(jsonString);
@@ -65,7 +65,7 @@ public class Limelight {
     public double getTy() {
         return io_.ty;
     }
- 
+
     public double getArea() {
         return io_.ta;
     }
@@ -85,7 +85,7 @@ public class Limelight {
     public double[] getID() {
         return io_.tid;
     }
-    
+
 
     public int getFID() {
         return io_.fid;

@@ -77,10 +77,14 @@ public class Drivetrain extends SubsystemBase{
         left_encoder_ = left_leader_.getEncoder();
         left_encoder_.setPositionConversionFactor(
             2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio);
+        left_encoder_.setVelocityConversionFactor(
+            2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio / 60);
 
         right_encoder_= right_leader_.getEncoder();
         right_encoder_.setPositionConversionFactor(
             2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio);
+        right_encoder_.setVelocityConversionFactor(
+            2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio / 60);
 
         // Initialize PID controllers.
         left_pid_controller_ = left_leader_.getPIDController();
@@ -104,11 +108,10 @@ public class Drivetrain extends SubsystemBase{
         //Read inputs
         io_.l_position = left_encoder_.getPosition();
         io_.r_position = right_encoder_.getPosition();
+        io_.l_velocity = left_encoder_.getVelocity();
+        io_.r_velocity = right_encoder_.getVelocity();
 
-        SmartDashboard.putNumber("LL Output", left_leader_.getOutputCurrent());
-        SmartDashboard.putNumber("LF Output", left_follower_.getOutputCurrent());
-        SmartDashboard.putNumber("RL Output", right_leader_.getOutputCurrent());
-        SmartDashboard.putNumber("RF Output", right_follower_.getOutputCurrent());
+        SmartDashboard.putNumber("Drivetrain Velocity Avg", (io_.l_velocity + io_.r_velocity) / 2);
 
         switch (output_type_){
             case PERCENT:
