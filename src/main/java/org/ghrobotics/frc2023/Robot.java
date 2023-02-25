@@ -5,18 +5,23 @@
 package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import org.ghrobotics.frc2023.subsystems.Gyroscope;
+import org.ghrobotics.frc2023.commands.DriveTeleop;
+import org.ghrobotics.frc2023.commands.DriveBalance;
+import org.ghrobotics.frc2023.Telemetry;
+import org.ghrobotics.frc2023.Limelight;
+import org.ghrobotics.frc2023.auto.ScoreConeLeftHigh;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import org.ghrobotics.frc2023.auto.ScoreConeLeftHigh;
-import org.ghrobotics.frc2023.commands.DriveBalance;
-import org.ghrobotics.frc2023.commands.DriveTeleop;
-import org.ghrobotics.frc2023.subsystems.Drivetrain;
-import org.ghrobotics.frc2023.subsystems.Gyroscope;
-import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /**
@@ -32,17 +37,17 @@ public class Robot extends TimedRobot {
   private final Limelight limelight_ = new Limelight("limelight");
   private final Gyroscope gyro_ = new Gyroscope();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
-  private final SendableChooser<Command> auto_selector_ = new SendableChooser<>();
-  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_,
-      auto_selector_);
+  private final SendableChooser<Command> auto_selector_side = new SendableChooser<>();
+  private final SendableChooser<Command> auto_selector_height = new SendableChooser<>();
   private Command autonomous_command_ = null;
   private final Timer timer_ = new Timer();
 
+  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_, auto_selector_side, auto_selector_height);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-
+  
   @Override
   public void robotInit() {
     drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
@@ -57,12 +62,16 @@ public class Robot extends TimedRobot {
     telemetry_.periodic();
     limelight_.periodic();
 
-    new Trigger(driver_controller_::getBButton).onTrue(
-        new ScoreConeLeftHigh(pose_estimator_, drivetrain_));
+    new Trigger(driver_controller_::getBButton).onTrue(new ScoreConeLeftHigh(pose_estimator_,drivetrain_));
+    SmartDashboard.putNumber("Velocity", drivetrain_.getVelocity());
   }
 
   @Override
   public void autonomousInit() {
+   autonomous_command_ = auto_selector_side.getSelected();
+    if (autonomous_command_ != null) {
+      autonomous_command_.schedule();
+    }
     new DriveBalance(drivetrain_, gyro_).schedule();
   }
 
@@ -70,20 +79,32 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    timer_.start();
+  }
 
   @Override
   public void teleopPeriodic() {
+    double t = timer_.get();
+    if (t <= 0.5){
+      drivetrain_.setVelocity(0.1, 0.1);
+    }
+    timer_.stop();
 
   }
 
   @Override
   public void disabledInit() {
     timer_.start();
+  }
+
+  @Override
+  public void disabledPeriodic() {
     double t = timer_.get();
-    if (t >= 3) {
+    if (t >= 0.5) {
       drivetrain_.setBrakeMode(false);
     }
+    timer_.stop();
   }
 
   @Override
@@ -98,11 +119,11 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {}
 
-  private void setUpAuto() {
+  private void setUpAuto(){
     //public static int ID;
-    /*if (limelight_.hasTarget()){
+    /*if (limelight_.hasTarget()){ 
       ID = limelight_.getID();
     }*/
-    auto_selector_.addOption("ScoreLeftHigh", new ScoreConeLeftHigh(pose_estimator_, drivetrain_));
+    auto_selector_side.addOption("ScoreLeftHigh", new ScoreConeLeftHigh(pose_estimator_, drivetrain_));
   }
 }

@@ -111,7 +111,7 @@ public class Drivetrain extends SubsystemBase{
         io_.l_velocity = left_encoder_.getVelocity();
         io_.r_velocity = right_encoder_.getVelocity();
 
-        SmartDashboard.putNumber("Drivetrain Velocity Avg", (io_.l_velocity + io_.r_velocity) / 2);
+        io_.avg_velocity = (io_.l_velocity +  io_.r_velocity / 2);
 
         switch (output_type_){
             case PERCENT:
@@ -171,6 +171,10 @@ public class Drivetrain extends SubsystemBase{
         return io_.r_velocity;
     }
 
+    public double getVelocity() {
+        return io_.avg_velocity;
+    }
+
     public DifferentialDriveKinematics getKinematics() {
         return kinematics_;
     }
@@ -196,6 +200,7 @@ public class Drivetrain extends SubsystemBase{
         double r_position;
         double l_velocity;
         double r_velocity;
+        double avg_velocity;
 
 
         //Outputs
