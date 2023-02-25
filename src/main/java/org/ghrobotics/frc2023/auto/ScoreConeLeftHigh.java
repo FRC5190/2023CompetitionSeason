@@ -25,11 +25,12 @@ public class ScoreConeLeftHigh extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      //new InstantCommand(() -> poseEstimator.setCurrentPose(AutoConfig.kStartToLeftOfBlueTag.getInitialPose())),
-      new DriveTrajectory(drivetrain, poseEstimator, TrajectoryGenerator.generateTrajectory
-      (poseEstimator.getCurrentPose(), List.of(), Arena.tagPositions[0].transformBy(Arena.blueTransform[0]).toPose2d(), 
-      AutoConfig.kForwardConfig))
-      //new DriveTrajectory(drivetrain, poseEstimator, AutoConfig.kStartToLeftOfBlueTag)
+      new InstantCommand(() -> poseEstimator.setCurrentPose(AutoConfig.kStartToLeftOfBlueTagNV.getInitialPose())),
+      /*new DriveTrajectory(drivetrain, poseEstimator, TrajectoryGenerator.generateTrajectory
+      (poseEstimator.getCurrentPose(), List.of(), Arena.tagPositions[5].transformBy(Arena.blueTransform[0]).toPose2d(), 
+      AutoConfig.kForwardConfig))*/
+
+      new DriveTrajectory(drivetrain, poseEstimator, AutoConfig.kStartToLeftOfBlueTagNV)
     );
   }
 }

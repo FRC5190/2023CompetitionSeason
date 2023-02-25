@@ -48,5 +48,10 @@ public class AutoConfig {
     (pose_estimator_.getCurrentPose(), List.of(), Arena.tagPositions[0].transformBy(Arena.blueTransform[0]).toPose2d(), 
     kForwardConfig);
 
+public static final Trajectory kStartToLeftOfBlueTagNV = TrajectoryGenerator.generateTrajectory
+    (new Pose2d(0.522, 0.345, Rotation2d.fromDegrees(271.5)), List.of(),
+    new Pose2d(0.422, 1.000, Rotation2d.fromDegrees(270)),
+    kForwardConfig);
+
 
 }

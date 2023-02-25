@@ -33,7 +33,7 @@ public class Telemetry {
     private final Field2d field_;
     private final SendableChooser<Command> auto_selector_;
 
-public Telemetry(Drivetrain drivetrain, PoseEstimator poseEstimator, Limelight limelight,SendableChooser<Command> auto_selector) {
+public Telemetry(Drivetrain drivetrain, PoseEstimator poseEstimator, Limelight limelight, SendableChooser<Command> auto_selector) {
     tab_ = Shuffleboard.getTab("2023");
 
     drivetrain_ = drivetrain;
