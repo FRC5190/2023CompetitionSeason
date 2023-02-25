@@ -5,6 +5,7 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.controller.RamseteController;
 import com.revrobotics.CANSparkMax;
@@ -37,10 +38,7 @@ public class Drivetrain extends SubsystemBase{
     //Control
     private final SparkMaxPIDController left_pid_controller_;
     private final SparkMaxPIDController right_pid_controller_;
-    private final SimpleMotorFeedforward left_feedforward_;
-    private final SimpleMotorFeedforward right_feedforward_;
-    private double last_l_velocity_setpoint_ = 0;
-    private double last_r_velocity_setpoint_ = 0;
+    private final DifferentialDriveFeedforward ff_;
 
     //Output Limit
     private boolean limit_output = false;
@@ -92,10 +90,9 @@ public class Drivetrain extends SubsystemBase{
         right_pid_controller_.setP(Constants.kRightKp);
 
          // Initialize feedforward.
-        left_feedforward_ = new SimpleMotorFeedforward(
-            Constants.kLeftKs, Constants.kLeftKv, Constants.kLeftKa);
-        right_feedforward_ = new SimpleMotorFeedforward(Constants.kRightKs, Constants.kRightKv,
-            Constants.kRightKa);
+        ff_ = new DifferentialDriveFeedforward(
+            Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa
+        );
 
         //Initialize Trajectory Tracking
         kinematics_ = new DifferentialDriveKinematics(Constants.kTrackWidth);
@@ -124,24 +121,18 @@ public class Drivetrain extends SubsystemBase{
                 break;
             case VELOCITY:
                 // Calculate feedforward value and add to built-in motor controller PID.
-            double l_feedforward = left_feedforward_.calculate(io_.l_demand,
-                 (io_.l_demand - last_l_velocity_setpoint_) / 0.02);
-             double r_feedforward = right_feedforward_.calculate(io_.r_demand,
-                 (io_.r_demand - last_r_velocity_setpoint_) / 0.02);
+                var wheel_voltages = ff_.calculate(
+                    io_.l_velocity, io_.l_demand, io_.r_velocity, io_.r_demand, 0.02);
 
-                left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0, l_feedforward);
-                right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0, r_feedforward);
-
-                // Store last velocity setpoints.
-                last_l_velocity_setpoint_ = io_.l_demand;
-                last_r_velocity_setpoint_ = io_.r_demand;
+                left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0,
+                    wheel_voltages.left);
+                right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0,
+                    wheel_voltages.right);
             break;
         }
     }
 
     public void setPercent(double l, double r) {
-        last_l_velocity_setpoint_ = 0;
-        last_r_velocity_setpoint_ = 0;
         output_type_ = OutputType.PERCENT;
         io_.l_demand = l;
         io_.r_demand = r;
@@ -223,15 +214,14 @@ public class Drivetrain extends SubsystemBase{
         //public static double kMass = 65.0; //CHANGE
         //public static double kMOI = 10.0; //CHANGE
 
-        //Control
-        public static double kLeftKs;
-        public static double kLeftKv;
-        public static double kLeftKa;
-        public static double kLeftKp;
-        public static double kRightKs;
-        public static double kRightKv;
-        public static double kRightKa;
-        public static double kRightKp;
+        // Control
+        public static final double kLinearKv = 2.6221;
+        public static final double kLinearKa = 0.29686;
+        public static final double kAngularKv = 2.9518;
+        public static final double kAngularKa = 0.30714;
+
+        public static final double kLeftKp = 0.0001;
+        public static final double kRightKp = 0.0001;
 
         //Output Limit
         public static final double kOutputLimit = 0.3;
