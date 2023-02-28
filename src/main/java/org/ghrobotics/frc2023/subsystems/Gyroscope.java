@@ -33,6 +33,7 @@ public class Gyroscope extends SubsystemBase {
     io_.angle = gyro_.getRotation2d();
 
     SmartDashboard.putNumber("Pitch Degrees", Math.toDegrees(io_.pitch));
+    SmartDashboard.putNumber("Heading", io_.angle.getDegrees());
   }
 
   public Rotation2d getGyroRotation() {

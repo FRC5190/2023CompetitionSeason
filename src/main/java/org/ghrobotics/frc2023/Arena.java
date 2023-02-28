@@ -8,9 +8,15 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+
+import java.io.IOException;
 
 /** Add your docs here. */
 public class Arena {
+
+    public AprilTagFieldLayout blueLayout;
 
     public static final Pose3d[] tagPositions = new Pose3d[]{
         new Pose3d(15.513, 1.0734, 0.46272, null), //1
@@ -36,6 +42,16 @@ public class Arena {
         new Transform3d(new Translation3d(0.554, 0.600, 0.675), new Rotation3d()), //High
         new Transform3d(new Translation3d(0.270, 0.170, 0.270), new Rotation3d()) //Mid
     };
+
+    public Arena(){
+        try{
+            blueLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+        }
+        catch(IOException ex) {
+            System.out.println("Error reading tag layout");
+        }
+
+    }
                     
     
 

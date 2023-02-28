@@ -43,7 +43,7 @@ public class Limelight {
         String post_id = arr.getJSONObject(i).getString("fID");
     }*/
 
-        io_.tid = table_.getEntry("tid").getDoubleArray(new double[6]);
+        io_.tid = table_.getEntry("tid").getDouble(0);
         io_.botpose = table_.getEntry("botpose").getDoubleArray(new double[6]);
         io_.botpose_wpiblue = table_.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
         io_.botpose_wpired = table_.getEntry("botpose_wpired").getDoubleArray(new double[6]);
@@ -82,7 +82,7 @@ public class Limelight {
         return io_.cl;
     }
 
-    public double[] getID() {
+    public double getID() {
         return io_.tid;
     }
 
@@ -129,7 +129,7 @@ public class Limelight {
         double cl;
         String jsonString;
         int fid;
-        double[] tid;
+        double tid;
         double[] botpose;
         double[] botpose_wpiblue;
         double[] botpose_wpired;

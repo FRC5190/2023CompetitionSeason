@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
@@ -38,8 +39,8 @@ public class PoseEstimator extends SubsystemBase {
   private final LinearFilter alive_filter_;
   private boolean is_alive_ = false;
 
-  private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
-  private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+  private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+  private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
 
   double[] camPose = new double[6];
   double camX;
@@ -54,8 +55,7 @@ public class PoseEstimator extends SubsystemBase {
   double blueYR;
   double blueZR;
 
-  double[] idValue = new double[6];
-  double id;
+  double idValue;
 
   private final DifferentialDrivePoseEstimator poseEstimator;
 
@@ -98,11 +98,13 @@ public class PoseEstimator extends SubsystemBase {
       blueZR = bluePose[5];
 
       idValue = limelight_.getID();
-      id = idValue[5];
 
       Pose3d bluePose3d = new Pose3d(blueX, blueY, blueZ, new Rotation3d(blueXR, blueYR, blueZR));
 
       Pose2d botPose = bluePose3d.toPose2d();
+
+      SmartDashboard.putNumber("Vision Position X", botPose.getX());
+      SmartDashboard.putNumber("Vision Position Y", botPose.getY());
 
       //Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
       poseEstimator.addVisionMeasurement(botPose, timestamp);
@@ -112,7 +114,8 @@ public class PoseEstimator extends SubsystemBase {
     poseEstimator.update(gyro_.getGyroRotation(), 
       drivetrain_.getLeftPosition(), 
       drivetrain_.getRightPosition());
-    
+
+
   }
 
   public Pose2d getCurrentPose(){
@@ -128,7 +131,7 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public double getIDValue(){
-    return id;
+    return idValue;
   }
 
   public void setCurrentPose(Pose2d newPose){

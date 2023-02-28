@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
@@ -58,10 +59,13 @@ public class DriveTrajectory extends CommandBase{
       // Convert to wheel speeds.
       DifferentialDriveWheelSpeeds wanted_wheel_speeds = drivetrain_.getKinematics().toWheelSpeeds(
           wanted_chassis_speeds);
+
+          SmartDashboard.putNumber("Wanted Wheel Speeds Left", wanted_wheel_speeds.leftMetersPerSecond);
+          SmartDashboard.putNumber("Wanted Wheel Speeds Right", wanted_wheel_speeds.rightMetersPerSecond);
   
       // Set wheel speeds on drivetrain.
-      drivetrain_.setVelocity(wanted_wheel_speeds.leftMetersPerSecond,
-          wanted_wheel_speeds.rightMetersPerSecond);
+     /* drivetrain_.setVelocity(wanted_wheel_speeds.leftMetersPerSecond,
+          wanted_wheel_speeds.rightMetersPerSecond);*/
     }
   
     @Override

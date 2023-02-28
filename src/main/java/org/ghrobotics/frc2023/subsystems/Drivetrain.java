@@ -133,6 +133,10 @@ public class Drivetrain extends SubsystemBase{
                     wheel_voltages.right);
             break;
         }
+        SmartDashboard.putNumber("L Velocity", io_.l_velocity);
+        SmartDashboard.putNumber("R Velocity", io_.r_velocity);
+        SmartDashboard.putNumber("L Position", io_.l_position);
+        SmartDashboard.putNumber("R Position", io_.r_position);
     }
 
     public void setPercent(double l, double r) {
