@@ -5,6 +5,7 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.controller.RamseteController;
 import com.revrobotics.CANSparkMax;
@@ -13,6 +14,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
@@ -21,9 +23,9 @@ import static com.revrobotics.CANSparkMax.ControlType;
 public class Drivetrain extends SubsystemBase{
     //Motor Controllers
     private final CANSparkMax left_leader_;
-    //private final CANSparkMax left_follower_;
+    private final CANSparkMax left_follower_;
     private final CANSparkMax right_leader_;
-    //private final CANSparkMax right_follower_;
+    private final CANSparkMax right_follower_;
 
     //Sensors
     private final RelativeEncoder left_encoder_;
@@ -36,10 +38,7 @@ public class Drivetrain extends SubsystemBase{
     //Control
     private final SparkMaxPIDController left_pid_controller_;
     private final SparkMaxPIDController right_pid_controller_;
-    private final SimpleMotorFeedforward left_feedforward_;
-    private final SimpleMotorFeedforward right_feedforward_;
-    private double last_l_velocity_setpoint_ = 0;
-    private double last_r_velocity_setpoint_ = 0;
+    private final DifferentialDriveFeedforward ff_;
 
     //Output Limit
     private boolean limit_output = false;
@@ -51,25 +50,41 @@ public class Drivetrain extends SubsystemBase{
     public Drivetrain(){
         //Initialize motor controllers
         left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
+        left_leader_.restoreFactoryDefaults();
+        left_leader_.setIdleMode(IdleMode.kBrake);
+        left_leader_.enableVoltageCompensation(12);
         left_leader_.setInverted(true);
-/*
+
         left_follower_ = new CANSparkMax(Constants.kLeftFollowerId, MotorType.kBrushless);
+        left_follower_.restoreFactoryDefaults();
+        left_follower_.setIdleMode(IdleMode.kBrake);
+        left_follower_.enableVoltageCompensation(12);
         left_follower_.follow(left_leader_);
-*/
+
         right_leader_ = new CANSparkMax(Constants.kRightLeaderId, MotorType.kBrushless);
+        right_leader_.restoreFactoryDefaults();
+        right_leader_.setIdleMode(IdleMode.kBrake);
+        right_leader_.enableVoltageCompensation(12);
         right_leader_.setInverted(false);
-/*
+
         right_follower_ = new CANSparkMax(Constants.kRightFollowerId, MotorType.kBrushless);
+        right_follower_.restoreFactoryDefaults();
+        right_follower_.setIdleMode(IdleMode.kBrake);
+        right_follower_.enableVoltageCompensation(12);
         right_follower_.follow(right_leader_);
-*/
+
         //Initialize encoders
         left_encoder_ = left_leader_.getEncoder();
         left_encoder_.setPositionConversionFactor(
             2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio);
+        left_encoder_.setVelocityConversionFactor(
+            2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio / 60);
 
         right_encoder_= right_leader_.getEncoder();
         right_encoder_.setPositionConversionFactor(
             2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio);
+        right_encoder_.setVelocityConversionFactor(
+            2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio / 60);
 
         // Initialize PID controllers.
         left_pid_controller_ = left_leader_.getPIDController();
@@ -79,10 +94,9 @@ public class Drivetrain extends SubsystemBase{
         right_pid_controller_.setP(Constants.kRightKp);
 
          // Initialize feedforward.
-        left_feedforward_ = new SimpleMotorFeedforward(
-            Constants.kLeftKs, Constants.kLeftKv, Constants.kLeftKa);
-        right_feedforward_ = new SimpleMotorFeedforward(Constants.kRightKs, Constants.kRightKv,
-            Constants.kRightKa);
+        ff_ = new DifferentialDriveFeedforward(
+            Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa
+        );
 
         //Initialize Trajectory Tracking
         kinematics_ = new DifferentialDriveKinematics(Constants.kTrackWidth);
@@ -94,36 +108,38 @@ public class Drivetrain extends SubsystemBase{
         //Read inputs
         io_.l_position = left_encoder_.getPosition();
         io_.r_position = right_encoder_.getPosition();
+        io_.l_velocity = left_encoder_.getVelocity();
+        io_.r_velocity = right_encoder_.getVelocity();
 
+        io_.avg_velocity = (io_.l_velocity +  io_.r_velocity / 2);
 
         switch (output_type_){
             case PERCENT:
-                left_leader_.set(limit_output ? 
-                    MathUtil.clamp(io_.l_demand, -Constants.kOutputLimit, Constants.kOutputLimit) : 
+                left_leader_.set(limit_output ?
+                    MathUtil.clamp(io_.l_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
                     io_.l_demand);
-                right_leader_.set(limit_output ? 
-                    MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) : 
+                right_leader_.set(limit_output ?
+                    MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
                     io_.r_demand);
-            case VELOCITY: 
+                break;
+            case VELOCITY:
                 // Calculate feedforward value and add to built-in motor controller PID.
-            double l_feedforward = left_feedforward_.calculate(io_.l_demand,
-                 (io_.l_demand - last_l_velocity_setpoint_) / 0.02);
-             double r_feedforward = right_feedforward_.calculate(io_.r_demand,
-                 (io_.r_demand - last_r_velocity_setpoint_) / 0.02);
+                var wheel_voltages = ff_.calculate(
+                    io_.l_velocity, io_.l_demand, io_.r_velocity, io_.r_demand, 0.02);
 
-                left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0, l_feedforward);
-                right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0, r_feedforward);
-
-                // Store last velocity setpoints.
-                last_l_velocity_setpoint_ = io_.l_demand;
-                last_r_velocity_setpoint_ = io_.r_demand;
+                left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0,
+                    wheel_voltages.left);
+                right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0,
+                    wheel_voltages.right);
             break;
         }
+        SmartDashboard.putNumber("L Velocity", io_.l_velocity);
+        SmartDashboard.putNumber("R Velocity", io_.r_velocity);
+        SmartDashboard.putNumber("L Position", io_.l_position);
+        SmartDashboard.putNumber("R Position", io_.r_position);
     }
 
     public void setPercent(double l, double r) {
-        last_l_velocity_setpoint_ = 0;
-        last_r_velocity_setpoint_ = 0;
         output_type_ = OutputType.PERCENT;
         io_.l_demand = l;
         io_.r_demand = r;
@@ -132,9 +148,9 @@ public class Drivetrain extends SubsystemBase{
     public void setBrakeMode(boolean value){
         IdleMode mode = value ? IdleMode.kBrake : IdleMode.kCoast;
         left_leader_.setIdleMode(mode);
-        //left_follower_.setIdleMode(mode);
+        left_follower_.setIdleMode(mode);
         right_leader_.setIdleMode(mode);
-        //right_follower_.setIdleMode(mode);
+        right_follower_.setIdleMode(mode);
     }
 
     public void setVelocity(double l, double r) {
@@ -159,6 +175,10 @@ public class Drivetrain extends SubsystemBase{
         return io_.r_velocity;
     }
 
+    public double getVelocity() {
+        return io_.avg_velocity;
+    }
+
     public DifferentialDriveKinematics getKinematics() {
         return kinematics_;
     }
@@ -172,7 +192,7 @@ public class Drivetrain extends SubsystemBase{
         io_.r_position = RPosition;
         //io_.angle = angle;
     }
-    
+
 
     enum OutputType {
         PERCENT, VELOCITY
@@ -184,6 +204,7 @@ public class Drivetrain extends SubsystemBase{
         double r_position;
         double l_velocity;
         double r_velocity;
+        double avg_velocity;
 
 
         //Outputs
@@ -193,7 +214,7 @@ public class Drivetrain extends SubsystemBase{
 
     public static class Constants {
         //Motor Controller IDs
-        public static final int kLeftLeaderId = 1; 
+        public static final int kLeftLeaderId = 1;
         public static final int kLeftFollowerId = 2;
         public static final int kRightLeaderId = 3;
         public static final int kRightFollowerId = 4;
@@ -205,15 +226,14 @@ public class Drivetrain extends SubsystemBase{
         //public static double kMass = 65.0; //CHANGE
         //public static double kMOI = 10.0; //CHANGE
 
-        //Control
-        public static double kLeftKs;
-        public static double kLeftKv;
-        public static double kLeftKa;
-        public static double kLeftKp;
-        public static double kRightKs;
-        public static double kRightKv;
-        public static double kRightKa;
-        public static double kRightKp;
+        // Control
+        public static final double kLinearKv = 2.6221;
+        public static final double kLinearKa = 0.29686;
+        public static final double kAngularKv = 2.9518;
+        public static final double kAngularKa = 0.30714;
+
+        public static final double kLeftKp = 0.0001;
+        public static final double kRightKp = 0.0001;
 
         //Output Limit
         public static final double kOutputLimit = 0.3;

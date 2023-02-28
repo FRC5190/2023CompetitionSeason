@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.List;
 import org.ghrobotics.frc2023.subsystems.Gyroscope;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
@@ -31,9 +32,9 @@ public class AutoConfig {
     private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
    
     // Constraints
-  public static final double kMaxVelocity = 3.0;
-  public static final double kMaxAcceleration = 1.8;
-  public static final double kMaxCentripetalAcceleration = 1.5;
+  public static final double kMaxVelocity = 0.5;
+  public static final double kMaxAcceleration = 0.5;
+  public static final double kMaxCentripetalAcceleration = 0.5;
 
   public static final TrajectoryConfig kForwardConfig =
       new TrajectoryConfig(kMaxVelocity, kMaxAcceleration)
@@ -44,9 +45,17 @@ public class AutoConfig {
           .setReversed(true)
           .addConstraint(new CentripetalAccelerationConstraint(kMaxCentripetalAcceleration));
 
-  public final Trajectory kStartToLeftOfBlueTag = TrajectoryGenerator.generateTrajectory
-    (pose_estimator_.getCurrentPose(), List.of(), Arena.tagPositions[0].transformBy(Arena.blueTransform[0][0]).toPose2d(), 
+  public Pose2d finalPos = Arena.tagPositions[0].transformBy(Arena.blueTransform[0]).toPose2d();
+    public Trajectory kStartToLeftOfBlueTag = TrajectoryGenerator.generateTrajectory
+        (pose_estimator_.getCurrentPose(), List.of(), finalPos, 
+        kForwardConfig);
+
+public static final Trajectory kStartToLeftOfBlueTagNV = TrajectoryGenerator.generateTrajectory
+    (new Pose2d(0.522, 0.345, Rotation2d.fromDegrees(271.5)), List.of(),
+    new Pose2d(0.422, 1.000, Rotation2d.fromDegrees(270)),
     kForwardConfig);
 
+    //SmartDashboard.putNumber("End Pos X", finalPos.getX());
+    //SmartDashboard.putNumber("End Pos Y", finalPose.getY());
 
 }

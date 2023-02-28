@@ -31,16 +31,34 @@ public class Telemetry {
     private final PoseEstimator estimator_;
     private final Limelight limelight_;
     private final Field2d field_;
+    private final SendableChooser<String> auto_selector_;
+    private final SendableChooser<String> auto_selector2_;
+    private final SendableChooser<String> auto_selector3_;
 
-public Telemetry(Drivetrain drivetrain, PoseEstimator poseEstimator, Limelight limelight) {
+public Telemetry(Drivetrain drivetrain, PoseEstimator poseEstimator, Limelight limelight, SendableChooser<String> auto_selector, SendableChooser<String> auto_selector2, SendableChooser<String> auto_selector3) {
     tab_ = Shuffleboard.getTab("2023");
 
     drivetrain_ = drivetrain;
     estimator_ = poseEstimator;
     limelight_ = limelight;
+    auto_selector_ = auto_selector;
+    auto_selector2_ = auto_selector2;
+    auto_selector3_ = auto_selector3;
 
     field_ = new Field2d();
     SmartDashboard.putData("Field", field_);
+
+    // Put autonomous mode selector on Shuffleboard.
+    tab_.add("Autonomous Side Selector", auto_selector_)
+        .withSize(3, 2)
+        .withPosition(3, 3);
+
+    tab_.add("Autonomous Height Selector", auto_selector2_)
+        .withSize(3,2)
+        .withPosition(4,4);
+    tab_.add("Balance Choice", auto_selector3_)
+        .withSize(3,2)
+        .withPosition(3,1);
 
     ShuffleboardLayout drivetrain_layout = tab_.getLayout("Drivetrain", BuiltInLayouts.kGrid)
         .withSize(2,2)

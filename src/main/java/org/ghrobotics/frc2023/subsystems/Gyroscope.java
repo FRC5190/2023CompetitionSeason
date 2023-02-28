@@ -4,6 +4,7 @@
 
 package org.ghrobotics.frc2023.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
@@ -18,16 +19,21 @@ public class Gyroscope extends SubsystemBase {
   /** Creates a new Gyroscope. */
   public Gyroscope() {
     gyro_ = new WPI_Pigeon2(17);
-    
+  }
+
+  public double getPitch() {
+    return io_.pitch;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    io_.pitch = gyro_.getPitch();
-    io_.roll = gyro_.getRoll();
+    io_.pitch = Math.toRadians(gyro_.getRoll());
     io_.yaw = gyro_.getYaw();
     io_.angle = gyro_.getRotation2d();
+
+    SmartDashboard.putNumber("Pitch Degrees", Math.toDegrees(io_.pitch));
+    SmartDashboard.putNumber("Heading", io_.angle.getDegrees());
   }
 
   public Rotation2d getGyroRotation() {
@@ -37,10 +43,8 @@ public class Gyroscope extends SubsystemBase {
   public static class PeriodicIO {
     double pitch;
     double yaw;
-    double roll;
     Rotation2d angle;
 
   }
-
 
 }

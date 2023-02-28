@@ -5,12 +5,15 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
@@ -52,8 +55,7 @@ public class PoseEstimator extends SubsystemBase {
   double blueYR;
   double blueZR;
 
-  double[] idValue = new double[6];
-  double id;
+  double idValue;
 
   private final DifferentialDrivePoseEstimator poseEstimator;
 
@@ -80,12 +82,13 @@ public class PoseEstimator extends SubsystemBase {
     limelight_.periodic();
 
     double latency = limelight_.getLatency();
+    double captureLatency = limelight_.getCaptureLatency();
     is_alive_ = alive_filter_.calculate(latency) > 11;
 
     tracking_target_ = limelight_.hasTarget();
     
     if (tracking_target_) {
-      //double timestamp = Timer.getFPGATimestamp() - latency / 1000;
+      double timestamp = Timer.getFPGATimestamp() - (latency / 1000)  - (captureLatency / 1000);
       bluePose = limelight_.getBlueBotPose();
       blueX = bluePose[0];
       blueY = bluePose[1];
@@ -95,18 +98,24 @@ public class PoseEstimator extends SubsystemBase {
       blueZR = bluePose[5];
 
       idValue = limelight_.getID();
-      id = idValue[5];
 
-      Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
-      poseEstimator.addVisionMeasurement(botPose, latency);
+      Pose3d bluePose3d = new Pose3d(blueX, blueY, blueZ, new Rotation3d(blueXR, blueYR, blueZR));
+
+      Pose2d botPose = bluePose3d.toPose2d();
+
+      SmartDashboard.putNumber("Vision Position X", botPose.getX());
+      SmartDashboard.putNumber("Vision Position Y", botPose.getY());
+
+      //Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
+      poseEstimator.addVisionMeasurement(botPose, timestamp);
       // Transform3d camToTarget = target.getBestCameraToTarget();
       // Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
     }
-    else{
     poseEstimator.update(gyro_.getGyroRotation(), 
       drivetrain_.getLeftPosition(), 
       drivetrain_.getRightPosition());
-    }
+
+
   }
 
   public Pose2d getCurrentPose(){
@@ -122,10 +131,10 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public double getIDValue(){
-    return id;
+    return idValue;
   }
 
-  public static void setCurrentPose(Pose2d newPose){
+  public void setCurrentPose(Pose2d newPose){
     poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(), 
       drivetrain_.getRightPosition(), newPose);
   }
