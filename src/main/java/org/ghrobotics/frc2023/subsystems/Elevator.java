@@ -59,13 +59,14 @@ public class Elevator extends SubsystemBase {
         double a = (v - getVelocity()) / 0.02;
         double ff = feedforward.calculate(v, a);
 
-        leader_.setVoltage(feedforward.calculate(v, a));
+        leader_.setVoltage(ff);
 
         pid_controller_.setReference(v, ControlType.kVelocity, 0, ff);
     }
 
     public double getVelocity() {
         return encoder_.getVelocity();
+        // convert from rpm
     }
 
     // public void setVelocity(double v) {
@@ -107,6 +108,7 @@ public class Elevator extends SubsystemBase {
         public static final double kG = 0; // volts
         public static final double kV = 0; // volts * sec / distance 
         public static final double kA = 0; // volts * sec^2 / distance
+        // kS, kV, kA taken from 2/10 sysid calculations - may need to rerun
 
         // Feedback
         public static final double kP = 0;
