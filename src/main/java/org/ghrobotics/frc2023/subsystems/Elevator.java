@@ -12,7 +12,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-    // use elevator feedforward
 
     // Motor Controllers
     private final CANSparkMax leader_;
@@ -38,7 +37,9 @@ public class Elevator extends SubsystemBase {
         follower_.follow(leader_);
 
         encoder_ = leader_.getEncoder();
-        // add conversion factor based on gear ratio
+        // add conversion factor based on gear ratio - needs to be fixed
+        encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
+        encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
 
         feedforward = new ElevatorFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
         pid_controller_ = leader_.getPIDController();
@@ -48,7 +49,6 @@ public class Elevator extends SubsystemBase {
 
     public double getPosition() {
         return encoder_.getPosition();
-        // convert from encoder values to elevator position
     }
 
     public void setPosition(SuperstructureState state) {
@@ -97,14 +97,16 @@ public class Elevator extends SubsystemBase {
         public static final double kMaxPosition = 0;
         // change based on height
 
-        public static final double kOutputLimit = 0;
+        // public static final double kOutputLimit = 0;
+
+        // Gear ratio
+        public static final double kGearRatio = 20;
 
         // Feedforward 
-        public static final double kS = 0.26197; // volts
-        public static final double kG = 0; // volts - not in sysid?
-        public static final double kV = 1.3623; // volts * sec / distance 
-        public static final double kA = 0.18601; // volts * sec^2 / distance
-        // kS, kV, kA taken from 2/10 sysid calculations - may need to rerun
+        public static final double kS = 0; // volts
+        public static final double kG = 0; // volts
+        public static final double kV = 0; // volts * sec / distance 
+        public static final double kA = 0; // volts * sec^2 / distance
 
         // Feedback
         public static final double kP = 0;
