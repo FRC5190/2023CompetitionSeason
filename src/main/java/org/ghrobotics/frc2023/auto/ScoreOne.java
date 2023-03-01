@@ -5,6 +5,9 @@
 package org.ghrobotics.frc2023.auto;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+import org.ghrobotics.frc2023.Arena;
+import org.ghrobotics.frc2023.Limelight;
 import org.ghrobotics.frc2023.commands.GoToTarget;
 import org.ghrobotics.frc2023.commands.Score;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
@@ -17,11 +20,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ScoreOne extends SequentialCommandGroup {
   /** Creates a new ScoreOne. */
-  public ScoreOne(Drivetrain drivetrain, PoseEstimator poseEstimator, Gyroscope gyroscope) {
+  public ScoreOne(Drivetrain drivetrain, PoseEstimator poseEstimator, Gyroscope gyroscope, String targetSide, Limelight limelight, Arena arena) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-    new GoToTarget(), 
+     new GoToTarget(poseEstimator, drivetrain, gyroscope, targetSide, limelight, arena), 
      new WaitCommand(2),
      new Score(poseEstimator, drivetrain)
     );

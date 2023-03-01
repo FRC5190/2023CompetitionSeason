@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2023.auto;
 
+import org.ghrobotics.frc2023.Arena;
+import org.ghrobotics.frc2023.Limelight;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.GoToChargeStation;
 import org.ghrobotics.frc2023.commands.GoToTarget;
@@ -21,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ScoreOneAndBalance extends SequentialCommandGroup {
   /** Creates a new ScoreOneAndBalance. */
-  public ScoreOneAndBalance(String targetSide, String targetHeight, Drivetrain drivetrain, PoseEstimator poseEstimator, Gyroscope gyroscope) {
+  public ScoreOneAndBalance(String targetSide, String targetHeight, Drivetrain drivetrain, PoseEstimator poseEstimator, Gyroscope gyroscope, Limelight limelight, Arena arena) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -32,13 +34,13 @@ public class ScoreOneAndBalance extends SequentialCommandGroup {
       (poseEstimator.getCurrentPose(), List.of(), Arena.tagPositions[5].transformBy(Arena.blueTransform[0]).toPose2d(), 
       AutoConfig.kForwardConfig))*/
      // new DriveTrajectory(drivetrain, poseEstimator, auto_config_.kStartToLeftOfBlueTag)
-     new GoToTarget(), 
-     new WaitCommand(2),
+     new GoToTarget(poseEstimator, drivetrain, gyroscope, targetSide, limelight, arena)
+     /*new WaitCommand(2),
      new Score(poseEstimator, drivetrain),
      new WaitCommand(2),
      new GoToChargeStation(),
      new WaitCommand(2),
-     new DriveBalance(drivetrain, gyroscope)
+     new DriveBalance(drivetrain, gyroscope)*/
     );
   }
 }

@@ -31,6 +31,7 @@ public class GoToTarget extends CommandBase {
   private final Arena arena_;
   private Pose2d end_position_;
   private Pose2d start_position_;
+  private Trajectory trajectory_;
 
   /** Creates a new GoToTarget. */
   public GoToTarget(PoseEstimator poseEstimator, Drivetrain drivetrain, Gyroscope gyroscope, String sideChoice, Limelight limelight, Arena arena) {
@@ -69,14 +70,21 @@ public class GoToTarget extends CommandBase {
       SmartDashboard.putNumber("End Position (X)", end_position_.getX());
       SmartDashboard.putNumber("End Position (Y)", end_position_.getY());
 
+      trajectory_ = TrajectoryGenerator.generateTrajectory
+      (start_position_, List.of(), end_position_, AutoConfig.kForwardConfig);
+
+      new DriveTrajectory(drivetrain_, pose_estimator_, trajectory_);
     }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    new DriveTrajectory(drivetrain_, pose_estimator_, TrajectoryGenerator.generateTrajectory
-      (start_position_, List.of(), end_position_, AutoConfig.kForwardConfig));
+
+  }
+
+  public Trajectory getTrajectory(){
+    return trajectory_;
   }
 
   // Called once the command ends or is interrupted.

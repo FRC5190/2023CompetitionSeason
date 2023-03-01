@@ -29,8 +29,8 @@ public class Arena {
 
    public static final Transform3d[] blueTransform = {
                     new Transform3d(new Translation3d(0.6096, -0.7366, -0.46272), new Rotation3d()), //Left
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //Center
-                    new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()),//Right
+                    new Transform3d(new Translation3d(0.6096, 0, -0.46272), new Rotation3d()), //Center
+                    new Transform3d(new Translation3d(0.6096, 0.7366, -0.46272), new Rotation3d()),//Right
                     }; 
 
     public static final Transform3d[] redTransform = {

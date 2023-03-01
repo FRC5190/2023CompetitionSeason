@@ -135,7 +135,8 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public void setCurrentPose(Pose2d newPose){
-    poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(), 
-      drivetrain_.getRightPosition(), newPose);
+   // poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(), 
+    //  drivetrain_.getRightPosition(), newPose);
+    poseEstimator.resetPosition(new Rotation2d(), 0, 0, newPose);
   }
 }

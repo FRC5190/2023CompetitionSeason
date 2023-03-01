@@ -1,0 +1,44 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/2023/Autonomous Height Selector": "String Chooser",
+      "/Shuffleboard/2023/Autonomous Side Selector": "String Chooser",
+      "/Shuffleboard/2023/Balance Choice": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "image": "C:\\Users\\sdiya\\FRC5190Programming\\2023Code\\2023-field.png",
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "2023": {
+          "Autonomous Height Selector": {
+            "open": true
+          },
+          "Autonomous Side Selector": {
+            "open": true
+          },
+          "Balance Choice": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  }
+}
