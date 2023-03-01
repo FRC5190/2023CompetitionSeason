@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
 
         encoder_ = leader_.getEncoder();
         // add conversion factor based on gear ratio - needs to be fixed
-        encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
+        encoder_.setPositionConversionFactor(2 * Math.PI * Constants.kPulleyDiameter / Constants.kGearRatio);
         encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
 
         feedforward = new ElevatorFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
@@ -100,8 +100,9 @@ public class Elevator extends SubsystemBase {
 
         // public static final double kOutputLimit = 0;
 
-        // Gear ratio
+        // Encoder conversions
         public static final double kGearRatio = 20;
+        public static final double kPulleyDiameter = 0.045466;
 
         // Feedforward 
         public static final double kS = 0; // volts

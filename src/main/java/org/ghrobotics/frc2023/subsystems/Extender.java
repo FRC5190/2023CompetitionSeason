@@ -24,7 +24,7 @@ public class Extender extends SubsystemBase {
   private final RelativeEncoder encoder_;
 
   // Feedforward
-  private final SimpleMotorFeedforward feedforward;
+  private final SimpleMotorFeedforward feedforward_;
 
   // Feedback
   private final SparkMaxPIDController pid_controller_;
@@ -41,7 +41,7 @@ public class Extender extends SubsystemBase {
       encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
       encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
       
-      feedforward = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
+      feedforward_ = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
       pid_controller_ = leader_.getPIDController();
       pid_controller_.setP(Constants.kP);
 
@@ -57,9 +57,9 @@ public class Extender extends SubsystemBase {
 
       double v = dist / 0.02;
       double a = (v - getVelocity()) / 0.02;
-      double ff = feedforward.calculate(v, a);
+      double ff = feedforward_.calculate(v, a);
 
-      leader_.setVoltage(feedforward.calculate(v, a));
+      leader_.setVoltage(feedforward_.calculate(v, a));
 
       pid_controller_.setReference(v, ControlType.kVelocity, 0, ff);
   }
@@ -85,7 +85,6 @@ public class Extender extends SubsystemBase {
   }
 
   public static class Constants {
-      public static final int kFollowerId = 0;
       public static final int kLeaderId = 0;
 
       public static final double kMinPosition = 0;

@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
   private final Limelight limelight_ = new Limelight("limelight");
   private final Gyroscope gyro_ = new Gyroscope();
   private final Arena arena_ = new Arena();
+  private final Superstructure superstructure_ = new Superstructure();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
   private final SendableChooser<String> auto_selector_side = new SendableChooser<>();
   private final SendableChooser<String> auto_selector_height = new SendableChooser<>();
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
 
     telemetry_.periodic();
     limelight_.periodic();
+    superstructure_.periodic();
 
     //new Trigger(driver_controller_::getBButton).onTrue(new ScoreConeLeftHigh(pose_estimator_,drivetrain_));
     SmartDashboard.putNumber("Velocity", drivetrain_.getVelocity());

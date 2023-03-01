@@ -62,5 +62,14 @@ public class Arena {
  6 | 7 | 8
 */
 
+    public static class ArenaConstants {
+        // meters
+        public static final double kMidCenterHeight = 0.87;
+        public static final double kMidSideHeight = 0.87;
+
+        public static final double kHighCenterHeight = 1.17;
+        public static final double kHighSideHeight = 1.17;
+
+    }
 
 }
