@@ -4,37 +4,40 @@
 
 package org.ghrobotics.frc2023.commands;
 
+import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
-/**
- * Add your docs here.
- */
 public class DriveTrajectory extends CommandBase {
+  // Subsystems
   private final Drivetrain drivetrain_;
-  private final PoseEstimator pose_estimator;
+  private final PoseEstimator pose_estimator_;
 
   // Objects needed to track trajectory.
   private final Trajectory trajectory_;
+  private final RamseteController controller_;
   private final Timer timer_;
 
-  public DriveTrajectory(Drivetrain drivetrain, PoseEstimator poseEstimator,
+  public DriveTrajectory(Drivetrain drivetrain, PoseEstimator pose_estimator,
                          Trajectory trajectory) {
 
+    // Assign member variables
     drivetrain_ = drivetrain;
-    pose_estimator = poseEstimator;
+    pose_estimator_ = pose_estimator;
     trajectory_ = trajectory;
 
+    // Initialize timer and controller
+    controller_ = new RamseteController();
     timer_ = new Timer();
 
+    // Add subsystem requirements
     addRequirements(drivetrain_);
   }
 
@@ -53,22 +56,18 @@ public class DriveTrajectory extends CommandBase {
     Trajectory.State desired_state = trajectory_.sample(t);
 
     // Get robot pose at the current time.
-    Pose2d current_state = pose_estimator.getCurrentPose();
+    Pose2d current_state = pose_estimator_.getCurrentPose();
 
     // Calculate chassis speeds to track desired state.
-    ChassisSpeeds wanted_chassis_speeds = drivetrain_.getRamseteController().calculate(
-        current_state, desired_state);
+    ChassisSpeeds wanted_chassis_speeds = controller_.calculate(current_state, desired_state);
 
     // Convert to wheel speeds.
     DifferentialDriveWheelSpeeds wanted_wheel_speeds = drivetrain_.getKinematics().toWheelSpeeds(
         wanted_chassis_speeds);
 
-    SmartDashboard.putNumber("Wanted Wheel Speeds Left", wanted_wheel_speeds.leftMetersPerSecond);
-    SmartDashboard.putNumber("Wanted Wheel Speeds Right", wanted_wheel_speeds.rightMetersPerSecond);
-
     // Set wheel speeds on drivetrain.
-     /* drivetrain_.setVelocity(wanted_wheel_speeds.leftMetersPerSecond,
-          wanted_wheel_speeds.rightMetersPerSecond);*/
+    drivetrain_.setVelocity(wanted_wheel_speeds.leftMetersPerSecond,
+        wanted_wheel_speeds.rightMetersPerSecond);
   }
 
   @Override
@@ -83,7 +82,7 @@ public class DriveTrajectory extends CommandBase {
 
     // Debug: print error
     Pose2d end_pose = trajectory_.sample(trajectory_.getTotalTimeSeconds()).poseMeters;
-    Pose2d robot_pose = pose_estimator.getCurrentPose();
+    Pose2d robot_pose = pose_estimator_.getCurrentPose();
 
     System.out.printf("X Error (in): %3.2f, Y Error (in): %3.2f, Theta Error (deg): %3.2f\n",
         Units.metersToFeet(end_pose.getX() - robot_pose.getX()),
