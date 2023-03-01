@@ -7,7 +7,9 @@ package org.ghrobotics.frc2023.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class GoToChargeStation extends CommandBase {
-  /** Creates a new GoToChargeStation. */
+  /**
+   * Creates a new GoToChargeStation.
+   */
   public GoToChargeStation() {
     // Use addRequirements() here to declare subsystem dependencies.
   }

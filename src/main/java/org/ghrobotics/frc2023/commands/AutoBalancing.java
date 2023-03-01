@@ -5,7 +5,6 @@
 package org.ghrobotics.frc2023.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.Gyroscope;
 
@@ -14,7 +13,9 @@ public class AutoBalancing extends CommandBase {
   public final Gyroscope gyro_;
   public final Drivetrain drivetrain_;
 
-  /** Creates a new AutoBalancing. */
+  /**
+   * Creates a new AutoBalancing.
+   */
   public AutoBalancing(Gyroscope gyro, Drivetrain drivetrain) {
     gyro_ = gyro;
     drivetrain_ = drivetrain;

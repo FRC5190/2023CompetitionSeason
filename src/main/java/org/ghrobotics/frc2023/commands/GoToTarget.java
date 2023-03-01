@@ -4,23 +4,19 @@
 
 package org.ghrobotics.frc2023.commands;
 
-import org.ghrobotics.frc2023.auto.AutoConfig;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.List;
 import org.ghrobotics.frc2023.Arena;
 import org.ghrobotics.frc2023.Limelight;
+import org.ghrobotics.frc2023.auto.AutoConfig;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.Gyroscope;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.util.List;
 
 public class GoToTarget extends CommandBase {
   private final Drivetrain drivetrain_;
@@ -33,8 +29,11 @@ public class GoToTarget extends CommandBase {
   private Pose2d start_position_;
   private Trajectory trajectory_;
 
-  /** Creates a new GoToTarget. */
-  public GoToTarget(PoseEstimator poseEstimator, Drivetrain drivetrain, Gyroscope gyroscope, String sideChoice, Limelight limelight, Arena arena) {
+  /**
+   * Creates a new GoToTarget.
+   */
+  public GoToTarget(PoseEstimator poseEstimator, Drivetrain drivetrain, Gyroscope gyroscope,
+                    String sideChoice, Limelight limelight, Arena arena) {
     // Use addRequirements() here to declare subsystem dependencies.
     drivetrain_ = drivetrain;
     pose_estimator_ = poseEstimator;
@@ -62,7 +61,7 @@ public class GoToTarget extends CommandBase {
       } else if (target_side_choice_ == "Right") {
         end_position_ = tagPose.transformBy(Arena.blueTransform[2]).toPose2d();
       }
-      
+
       start_position_ = pose_estimator_.getCurrentPose();
 
       SmartDashboard.putNumber("Start Position (X)", start_position_.getX());
@@ -71,7 +70,7 @@ public class GoToTarget extends CommandBase {
       SmartDashboard.putNumber("End Position (Y)", end_position_.getY());
 
       trajectory_ = TrajectoryGenerator.generateTrajectory
-      (start_position_, List.of(), end_position_, AutoConfig.kForwardConfig);
+          (start_position_, List.of(), end_position_, AutoConfig.kForwardConfig);
 
       new DriveTrajectory(drivetrain_, pose_estimator_, trajectory_);
     }
@@ -83,7 +82,7 @@ public class GoToTarget extends CommandBase {
 
   }
 
-  public Trajectory getTrajectory(){
+  public Trajectory getTrajectory() {
     return trajectory_;
   }
 

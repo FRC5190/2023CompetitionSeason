@@ -4,31 +4,20 @@
 
 package org.ghrobotics.frc2023.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
-
-import org.ghrobotics.frc2023.Limelight;
-import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import org.ghrobotics.frc2023.subsystems.Drivetrain;
-import org.ghrobotics.frc2023.subsystems.Gyroscope;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.ghrobotics.frc2023.Limelight;
 
 public class PoseEstimator extends SubsystemBase {
 
@@ -39,8 +28,10 @@ public class PoseEstimator extends SubsystemBase {
   private final LinearFilter alive_filter_;
   private boolean is_alive_ = false;
 
-  private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-  private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+  private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05,
+      Units.degreesToRadians(5));
+  private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5,
+      Units.degreesToRadians(10));
 
   double[] camPose = new double[6];
   double camX;
@@ -59,7 +50,9 @@ public class PoseEstimator extends SubsystemBase {
 
   private final DifferentialDrivePoseEstimator poseEstimator;
 
-  /** Creates a new PoseEstimator. */
+  /**
+   * Creates a new PoseEstimator.
+   */
   public PoseEstimator(Limelight limelight, Drivetrain drivetrain, Gyroscope gyroscope) {
     limelight_ = limelight;
     drivetrain_ = drivetrain;
@@ -67,12 +60,12 @@ public class PoseEstimator extends SubsystemBase {
 
     alive_filter_ = LinearFilter.movingAverage(10);
 
-    poseEstimator =  new DifferentialDrivePoseEstimator(
+    poseEstimator = new DifferentialDrivePoseEstimator(
         drivetrain_.kinematics_,
         new Rotation2d(0), //CHANGE
         drivetrain_.getLeftPosition(),
         drivetrain_.getRightPosition(),
-        new Pose2d(0,0,new Rotation2d(0)),
+        new Pose2d(0, 0, new Rotation2d(0)),
         stateStdDevs, visionMeasurementStdDevs);
   }
 
@@ -86,9 +79,9 @@ public class PoseEstimator extends SubsystemBase {
     is_alive_ = alive_filter_.calculate(latency) > 11;
 
     tracking_target_ = limelight_.hasTarget();
-    
+
     if (tracking_target_) {
-      double timestamp = Timer.getFPGATimestamp() - (latency / 1000)  - (captureLatency / 1000);
+      double timestamp = Timer.getFPGATimestamp() - (latency / 1000) - (captureLatency / 1000);
       bluePose = limelight_.getBlueBotPose();
       blueX = bluePose[0];
       blueY = bluePose[1];
@@ -111,31 +104,31 @@ public class PoseEstimator extends SubsystemBase {
       // Transform3d camToTarget = target.getBestCameraToTarget();
       // Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
     }
-    poseEstimator.update(gyro_.getGyroRotation(), 
-      drivetrain_.getLeftPosition(), 
-      drivetrain_.getRightPosition());
+    poseEstimator.update(gyro_.getGyroRotation(),
+        drivetrain_.getLeftPosition(),
+        drivetrain_.getRightPosition());
 
 
   }
 
-  public Pose2d getCurrentPose(){
+  public Pose2d getCurrentPose() {
     return poseEstimator.getEstimatedPosition();
   }
 
-  public double getCamX(){
+  public double getCamX() {
     return camX;
   }
 
-  public double getCamY(){
+  public double getCamY() {
     return camY;
   }
 
-  public double getIDValue(){
+  public double getIDValue() {
     return idValue;
   }
 
-  public void setCurrentPose(Pose2d newPose){
-   // poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(), 
+  public void setCurrentPose(Pose2d newPose) {
+    // poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(),
     //  drivetrain_.getRightPosition(), newPose);
     poseEstimator.resetPosition(new Rotation2d(), 0, 0, newPose);
   }

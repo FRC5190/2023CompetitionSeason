@@ -6,7 +6,6 @@ package org.ghrobotics.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +18,9 @@ public class Grabber extends SubsystemBase {
 
   private final PeriodicIO io_ = new PeriodicIO();
 
-  /** Creates a new Grabber. */
+  /**
+   * Creates a new Grabber.
+   */
   public Grabber() {
 
     left_leader_ = new CANSparkMax(0, MotorType.kBrushless);
@@ -42,5 +43,5 @@ public class Grabber extends SubsystemBase {
 
   public static class PeriodicIO {}
 
-  public static class Constants{}
+  public static class Constants {}
 }

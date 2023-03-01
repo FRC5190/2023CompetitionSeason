@@ -7,7 +7,9 @@ package org.ghrobotics.frc2023.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-  /** Creates a new Elevator. */
+  /**
+   * Creates a new Elevator.
+   */
   public Elevator() {
 
     //2 neos
@@ -16,7 +18,8 @@ public class Elevator extends SubsystemBase {
     //min and max postion --> constants
     //modes --> rest, target mode
     //target mode logic --> current pose vs target pose difference
-    //upon button click, command runs and that command has mode.target mode, and also the target position
+    //upon button click, command runs and that command has mode.target mode, and also the target
+    // position
 
   }
 

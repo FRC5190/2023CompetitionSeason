@@ -4,11 +4,10 @@
 
 package org.ghrobotics.frc2023.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Gyroscope extends SubsystemBase {
 
@@ -16,7 +15,9 @@ public class Gyroscope extends SubsystemBase {
 
   private final PeriodicIO io_ = new PeriodicIO();
 
-  /** Creates a new Gyroscope. */
+  /**
+   * Creates a new Gyroscope.
+   */
   public Gyroscope() {
     gyro_ = new WPI_Pigeon2(17);
   }

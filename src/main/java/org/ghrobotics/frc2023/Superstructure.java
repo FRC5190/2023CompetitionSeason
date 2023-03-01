@@ -4,8 +4,10 @@
 
 package org.ghrobotics.frc2023;
 
-/** Add your docs here. */
+/**
+ * Add your docs here.
+ */
 public class Superstructure {
 
-    
+
 }
