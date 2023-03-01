@@ -11,9 +11,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
-import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
@@ -22,34 +20,32 @@ import static com.revrobotics.CANSparkMax.ControlType;
  * Add your docs here.
  */
 public class Drivetrain extends SubsystemBase {
-  //Motor Controllers
+  // Motor Controllers
   private final CANSparkMax left_leader_;
   private final CANSparkMax left_follower_;
   private final CANSparkMax right_leader_;
   private final CANSparkMax right_follower_;
 
-  //Sensors
+  // Sensors
   private final RelativeEncoder left_encoder_;
   private final RelativeEncoder right_encoder_;
 
-  //Trajectory Tracking
-  public final DifferentialDriveKinematics kinematics_;
-  private final RamseteController ramsete_controller_;
-
-  //Control
+  // Control
   private final SparkMaxPIDController left_pid_controller_;
   private final SparkMaxPIDController right_pid_controller_;
+  public final DifferentialDriveKinematics kinematics_;
   private final DifferentialDriveFeedforward ff_;
 
-  //Output Limit
-  private final boolean limit_output = false;
+  // Output Limit
+  private final boolean limit_output_ = false;
 
-  //IO
+  // IO
   private OutputType output_type_ = OutputType.PERCENT;
   private final PeriodicIO io_ = new PeriodicIO();
 
+  // Constructor
   public Drivetrain() {
-    //Initialize motor controllers
+    // Initialize motor controllers
     left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
     left_leader_.restoreFactoryDefaults();
     left_leader_.setIdleMode(IdleMode.kBrake);
@@ -74,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
     right_follower_.enableVoltageCompensation(12);
     right_follower_.follow(right_leader_);
 
-    //Initialize encoders
+    // Initialize encoders
     left_encoder_ = left_leader_.getEncoder();
     left_encoder_.setPositionConversionFactor(
         2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio);
@@ -99,27 +95,24 @@ public class Drivetrain extends SubsystemBase {
         Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa
     );
 
-    //Initialize Trajectory Tracking
+    // Initialize kinematics
     kinematics_ = new DifferentialDriveKinematics(Constants.kTrackWidth);
-    ramsete_controller_ = new RamseteController();
   }
 
   @Override
   public void periodic() {
-    //Read inputs
+    // Read inputs
     io_.l_position = left_encoder_.getPosition();
     io_.r_position = right_encoder_.getPosition();
     io_.l_velocity = left_encoder_.getVelocity();
     io_.r_velocity = right_encoder_.getVelocity();
 
-    io_.avg_velocity = (io_.l_velocity + io_.r_velocity / 2);
-
     switch (output_type_) {
       case PERCENT:
-        left_leader_.set(limit_output ?
+        left_leader_.set(limit_output_ ?
             MathUtil.clamp(io_.l_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
             io_.l_demand);
-        right_leader_.set(limit_output ?
+        right_leader_.set(limit_output_ ?
             MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
             io_.r_demand);
         break;
@@ -134,18 +127,23 @@ public class Drivetrain extends SubsystemBase {
             wheel_voltages.right);
         break;
     }
-    SmartDashboard.putNumber("L Velocity", io_.l_velocity);
-    SmartDashboard.putNumber("R Velocity", io_.r_velocity);
-    SmartDashboard.putNumber("L Position", io_.l_position);
-    SmartDashboard.putNumber("R Position", io_.r_position);
   }
 
+  // Percent Setter
   public void setPercent(double l, double r) {
     output_type_ = OutputType.PERCENT;
     io_.l_demand = l;
     io_.r_demand = r;
   }
 
+  // Velocity Setter
+  public void setVelocity(double l, double r) {
+    output_type_ = OutputType.VELOCITY;
+    io_.l_demand = l;
+    io_.r_demand = r;
+  }
+
+  // Brake Mode Setter
   public void setBrakeMode(boolean value) {
     IdleMode mode = value ? IdleMode.kBrake : IdleMode.kCoast;
     left_leader_.setIdleMode(mode);
@@ -154,61 +152,48 @@ public class Drivetrain extends SubsystemBase {
     right_follower_.setIdleMode(mode);
   }
 
-  public void setVelocity(double l, double r) {
-    output_type_ = OutputType.VELOCITY;
-    io_.l_demand = l;
-    io_.r_demand = r;
-  }
-
+  // Left Position Getter
   public double getLeftPosition() {
     return io_.l_position;
   }
 
+  // Right Position Getter
   public double getRightPosition() {
     return io_.r_position;
   }
 
+  // Left Velocity Getter
   public double getLeftVelocity() {
     return io_.l_velocity;
   }
 
+  // Right Velocity Getter
   public double getRightVelocity() {
     return io_.r_velocity;
   }
 
-  public double getVelocity() {
-    return io_.avg_velocity;
+  // Average Velocity Getter
+  public double getAverageVelocity() {
+    return (io_.l_velocity + io_.r_velocity) / 2;
   }
 
+  // Kinematics Getter
   public DifferentialDriveKinematics getKinematics() {
     return kinematics_;
   }
-
-  public RamseteController getRamseteController() {
-    return ramsete_controller_;
-  }
-
-  public void updateRobotPose(double LPosition, double RPosition, double angle) {
-    io_.l_position = LPosition;
-    io_.r_position = RPosition;
-    //io_.angle = angle;
-  }
-
 
   enum OutputType {
     PERCENT, VELOCITY
   }
 
   public static class PeriodicIO {
-    //Inputs
+    // Inputs
     double l_position;
     double r_position;
     double l_velocity;
     double r_velocity;
-    double avg_velocity;
 
-
-    //Outputs
+    // Outputs
     double l_demand;
     double r_demand;
   }
@@ -223,9 +208,7 @@ public class Drivetrain extends SubsystemBase {
     //Hardware
     public static double kGearRatio = 10.18;
     public static double kWheelRadius = 0.0762;
-    public static double kTrackWidth = 0.759; //CHANGE
-    //public static double kMass = 65.0; //CHANGE
-    //public static double kMOI = 10.0; //CHANGE
+    public static double kTrackWidth = 0.65921;
 
     // Control
     public static final double kLinearKv = 2.6221;
@@ -236,7 +219,7 @@ public class Drivetrain extends SubsystemBase {
     public static final double kLeftKp = 0.0001;
     public static final double kRightKp = 0.0001;
 
-    //Output Limit
+    // Output Limit
     public static final double kOutputLimit = 0.3;
   }
 }
