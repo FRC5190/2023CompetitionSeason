@@ -15,121 +15,112 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.ghrobotics.frc2023.Limelight;
 
 public class PoseEstimator extends SubsystemBase {
-
-  private final Limelight limelight_;
+  // Subsystems
   private final Drivetrain drivetrain_;
-  private final Gyroscope gyro_;
-  private boolean tracking_target_ = false;
+  private final Limelight limelight_;
+
+  // Alive Filter for Limelight
   private final LinearFilter alive_filter_;
   private boolean is_alive_ = false;
 
+  // Pose Estimator Confidence Values
   private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05,
       Units.degreesToRadians(5));
   private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5,
       Units.degreesToRadians(10));
 
-  double[] camPose = new double[6];
-  double camX;
-  double camY;
-  double camZ;
+  // Pose Estimator
+  private final DifferentialDrivePoseEstimator pose_estimator_;
 
-  double[] bluePose = new double[6];
-  double blueX;
-  double blueY;
-  double blueZ;
-  double blueXR;
-  double blueYR;
-  double blueZR;
+  // Reset Position From Vision
+  private boolean reset_position_from_vision_ = false;
 
-  double idValue;
+  // Primary Tag ID
+  private int primary_tag_id_ = -1;
 
-  private final DifferentialDrivePoseEstimator poseEstimator;
-
-  /**
-   * Creates a new PoseEstimator.
-   */
-  public PoseEstimator(Limelight limelight, Drivetrain drivetrain, Gyroscope gyroscope) {
-    limelight_ = limelight;
+  // Constructor
+  public PoseEstimator(Drivetrain drivetrain, Limelight limelight) {
+    // Assign member variables
     drivetrain_ = drivetrain;
-    gyro_ = gyroscope;
+    limelight_ = limelight;
 
+    // Initialize alive filter
     alive_filter_ = LinearFilter.movingAverage(10);
 
-    poseEstimator = new DifferentialDrivePoseEstimator(
-        drivetrain_.kinematics_,
-        new Rotation2d(0), //CHANGE
-        drivetrain_.getLeftPosition(),
+    // Initialize pose estimator
+    pose_estimator_ = new DifferentialDrivePoseEstimator(drivetrain_.getKinematics(),
+        new Rotation2d(drivetrain_.getAngle()), drivetrain_.getLeftPosition(),
         drivetrain_.getRightPosition(),
-        new Pose2d(0, 0, new Rotation2d(0)),
-        stateStdDevs, visionMeasurementStdDevs);
+        new Pose2d(), stateStdDevs, visionMeasurementStdDevs);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    limelight_.periodic();
+    // Get limelight processing and capture latency
+    double processing_latency = limelight_.getProcessingLatency();
+    double capture_latency = limelight_.getCaptureLatency();
 
-    double latency = limelight_.getLatency();
-    double captureLatency = limelight_.getCaptureLatency();
-    is_alive_ = alive_filter_.calculate(latency) > 11;
+    // Update alive filter
+    is_alive_ = alive_filter_.calculate(processing_latency) > 11;
 
-    tracking_target_ = limelight_.hasTarget();
+    // Update the pose estimator with new measurements if we have a new target.
+    if (limelight_.hasTarget()) {
+      // Calculate timestamp of capture
+      double timestamp =
+          Timer.getFPGATimestamp() - (processing_latency / 1000) - (capture_latency / 1000);
 
-    if (tracking_target_) {
-      double timestamp = Timer.getFPGATimestamp() - (latency / 1000) - (captureLatency / 1000);
-      bluePose = limelight_.getBlueBotPose();
-      blueX = bluePose[0];
-      blueY = bluePose[1];
-      blueZ = bluePose[2];
-      blueXR = bluePose[3];
-      blueYR = bluePose[4];
-      blueZR = bluePose[5];
+      // Update primary tag id
+      primary_tag_id_ = limelight_.getID();
 
-      idValue = limelight_.getID();
+      // Use the robot pose with blue alliance origin
+      double[] raw_pose = limelight_.getBlueBotPose();
 
-      Pose3d bluePose3d = new Pose3d(blueX, blueY, blueZ, new Rotation3d(blueXR, blueYR, blueZR));
+      // Extract 3d pose from double[]
+      Pose3d robot_pose = new Pose3d(raw_pose[0], raw_pose[1], raw_pose[2],
+          new Rotation3d(raw_pose[3], raw_pose[4], raw_pose[5]));
 
-      Pose2d botPose = bluePose3d.toPose2d();
-
-      SmartDashboard.putNumber("Vision Position X", botPose.getX());
-      SmartDashboard.putNumber("Vision Position Y", botPose.getY());
-
-      //Pose2d botPose = new Pose2d(blueX, blueY, new Rotation2d(blueXR, blueYR));
-      poseEstimator.addVisionMeasurement(botPose, timestamp);
-      // Transform3d camToTarget = target.getBestCameraToTarget();
-      // Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+      // Check whether we want to reset position from vision
+      if (reset_position_from_vision_) {
+        resetPosition(robot_pose.toPose2d());
+        reset_position_from_vision_ = false;
+      } else {
+        // Add vision measurement to estimator
+        pose_estimator_.addVisionMeasurement(robot_pose.toPose2d(), timestamp);
+      }
     }
-    poseEstimator.update(gyro_.getGyroRotation(),
-        drivetrain_.getLeftPosition(),
+
+    // Add encoders / gyro measurement
+    pose_estimator_.update(new Rotation2d(drivetrain_.getAngle()), drivetrain_.getLeftPosition(),
         drivetrain_.getRightPosition());
-
-
   }
 
-  public Pose2d getCurrentPose() {
-    return poseEstimator.getEstimatedPosition();
+  // Vision Alive Getter
+  public boolean isVisionAlive() {
+    return is_alive_;
   }
 
-  public double getCamX() {
-    return camX;
+  // Primary Tag ID Getter
+  public int getVisionPrimaryTagId() {
+    return primary_tag_id_;
   }
 
-  public double getCamY() {
-    return camY;
+  // Position Getter
+  public Pose2d getPosition() {
+    return pose_estimator_.getEstimatedPosition();
   }
 
-  public double getIDValue() {
-    return idValue;
+  // Reset Position
+  public void resetPosition(Pose2d pose) {
+    pose_estimator_.resetPosition(new Rotation2d(drivetrain_.getAngle()),
+        drivetrain_.getLeftPosition(),
+        drivetrain_.getRightPosition(), pose);
   }
 
-  public void setCurrentPose(Pose2d newPose) {
-    // poseEstimator.resetPosition(gyro_.getGyroRotation(), drivetrain_.getLeftPosition(),
-    //  drivetrain_.getRightPosition(), newPose);
-    poseEstimator.resetPosition(new Rotation2d(), 0, 0, newPose);
+  // Reset Position from Vision
+  public void resetPositionFromVision() {
+    reset_position_from_vision_ = true;
   }
 }

@@ -12,54 +12,48 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import java.io.IOException;
 
-/**
- * Add your docs here.
- */
+// The Playing Field
 public class Arena {
+  // April Tag Field Layout
+  private static AprilTagFieldLayout field_layout_ = null;
 
-  public AprilTagFieldLayout blueLayout;
+  // Transforms Relative to Tag
+  private static final Transform3d kTagToLPosition = new Transform3d(
+      new Translation3d(0.6096, -0.7366, -0.46272),
+      new Rotation3d(0, 0, Math.PI));
+  private static final Transform3d kTagToRPosition = new Transform3d(
+      new Translation3d(0.6096, +0.7366, -0.46272),
+      new Rotation3d(0, 0, Math.PI));
+  private static final Transform3d kTagToCPosition = new Transform3d(
+      new Translation3d(0.6096, 0, -0.46272),
+      new Rotation3d(0, 0, Math.PI));
 
-  public static final Pose3d[] tagPositions = new Pose3d[]{
-      new Pose3d(15.513, 1.0734, 0.46272, null), //1
-      new Pose3d(15.513, 2.7498, 0.46272, null), //2
-      new Pose3d(15.513, 4.4262, 0.46272, null), //3
-      new Pose3d(1.0269, 4.4262, 0.46272, null), //6
-      new Pose3d(1.0269, 2.7498, 0.46272, null), //7
-      new Pose3d(1.0269, 1.0734, 0.46272, null), //8
-  };
-
-  public static final Transform3d[] blueTransform = {
-      new Transform3d(new Translation3d(0.6096, -0.7366, -0.46272), new Rotation3d()), //Left
-      new Transform3d(new Translation3d(0.6096, 0, -0.46272), new Rotation3d()), //Center
-      new Transform3d(new Translation3d(0.6096, 0.7366, -0.46272), new Rotation3d()),//Right
-  };
-
-  public static final Transform3d[] redTransform = {
-      new Transform3d(new Translation3d(-0.6096, 0.7366, -0.46272), new Rotation3d()), //Left
-      new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()), //Center
-      new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()),//Right
-  };
-  public static final Transform3d[] highAndMidTransform = {
-      new Transform3d(new Translation3d(0.554, 0.600, 0.675), new Rotation3d()), //High
-      new Transform3d(new Translation3d(0.270, 0.170, 0.270), new Rotation3d()) //Mid
-  };
-
-  public Arena() {
+  // Initialization
+  static {
     try {
-      blueLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+      field_layout_ = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
     } catch (IOException ex) {
-      System.out.println("Error reading tag layout");
+      System.out.println("An error occurred when loading the AprilTag field!");
     }
-
   }
 
+  // Tag Position Getter
+  public static Pose3d getTagPosition(int id) {
+    return field_layout_.getTagPose(id).orElse(null);
+  }
 
-//Layout of Grids ( A | B | C)
-/* A
- 0 | 1 | 2
- 3 | 4 | 5
- 6 | 7 | 8
-*/
+  // Tag Left Transform Getter
+  public static Transform3d getTagToLPosition() {
+    return kTagToLPosition;
+  }
 
+  // Tag Right Transform Getter
+  public static Transform3d getTagToRPosition() {
+    return kTagToRPosition;
+  }
 
+  // Tag Center Transform Getter
+  public static Transform3d getTagToCPosition() {
+    return kTagToCPosition;
+  }
 }

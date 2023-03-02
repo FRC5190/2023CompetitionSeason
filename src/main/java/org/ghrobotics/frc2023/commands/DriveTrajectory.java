@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.Supplier;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -21,12 +22,15 @@ public class DriveTrajectory extends CommandBase {
   private final PoseEstimator pose_estimator_;
 
   // Objects needed to track trajectory.
-  private final Trajectory trajectory_;
+  private final Supplier<Trajectory> trajectory_;
   private final RamseteController controller_;
   private final Timer timer_;
 
+  // Trajectory
+  private Trajectory traj_;
+
   public DriveTrajectory(Drivetrain drivetrain, PoseEstimator pose_estimator,
-                         Trajectory trajectory) {
+                         Supplier<Trajectory> trajectory) {
 
     // Assign member variables
     drivetrain_ = drivetrain;
@@ -45,6 +49,9 @@ public class DriveTrajectory extends CommandBase {
   public void initialize() {
     // Start the timer.
     timer_.start();
+
+    // Get trajectory
+    traj_ = trajectory_.get();
   }
 
   @Override
@@ -53,10 +60,11 @@ public class DriveTrajectory extends CommandBase {
     double t = timer_.get();
 
     // Get desired state at current time.
-    Trajectory.State desired_state = trajectory_.sample(t);
+    Trajectory.State desired_state = traj_.sample(t);
 
     // Get robot pose at the current time.
-    Pose2d current_state = pose_estimator_.getCurrentPose();
+    Pose2d current_state = pose_estimator_.getPosition();
+    System.out.println(current_state);
 
     // Calculate chassis speeds to track desired state.
     ChassisSpeeds wanted_chassis_speeds = controller_.calculate(current_state, desired_state);
@@ -81,8 +89,8 @@ public class DriveTrajectory extends CommandBase {
     timer_.reset();
 
     // Debug: print error
-    Pose2d end_pose = trajectory_.sample(trajectory_.getTotalTimeSeconds()).poseMeters;
-    Pose2d robot_pose = pose_estimator_.getCurrentPose();
+    Pose2d end_pose = traj_.sample(traj_.getTotalTimeSeconds()).poseMeters;
+    Pose2d robot_pose = pose_estimator_.getPosition();
 
     System.out.printf("X Error (in): %3.2f, Y Error (in): %3.2f, Theta Error (deg): %3.2f\n",
         Units.metersToFeet(end_pose.getX() - robot_pose.getX()),
@@ -93,7 +101,6 @@ public class DriveTrajectory extends CommandBase {
   @Override
   public boolean isFinished() {
     // We are done when the elapsed time is greater than the trajectory's total time.
-    return timer_.get() > trajectory_.getTotalTimeSeconds();
+    return timer_.get() > traj_.getTotalTimeSeconds();
   }
-
 }

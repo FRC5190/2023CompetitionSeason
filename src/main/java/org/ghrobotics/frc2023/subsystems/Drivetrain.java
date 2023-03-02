@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2023.subsystems;
 
+import com.ctre.phoenix.sensors.BasePigeonSimCollection;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -12,13 +14,14 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
-
-/**
- * Add your docs here.
- */
 public class Drivetrain extends SubsystemBase {
   // Motor Controllers
   private final CANSparkMax left_leader_;
@@ -29,12 +32,19 @@ public class Drivetrain extends SubsystemBase {
   // Sensors
   private final RelativeEncoder left_encoder_;
   private final RelativeEncoder right_encoder_;
+  private final WPI_Pigeon2 gyro_;
 
   // Control
   private final SparkMaxPIDController left_pid_controller_;
   private final SparkMaxPIDController right_pid_controller_;
-  public final DifferentialDriveKinematics kinematics_;
+  private final DifferentialDriveKinematics kinematics_;
   private final DifferentialDriveFeedforward ff_;
+
+  // Simulation
+  private final DifferentialDrivetrainSim physics_sim_;
+  private final SimDeviceSim left_leader_sim_;
+  private final SimDeviceSim right_leader_sim_;
+  private final BasePigeonSimCollection gyro_sim_;
 
   // Output Limit
   private final boolean limit_output_ = false;
@@ -83,6 +93,9 @@ public class Drivetrain extends SubsystemBase {
     right_encoder_.setVelocityConversionFactor(
         2 * Math.PI * Constants.kWheelRadius / Constants.kGearRatio / 60);
 
+    // Initialize gyro
+    gyro_ = new WPI_Pigeon2(Constants.kGyroId);
+
     // Initialize PID controllers.
     left_pid_controller_ = left_leader_.getPIDController();
     left_pid_controller_.setP(Constants.kLeftKp);
@@ -97,6 +110,18 @@ public class Drivetrain extends SubsystemBase {
 
     // Initialize kinematics
     kinematics_ = new DifferentialDriveKinematics(Constants.kTrackWidth);
+
+    // Initialize simulation
+    physics_sim_ = new DifferentialDrivetrainSim(LinearSystemId.identifyDrivetrainSystem(
+        Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa),
+        DCMotor.getNEO(2),
+        Constants.kGearRatio,
+        Constants.kTrackWidth,
+        Constants.kWheelRadius,
+        null);
+    left_leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeftLeaderId + "]");
+    right_leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kRightLeaderId + "]");
+    gyro_sim_ = gyro_.getSimCollection();
   }
 
   @Override
@@ -106,6 +131,8 @@ public class Drivetrain extends SubsystemBase {
     io_.r_position = right_encoder_.getPosition();
     io_.l_velocity = left_encoder_.getVelocity();
     io_.r_velocity = right_encoder_.getVelocity();
+    io_.angle = Math.toRadians(gyro_.getYaw());
+    io_.pitch = Math.toRadians(gyro_.getRoll());
 
     switch (output_type_) {
       case PERCENT:
@@ -115,6 +142,12 @@ public class Drivetrain extends SubsystemBase {
         right_leader_.set(limit_output_ ?
             MathUtil.clamp(io_.r_demand, -Constants.kOutputLimit, Constants.kOutputLimit) :
             io_.r_demand);
+
+        // Set simulated inputs.
+        if (RobotBase.isSimulation()) {
+          left_leader_sim_.getDouble("Applied Output").set(io_.l_demand * 12);
+          right_leader_sim_.getDouble("Applied Output").set(io_.r_demand * 12);
+        }
         break;
       case VELOCITY:
         // Calculate feedforward value and add to built-in motor controller PID.
@@ -125,8 +158,30 @@ public class Drivetrain extends SubsystemBase {
             wheel_voltages.left);
         right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0,
             wheel_voltages.right);
+
+        // Set simulated inputs
+        if (RobotBase.isSimulation()) {
+          left_leader_sim_.getDouble("Applied Output").set(wheel_voltages.left);
+          right_leader_sim_.getDouble("Applied Output").set(wheel_voltages.right);
+        }
         break;
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // Update physics sim with inputs
+    physics_sim_.setInputs(left_leader_.getAppliedOutput(), right_leader_.getAppliedOutput());
+
+    // Update physics sim forward in time
+    physics_sim_.update(0.02);
+
+    // Update encoder values
+    left_leader_sim_.getDouble("Position").set(physics_sim_.getLeftPositionMeters());
+    left_leader_sim_.getDouble("Velocity").set(physics_sim_.getLeftVelocityMetersPerSecond());
+    right_leader_sim_.getDouble("Position").set(physics_sim_.getRightPositionMeters());
+    right_leader_sim_.getDouble("Velocity").set(physics_sim_.getRightVelocityMetersPerSecond());
+    gyro_sim_.setRawHeading(physics_sim_.getHeading().getDegrees());
   }
 
   // Percent Setter
@@ -172,6 +227,16 @@ public class Drivetrain extends SubsystemBase {
     return io_.r_velocity;
   }
 
+  // Angle Getter
+  public double getAngle() {
+    return io_.angle;
+  }
+
+  // Pitch Getter
+  public double getPitch() {
+    return io_.pitch;
+  }
+
   // Average Velocity Getter
   public double getAverageVelocity() {
     return (io_.l_velocity + io_.r_velocity) / 2;
@@ -192,6 +257,8 @@ public class Drivetrain extends SubsystemBase {
     double r_position;
     double l_velocity;
     double r_velocity;
+    double angle;
+    double pitch;
 
     // Outputs
     double l_demand;
@@ -199,13 +266,16 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public static class Constants {
-    //Motor Controller IDs
+    // Motor Controller IDs
     public static final int kLeftLeaderId = 1;
     public static final int kLeftFollowerId = 2;
     public static final int kRightLeaderId = 3;
     public static final int kRightFollowerId = 4;
 
-    //Hardware
+    // Gyro IDs
+    public static final int kGyroId = 17;
+
+    // Hardware
     public static double kGearRatio = 10.18;
     public static double kWheelRadius = 0.0762;
     public static double kTrackWidth = 0.65921;

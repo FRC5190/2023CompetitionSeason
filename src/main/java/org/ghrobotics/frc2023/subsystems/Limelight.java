@@ -2,25 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.ghrobotics.frc2023;
+package org.ghrobotics.frc2023.subsystems;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-//import org.json.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * Add your docs here.
  */
-public class Limelight {
+public class Limelight extends SubsystemBase {
+  // NetworkTable for getting / setting data
   private final NetworkTable table_;
 
+  // IO
   private final PeriodicIO io_ = new PeriodicIO();
 
+  // Constructor
   public Limelight(String name) {
     table_ = NetworkTableInstance.getDefault().getTable(name);
   }
 
+  @Override
   public void periodic() {
+    // Read inputs
     io_.tv = table_.getEntry("tv").getDouble(0);
     io_.tx = table_.getEntry("tx").getDouble(0);
     io_.ty = table_.getEntry("ty").getDouble(0);
@@ -29,22 +34,6 @@ public class Limelight {
     io_.tl = table_.getEntry("tl").getDouble(0);
     io_.cl = table_.getEntry("cl").getDouble(0);
     io_.jsonString = table_.getEntry("json").getString("");
-
-//        System.out.println(io_.jsonString);
-//        System.out.println("Inside limelight periodic");
-
-
-/*
-    String jsonString = io_.jsonString ; //assign your JSON String here
-    JSONObject obj = new JSONObject(jsonString);
-    String pageName = obj.getJSONObject("Results");
-
-    JSONArray arr = obj.getJSONArray("Fiducial"); // notice that `"posts": [...]`
-    for (int i = 0; i < arr.length(); i++)
-    {
-        String post_id = arr.getJSONObject(i).getString("fID");
-    }*/
-
     io_.tid = table_.getEntry("tid").getDouble(0);
     io_.botpose = table_.getEntry("botpose").getDoubleArray(new double[6]);
     io_.botpose_wpiblue = table_.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
@@ -54,6 +43,7 @@ public class Limelight {
     io_.targetpose_cameraspace = table_.getEntry("targetpose_cameraspace").getDoubleArray(
         new double[6]);
 
+    // Write outputs
     table_.getEntry("ledMode").setDouble(io_.led_mode);
     table_.getEntry("pipeline").setDouble(io_.pipeline);
   }
@@ -78,7 +68,7 @@ public class Limelight {
     return io_.ts;
   }
 
-  public double getLatency() {
+  public double getProcessingLatency() {
     return io_.tl;
   }
 
@@ -86,16 +76,15 @@ public class Limelight {
     return io_.cl;
   }
 
-  public double getID() {
-    return io_.tid;
+  public int getID() {
+    return (int) io_.tid;
   }
-
 
   public int getFID() {
     return io_.fid;
   }
 
-  public double[] getbotpose() {
+  public double[] getBotPose() {
     return io_.botpose;
   }
 
@@ -123,7 +112,8 @@ public class Limelight {
     PIPELINE, OFF, BLINK, ON
   }
 
-  static class PeriodicIO {
+  private static class PeriodicIO {
+    // Inputs
     double tv;
     double tx;
     double ty;
@@ -140,6 +130,7 @@ public class Limelight {
     double[] camerapose_targetspace;
     double[] targetpose_cameraspace;
 
+    // Outputs
     double led_mode;
     double pipeline;
   }

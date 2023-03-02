@@ -8,7 +8,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import org.ghrobotics.frc2023.Limelight;
+import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 
 public class ChaseTag extends CommandBase {
