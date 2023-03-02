@@ -109,7 +109,6 @@ public class Elevator extends SubsystemBase {
         public static final double kG = 0; // volts
         public static final double kV = 0; // volts * sec / distance 
         public static final double kA = 0; // volts * sec^2 / distance
-        // kS, kV, kA taken from 2/10 sysid calculations - may need to rerun
 
         // Feedback
         public static final double kP = 0;

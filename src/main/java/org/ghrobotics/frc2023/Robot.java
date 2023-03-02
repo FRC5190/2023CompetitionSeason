@@ -11,12 +11,16 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.Elevator;
+import org.ghrobotics.frc2023.subsystems.Extender;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 import org.ghrobotics.frc2023.subsystems.Gyroscope;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.Telemetry;
+import org.ghrobotics.frc2023.Superstructure.SuperstructureState;
 import org.ghrobotics.frc2023.Limelight;
 import org.ghrobotics.frc2023.auto.ScoreOne;
 import org.ghrobotics.frc2023.auto.ScoreOneAndBalance;
@@ -36,10 +40,15 @@ public class Robot extends TimedRobot {
 
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final XboxController driver_controller_ = new XboxController(0);
+  private final XboxController operator_controller = new XboxController(0);  // which port?
   private final Limelight limelight_ = new Limelight("limelight");
   private final Gyroscope gyro_ = new Gyroscope();
   private final Arena arena_ = new Arena();
-  private final Superstructure superstructure_ = new Superstructure();
+  private final Elevator elevator_ = new Elevator();
+  private final Extender extender_ = new Extender();
+  private final Arm arm_ = new Arm();
+  private final Superstructure superstructure_ = new Superstructure(elevator_, 
+          extender_, arm_, operator_controller, SuperstructureState.RESET);
   private final PoseEstimator pose_estimator_ = new PoseEstimator(limelight_, drivetrain_, gyro_);
   private final SendableChooser<String> auto_selector_side = new SendableChooser<>();
   private final SendableChooser<String> auto_selector_height = new SendableChooser<>();
@@ -61,6 +70,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
     setUpAuto();
+    superstructure_.reset();
   }
 
   @Override
