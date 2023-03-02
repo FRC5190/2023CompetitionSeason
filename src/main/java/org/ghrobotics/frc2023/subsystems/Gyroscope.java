@@ -18,7 +18,7 @@ public class Gyroscope extends SubsystemBase {
   // Constructor
   public Gyroscope() {
     // Initialize gyro
-    gyro_ = new WPI_Pigeon2(17);
+    gyro_ = new WPI_Pigeon2(Constants.kGyroId);
   }
 
   @Override
@@ -42,5 +42,10 @@ public class Gyroscope extends SubsystemBase {
     // Inputs
     Rotation2d angle = new Rotation2d();
     double pitch;
+  }
+  
+  // Constants class
+  public static class Constants {
+    public static final int kGyroId = 17;
   }
 }
