@@ -14,8 +14,8 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 | 6   | Elevator F    | NEO        | SPARK MAX        | ?        |
 | 7   | Extender      | NEO        | SPARK MAX        | ?        |
 | 8   | Arm           | NEO        | SPARK MAX        | ?        |
-| 9   | Intake L      | NEO        | SPARK MAX        | ?        |
-| 10  | Intake R      | NEO        | SPARK MAX        | ?        |
+| 9   | Grabber L     | NEO        | SPARK MAX        | ?        |
+| 10  | Grabber R     | NEO        | SPARK MAX        | ?        |
 
 
 
@@ -28,5 +28,5 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 
 | Solenoid ID(s) | Mechanism               |
 | -------------- |-------------------------|
-| 0              | -------------           |
+| 0              | Grabber Pivot           |
 

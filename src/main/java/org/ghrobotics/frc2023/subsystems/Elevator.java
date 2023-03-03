@@ -33,8 +33,10 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
     // Initialize motor controllers
     leader_ = new CANSparkMax(Constants.kLeaderId, kBrushless);
+    leader_.restoreFactoryDefaults();
 
     follower_ = new CANSparkMax(Constants.kFollowerId, kBrushless);
+    follower_.restoreFactoryDefaults();
     follower_.follow(leader_);
 
     // Initialize encoder
