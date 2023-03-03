@@ -4,80 +4,74 @@
 
 package org.ghrobotics.frc2023;
 
-import org.ghrobotics.frc2023.subsystems.Arm;
-import org.ghrobotics.frc2023.subsystems.Elevator;
-import org.ghrobotics.frc2023.subsystems.Extender;
+import org.ghrobotics.frc2023.subsystems.Grabber;
 
-import edu.wpi.first.wpilibj.XboxController;
-
-/** Add your docs here. */
-
+/**
+ * Add your docs here.
+ */
 public class Superstructure {
 
-    private final Elevator elevator_;
-    private final Extender extender_;
-    private final Arm arm_;
+    //Subsystems
+    private final Grabber grabber_;
 
-    private final XboxController controller_;
+    //Subsystem States
+    private GrabberState grabber_state_ = GrabberState.IDLE;
 
-    private SuperstructureState current_state_;
+    //Subsystem References
+    private double grabber_pct_;
+    private boolean grabber_pivot_;
 
-    public Superstructure(Elevator elevator, Extender extender, Arm arm,
-                XboxController controller, SuperstructureState currentState) {
+    public Superstructure(Grabber grabber){
+        grabber_ = grabber;
 
-        elevator_ = elevator;
-        extender_ = extender;
-        arm_ = arm;
-
-        controller_ = controller;
-
-        current_state_ = currentState;
     }
 
-    public static enum SuperstructureState {
-        SCORE_HIGH,
-        SCORE_MID,
-        PICKUP_GROUND,
-        PICKUP_SUBSTATION,
-        RESET
+
+    public void update(){
+        switch (grabber_state_){
+            case IDLE:
+                grabber_pivot_ = false;
+                grabber_pct_ = Constants.kIdleGrabberPct;
+                break;
+            case INTAKE:
+                grabber_pivot_ = true;
+                grabber_pct_ = Constants.kIntakeGrabberPct;
+                break;
+            case EJECT:
+                grabber_pivot_ = true;
+                grabber_pct_ = Constants.kEjectGrabberPct;
+        }
+
+        grabber_.setPercent(grabber_pct_);
+        grabber_.setPivot(grabber_pivot_);
+
     }
 
-    public SuperstructureState getWantedState() {
-        SuperstructureState wantedState = current_state_;
+    public void scoreHigh() {
 
-        if (controller_.getYButton()) {
-            wantedState = SuperstructureState.SCORE_HIGH;
-        }
-        else if (controller_.getAButton()) {
-            wantedState = SuperstructureState.SCORE_MID;
-        }
-        else if (controller_.getXButton()) {
-            wantedState = SuperstructureState.PICKUP_SUBSTATION;
-        }
-        else if (controller_.getBButton()) {
-            wantedState = SuperstructureState.PICKUP_GROUND;
-        }
-        else if (controller_.getRightBumper()) {
-            wantedState = SuperstructureState.RESET;
-        }
-
-        current_state_ = wantedState;
-
-        return wantedState;
     }
 
-    public void reset() {
-        elevator_.setPosition(SuperstructureState.RESET);
-        extender_.setPosition(SuperstructureState.RESET);
-        arm_.setPosition(SuperstructureState.RESET);
+    public void scoreMid() {
+
     }
 
-    public void periodic() {
-        SuperstructureState state = getWantedState();
+    public void setHint(){
 
-        elevator_.setPosition(state);
-        extender_.setPosition(state);
-        arm_.setPosition(state);
+    }
+    
+    public enum GrabberState{
+        IDLE, INTAKE, EJECT
+    }
+
+    public static class Constants {
+        //Idle
+        public static final int kIdleGrabberPct = 0;
+
+        //Intake
+        public static final double kIntakeGrabberPct = 0.2;
+
+        //Eject
+        public static final double kEjectGrabberPct = 0.4;
 
     }
 }

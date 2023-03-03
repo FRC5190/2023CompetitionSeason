@@ -4,110 +4,125 @@
 
 package org.ghrobotics.frc2023.subsystems;
 
-import org.ghrobotics.frc2023.Superstructure.SuperstructureState;
-
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Extender extends SubsystemBase {
-
   // Motor Controllers
   private final CANSparkMax leader_;
 
-  // Sensors
+  // Encoder
   private final RelativeEncoder encoder_;
 
-  // Feedforward
-  private final SimpleMotorFeedforward feedforward_;
+  // Control
+  private final ProfiledPIDController fb_;
+  private final SimpleMotorFeedforward ff_;
 
-  // Feedback
-  private final SparkMaxPIDController pid_controller_;
+  // IO
+  private final PeriodicIO io_ = new PeriodicIO();
+  private OutputType output_type_ = OutputType.PERCENT;
+
 
   public Extender() {
+    // Initialize motor controllers
+    leader_ = new CANSparkMax(Constants.kLeaderId, kBrushless);
 
-      // Initialize motor controllers
-      leader_ = new CANSparkMax(Constants.kLeaderId, MotorType.kBrushless);
-      leader_.setInverted(false);
-      // figure out if motor should be inverted
 
-      encoder_ = leader_.getEncoder();
-      // add conversion factor based on gear ratio - needs to be fixed
-      encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
-      encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
-      
-      feedforward_ = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
-      pid_controller_ = leader_.getPIDController();
-      pid_controller_.setP(Constants.kP);
+    // Initialize encoder
+    encoder_ = leader_.getEncoder();
+    encoder_.setPositionConversionFactor(
+        Math.PI * Constants.kSprocketDiameter / Constants.kGearRatio);
+    encoder_.setVelocityConversionFactor(
+        Math.PI * Constants.kSprocketDiameter / Constants.kGearRatio / 60);
 
-  }
+    // Initialize control
+    ff_ = new SimpleMotorFeedforward(Constants.kS, Constants.kV, Constants.kA);
+    fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
+        Constants.kMaxVelocity, Constants.kMaxAcceleration));
 
-  public double getPosition() {
-      return encoder_.getPosition();
-  }
-
-  public void setPosition(SuperstructureState state) {
-      // positive if target in front, negative if behind
-      double dist = getTargetPosition(state) - getPosition();
-
-      double v = dist / 0.02;
-      double a = (v - getVelocity()) / 0.02;
-      double ff = feedforward_.calculate(v, a);
-
-      leader_.setVoltage(feedforward_.calculate(v, a));
-
-      pid_controller_.setReference(v, ControlType.kVelocity, 0, ff);
-  }
-
-  public double getVelocity() {
-      return encoder_.getVelocity();
-  }
-
-  // find values
-  public double getTargetPosition(SuperstructureState state) {
-      switch (state) {
-          case SCORE_HIGH:
-              return 0.0;
-          case SCORE_MID:
-              return 0.0;
-          case PICKUP_GROUND:
-              return 0.0;
-          case PICKUP_SUBSTATION:
-              return 0.0;
-          default:
-              return 0.0;
-      }
-  }
-
-  public static class Constants {
-      public static final int kLeaderId = 0;
-
-      public static final double kMinPosition = 0;
-      public static final double kMaxPosition = 0;
-      // change based on length
-
-      // public static final double kOutputLimit = 0;
-
-      // Gear ratio
-      public static final double kGearRatio = 12;
-
-      // Feedforward 
-      public static final double kS = 0; // volts
-      public static final double kV = 0; // volts * sec / distance 
-      public static final double kA = 0; // volts * sec^2 / distance
-
-      // Feedback
-      public static final double kP = 0;
-
+    // Safety features
+    leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
+    leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinLength);
+    leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxLength);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // Read inputs
+    io_.position = encoder_.getPosition();
+    io_.velocity = encoder_.getVelocity();
+
+    // Write outputs
+    switch (output_type_) {
+      case PERCENT:
+        leader_.set(io_.demand);
+        break;
+      case POSITION:
+        fb_.setGoal(io_.demand);
+        double feedback = fb_.calculate(io_.position);
+
+        double velocity_setpoint = fb_.getSetpoint().velocity;
+        double acceleration_setpoint = (velocity_setpoint - io_.velocity) / 0.02;
+        double feedforward = ff_.calculate(velocity_setpoint, acceleration_setpoint);
+
+        leader_.setVoltage(feedback + feedforward);
+        break;
+    }
+  }
+
+  public void setPercent(double percent) {
+    output_type_ = OutputType.PERCENT;
+    io_.demand = percent;
+  }
+
+  public void setPosition(double position) {
+    output_type_ = OutputType.POSITION;
+    io_.demand = position;
+  }
+
+  // Output Type
+  private enum OutputType {
+    PERCENT, POSITION
+  }
+
+  // IO
+  private static class PeriodicIO {
+    // Inputs
+    double position;
+    double velocity;
+
+    // Outputs
+    double demand;
+  }
+
+  // Constants
+  private static class Constants {
+    // Motor Controllers
+    public static final int kLeaderId = 7;
+
+    // Physical Constants
+    public static final double kGearRatio = 12.0;
+    public static final double kSprocketDiameter = 0.045;
+    public static final double kMinLength = 0.0;
+    public static final double kMaxLength = Units.inchesToMeters(40);
+
+    // Feedforward
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+
+    // Current Limit
+    public static final double kCurrentLimit = 50;
+
+    // Control
+    public static double kMaxVelocity = 0.3;
+    public static double kMaxAcceleration = 0.3;
+    public static double kP = 0.0;
   }
 }

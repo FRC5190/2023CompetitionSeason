@@ -10,6 +10,13 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 | 2   | Drivetrain LF | NEO        | SPARK MAX        | ?        |
 | 3   | Drivetrain RL | NEO        | SPARK MAX        | 19       |
 | 4   | Drivetrain RF | NEO        | SPARK MAX        | ?        |
+| 5   | Elevator L    | NEO        | SPARK MAX        | ?        |
+| 6   | Elevator F    | NEO        | SPARK MAX        | ?        |
+| 7   | Extender      | NEO        | SPARK MAX        | ?        |
+| 8   | Arm           | NEO        | SPARK MAX        | ?        |
+| 9   | Grabber L     | NEO        | SPARK MAX        | ?        |
+| 10  | Grabber R     | NEO        | SPARK MAX        | ?        |
+
 
 
 ## Sensors and Limelight
@@ -21,5 +28,5 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 
 | Solenoid ID(s) | Mechanism               |
 | -------------- |-------------------------|
-| 0              | -------------           |
+| 0              | Grabber Pivot           |
 

@@ -18,16 +18,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-  /** Creates a new Arm. */
-
-  // Initialize motor and encoder
-  private final CANSparkMax leader_;
-  private final CANCoder encoder_;
-
-  // Initialize feedforward and feedback
-  private final ArmFeedforward feedforward_;
-  private final SparkMaxPIDController pid_controller_;
-
+  /**
+   * Creates a new Arm.
+   */
   public Arm() {
 
     leader_ = new CANSparkMax(Constants.kMotorId, MotorType.kBrushless);

@@ -1,0 +1,75 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/2023/Autonomous Height Selector": "String Chooser",
+      "/Shuffleboard/2023/Autonomous Side Selector": "String Chooser",
+      "/Shuffleboard/2023/Balance Choice": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/2023/Autonomous Height Selector": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/2023/Autonomous Side Selector": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/2023/Balance Choice": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "/Users/prateekma/Downloads/2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "2023": {
+          "Autonomous Height Selector": {
+            "open": true
+          },
+          "Autonomous Side Selector": {
+            "open": true
+          },
+          "Balance Choice": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
+  "NetworkTables View": {
+    "visible": false
+  }
+}

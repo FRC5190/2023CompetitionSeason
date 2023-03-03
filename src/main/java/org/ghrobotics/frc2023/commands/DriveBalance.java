@@ -8,7 +8,6 @@ import org.ghrobotics.frc2023.subsystems.Gyroscope;
 public class DriveBalance extends CommandBase {
   // Subsystems
   private final Drivetrain drivetrain_;
-  private final Gyroscope gyroscope_;
 
   // Decision Variables
   private double baseline_pitch_ = 0.0;
@@ -16,10 +15,9 @@ public class DriveBalance extends CommandBase {
   private boolean is_balanced_ = false;
 
   // Constructor
-  public DriveBalance(Drivetrain drivetrain, Gyroscope gyroscope) {
+  public DriveBalance(Drivetrain drivetrain) {
     // Assign member variables
     drivetrain_ = drivetrain;
-    gyroscope_ = gyroscope;
 
     // Add subsystem requirements
     addRequirements(drivetrain_);
@@ -28,7 +26,7 @@ public class DriveBalance extends CommandBase {
   @Override
   public void initialize() {
     // Establish baseline pitch value when robot is flat on the floor
-    baseline_pitch_ = gyroscope_.getPitch();
+    baseline_pitch_ = drivetrain_.getPitch();
   }
 
   @Override
@@ -38,11 +36,11 @@ public class DriveBalance extends CommandBase {
     drivetrain_.setVelocity(speed, speed);
 
     // If we weren't on the platform before, check whether we are now
-    if (!on_platform_ && (gyroscope_.getPitch() - baseline_pitch_) > Constants.kOnPlatformThreshold)
+    if (!on_platform_ && (drivetrain_.getPitch() - baseline_pitch_) > Constants.kOnPlatformThreshold)
       on_platform_ = true;
 
     // If we are on the platform and weren't balanced, check whether we are now
-    if (on_platform_ && !is_balanced_ && (gyroscope_.getPitch() - baseline_pitch_) < Constants.kBalanceThreshold)
+    if (on_platform_ && !is_balanced_ && (drivetrain_.getPitch() - baseline_pitch_) < Constants.kBalanceThreshold)
       is_balanced_ = true;
 
     // Telemetry: delete later
