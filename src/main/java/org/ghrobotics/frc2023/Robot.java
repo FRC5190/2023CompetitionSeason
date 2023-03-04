@@ -11,8 +11,11 @@ import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.LED;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
+import org.ghrobotics.frc2023.commands.DriveBalance;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,6 +28,10 @@ public class Robot extends TimedRobot {
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final Limelight limelight_ = new Limelight("limelight");
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
+  private final LED led_ = new LED();
+
+  // Commands - (needed for autobalancing)
+  private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);
 
   // Auto Selector
   private final AutoSelector auto_selector_ = new AutoSelector();
@@ -99,5 +106,35 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+  /**
+   * Updates the status of the LEDs periodically based on the various states of the robot (e.g.
+   * limelight working, arm, autobalancing).
+   */
+
+  // For future reference, find a way to detect errors and add them to the requirement for LED change
+  public void updateLEDs() {
+    if(isDisabled()){
+      System.out.println("LEDs: Robot is disabled");
+      led_.setOutput(LED.OutputType.DISABLED_READY);
+    }
+
+    else if(isEnabled()){
+      System.out.println("LEDs: Robot is enabled");
+      led_.setOutput(LED.OutputType.ENABLED_READY);
+    }
+
+    else if(limelight_.hasTarget()){
+      System.out.println("LEDs: Intake");
+      led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
+    }
+
+    else if(drive_balance_.isFinished()){
+      System.out.println("LEDs: Balanced");
+      led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
+    }
+  }
+  
+
 
 }
