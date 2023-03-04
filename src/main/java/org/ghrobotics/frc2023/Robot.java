@@ -61,7 +61,6 @@ public class Robot extends TimedRobot {
 
     // Run telemetry periodic functions
     telemetry_.periodic();
-    led_.periodic();
     updateLEDs();
   }
 
@@ -136,7 +135,7 @@ public class Robot extends TimedRobot {
       led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
   }
-  
+
 
 
 }
