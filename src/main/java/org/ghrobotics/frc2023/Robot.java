@@ -147,22 +147,22 @@ public class Robot extends TimedRobot {
   // For future reference, find a way to detect errors and add them to the requirement for LED change
   public void updateLEDs() {
     if(isDisabled()){
-      System.out.println("LEDs: Robot is disabled");
+      //System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
     }
 
     else if(isEnabled()){
-      System.out.println("LEDs: Robot is enabled");
+      //System.out.println("LEDs: Robot is enabled");
       led_.setOutput(LED.OutputType.ENABLED_READY);
     }
 
     else if(limelight_.hasTarget()){
-      System.out.println("LEDs: Intake");
+      //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
     }
 
     else if(drive_balance_.isFinished()){
-      System.out.println("LEDs: Balanced");
+      //System.out.println("LEDs: Balanced");
       led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
   }
