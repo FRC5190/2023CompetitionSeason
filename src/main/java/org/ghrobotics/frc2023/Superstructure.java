@@ -30,7 +30,7 @@ public class Superstructure {
     public void update(){
         switch (grabber_state_){
             case IDLE:
-                grabber_pivot_ = false;
+                grabber_pivot_ = true;
                 grabber_pct_ = Constants.kIdleGrabberPct;
                 break;
             case INTAKE:
@@ -40,6 +40,14 @@ public class Superstructure {
             case EJECT:
                 grabber_pivot_ = true;
                 grabber_pct_ = Constants.kEjectGrabberPct;
+                break;
+            case RELEASE:
+                grabber_pivot_ = false;
+                grabber_pct_ = Constants.kIdleGrabberPct;
+                break;
+            case HOLD:
+                grabber_pivot_ = true;
+                grabber_pct_ = Constants.kIdleGrabberPct;
         }
 
         grabber_.setPercent(grabber_pct_);
@@ -60,18 +68,13 @@ public class Superstructure {
     }
     
     public enum GrabberState{
-        IDLE, INTAKE, EJECT
+        IDLE, INTAKE, EJECT, RELEASE, HOLD
     }
 
     public static class Constants {
-        //Idle
+         //Grabber
         public static final int kIdleGrabberPct = 0;
-
-        //Intake
         public static final double kIntakeGrabberPct = 0.2;
-
-        //Eject
         public static final double kEjectGrabberPct = 0.4;
-
     }
 }
