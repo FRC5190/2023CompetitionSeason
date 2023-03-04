@@ -61,7 +61,7 @@ public class Extender extends SubsystemBase {
     // Write outputs
     switch (output_type_) {
       case PERCENT:
-        leader_.set(io_.demand);
+        //leader_.set(io_.demand);
         break;
       case POSITION:
         fb_.setGoal(io_.demand);
@@ -71,7 +71,7 @@ public class Extender extends SubsystemBase {
         double acceleration_setpoint = (velocity_setpoint - io_.velocity) / 0.02;
         double feedforward = ff_.calculate(velocity_setpoint, acceleration_setpoint);
 
-        leader_.setVoltage(feedback + feedforward);
+        //leader_.setVoltage(feedback + feedforward);
         break;
     }
   }

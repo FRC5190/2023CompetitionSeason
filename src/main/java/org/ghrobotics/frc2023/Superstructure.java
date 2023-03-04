@@ -35,7 +35,7 @@ public class Superstructure {
                 break;
             case INTAKE:
                 grabber_pivot_ = true;
-                grabber_pct_ = Constants.kIntakeGrabberPct;
+                //grabber_pct_ = Constants.kIntakeGrabberPct;
                 break;
             case EJECT:
                 grabber_pivot_ = true;
@@ -50,8 +50,8 @@ public class Superstructure {
                 grabber_pct_ = Constants.kIdleGrabberPct;
         }
 
-        grabber_.setPercent(grabber_pct_);
-        grabber_.setPivot(grabber_pivot_);
+        //grabber_.setPercent(grabber_pct_);
+        //grabber_.setPivot(grabber_pivot_);
 
     }
 

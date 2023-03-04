@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
 
   // Xbox Controller
   private final XboxController driver_controller_ = new XboxController(0);
+  private final XboxController operator_controller_ = new XboxController(1);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_,
@@ -62,6 +63,8 @@ public class Robot extends TimedRobot {
     // Run telemetry periodic functions
     telemetry_.periodic();
     updateLEDs();
+    setupTeleopControls();
+  
   }
 
   @Override
@@ -107,6 +110,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void setupTeleopControls(){
+    //Driver Controller
+    /*Arcade Drive --> Left Joystick
+     * Quick Turn --> X Button
+     * Pick-up from ground with grabber open --> A Button
+     * Pick-up from substation with grabber open --> Y Button
+     * Hold object position --> B Button
+     */
+
+    //Operator Controller
+    /*Grabber Close and Open --> B Button
+     * Grabber Intake --> Right Bumper
+     * Grabber Eject --> Right Trigger
+     * Score High Level --> Up Arrow
+     * Score Mid Level --> Down Arrow
+     * Go into Balance Mode (with all subsystems in) --> Start Button
+     */
+  }
 
   /**
    * Updates the status of the LEDs periodically based on the various states of the robot (e.g.
