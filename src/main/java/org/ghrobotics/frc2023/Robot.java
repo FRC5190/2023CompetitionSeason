@@ -61,6 +61,8 @@ public class Robot extends TimedRobot {
 
     // Run telemetry periodic functions
     telemetry_.periodic();
+    led_.periodic();
+    updateLEDs();
   }
 
   @Override
