@@ -5,13 +5,11 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -38,13 +36,13 @@ public class Arm extends SubsystemBase {
 
     //Initialize encoder
     encoder_ = leader_.getEncoder();
-    encoder_.setPositionConversionFactor(((Constants.kSmallSprocketDiameter / Constants.kBigSprocketDiameter) / Constants.kGearRatio) * 2 * Math.PI);
-    encoder_.setVelocityConversionFactor(((Constants.kSmallSprocketDiameter / Constants.kBigSprocketDiameter) / Constants.kGearRatio) * (2 * Math.PI) / 60);
+    encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
+    encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
 
     //Initialize control
     ff_ = new ArmFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
     fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
-      Constants.kMaxVelocity, Constants.kMaxAcceleration));
+        Constants.kMaxVelocity, Constants.kMaxAcceleration));
 
     //Safety features
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
@@ -59,7 +57,7 @@ public class Arm extends SubsystemBase {
     io_.angular_velocity = encoder_.getVelocity();
 
     //Write outputs
-    switch (output_type_){
+    switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
         break;
@@ -76,7 +74,7 @@ public class Arm extends SubsystemBase {
     }
   }
 
-  public void setPercent(double percent){
+  public void setPercent(double percent) {
     output_type_ = OutputType.PERCENT;
     io_.demand = percent;
   }
@@ -107,11 +105,9 @@ public class Arm extends SubsystemBase {
     public static final int kLeaderId = 8;
 
     //Physical Constants
-    public static final double kGearRatio = 49.0;
-    public static final double kSmallSprocketDiameter = Units.inchesToMeters(1.790);
-    public static final double kBigSprocketDiameter = Units.inchesToMeters(4.303);
-    public static final double kMinAngle = 0.0;
-    public static final double kMaxAngle = 0.0;
+    public static final double kGearRatio = 49.0 * 33.0 / 15.0;
+    public static final double kMinAngle = Math.toRadians(-20);
+    public static final double kMaxAngle = Math.toRadians(126);
 
     //Feedforward
     public static final double kA = 0.0; //volts * seconds^2 / radians
