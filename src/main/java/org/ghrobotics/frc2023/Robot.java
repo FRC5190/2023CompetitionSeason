@@ -7,10 +7,14 @@ package org.ghrobotics.frc2023;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.Grabber;
 import org.ghrobotics.frc2023.subsystems.LED;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
@@ -27,6 +31,7 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final Limelight limelight_ = new Limelight("limelight");
+  private final Grabber grabber_ = new Grabber();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
   private final LED led_ = new LED();
 
@@ -60,6 +65,9 @@ public class Robot extends TimedRobot {
     // Run command scheduler
     CommandScheduler.getInstance().run();
 
+    new Trigger(driver_controller_::getAButton).onTrue(new RunCommand(() -> grabber_.setPivot(true)));
+    new Trigger(driver_controller_::getBButton).onTrue(new RunCommand(() -> grabber_.setPivot(false)));
+
     // Run telemetry periodic functions
     telemetry_.periodic();
     updateLEDs();
@@ -73,7 +81,7 @@ public class Robot extends TimedRobot {
     drivetrain_.setBrakeMode(true);
 
     // Run auto
-    auto_selector_.run(drivetrain_, pose_estimator_);
+    //auto_selector_.run(drivetrain_, pose_estimator_);
   }
 
   @Override
@@ -92,7 +100,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     // Set drivetrain coast mode after 5 sec
-    new DriveBrakeMode(drivetrain_).schedule();
+    //new DriveBrakeMode(drivetrain_).schedule();
   }
 
   @Override
@@ -121,12 +129,13 @@ public class Robot extends TimedRobot {
      */
 
     //Operator Controller
-    /*Grabber Close and Open --> B Button
+    /*Grabber Close and Open --> Left Bumper
      * Grabber Intake --> Right Bumper
      * Grabber Eject --> Right Trigger
      * Score High Level --> Up Arrow
      * Score Mid Level --> Down Arrow
      * Go into Balance Mode (with all subsystems in) --> Start Button
+     *     Balance Mode means that the robot will move slower based off driver input
      */
   }
 
