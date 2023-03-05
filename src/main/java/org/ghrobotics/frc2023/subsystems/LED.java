@@ -156,7 +156,8 @@ public class LED extends SubsystemBase {
     // ENABLED_READY(Color.kGreen, 1.0, 0.0),
     AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
     ERROR(Color.kRed, 1.0, 0.0),
-    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0);
+    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0),
+    INTAKE(Color.kBlue, 1.0, 0.0);
 
 
     // Stores the color and on percentage for the current output.

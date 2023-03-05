@@ -11,10 +11,11 @@ import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.Grabber;
 import org.ghrobotics.frc2023.subsystems.LED;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
-import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
+// import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 
 /**
@@ -29,6 +30,7 @@ public class Robot extends TimedRobot {
   private final Limelight limelight_ = new Limelight("limelight");
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
   private final LED led_ = new LED();
+  private final Grabber grabber_ = new Grabber();
 
   // Commands - (needed for autobalancing)
   private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);
@@ -38,6 +40,9 @@ public class Robot extends TimedRobot {
 
   // Xbox Controller
   private final XboxController driver_controller_ = new XboxController(0);
+
+  // Superstructure
+  private final Superstructure superstructure_ = new Superstructure(grabber_);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_,
@@ -134,8 +139,15 @@ public class Robot extends TimedRobot {
       System.out.println("LEDs: Balanced");
       led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
+
+    else if(superstructure_.LEDGrabberState()){
+      System.out.println("LEDs: Intake");
+      led_.setOutput(LED.StandardLEDOutput.INTAKE);
+    }
+
+    else{
+      led_.setOutput(LED.StandardLEDOutput.BLANK);
+    }
   }
-
-
 
 }

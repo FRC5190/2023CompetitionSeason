@@ -21,6 +21,8 @@ public class Superstructure {
     private double grabber_pct_;
     private boolean grabber_pivot_;
 
+    public boolean LEDpiston = false;
+
     public Superstructure(Grabber grabber){
         grabber_ = grabber;
 
@@ -36,10 +38,12 @@ public class Superstructure {
             case INTAKE:
                 grabber_pivot_ = true;
                 grabber_pct_ = Constants.kIntakeGrabberPct;
+                LEDpiston = true;
                 break;
             case EJECT:
                 grabber_pivot_ = true;
                 grabber_pct_ = Constants.kEjectGrabberPct;
+                LEDpiston = false;
         }
 
         grabber_.setPercent(grabber_pct_);
@@ -61,6 +65,10 @@ public class Superstructure {
     
     public enum GrabberState{
         IDLE, INTAKE, EJECT
+    }
+
+    public boolean LEDGrabberState(){
+        return LEDpiston;
     }
 
     public static class Constants {
