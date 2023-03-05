@@ -4,22 +4,27 @@
 
 package org.ghrobotics.frc2023;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import org.ghrobotics.frc2023.auto.AutoSelector;
+import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
+import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
+import org.ghrobotics.frc2023.subsystems.Elevator;
+import org.ghrobotics.frc2023.subsystems.Extender;
 import org.ghrobotics.frc2023.subsystems.Grabber;
 import org.ghrobotics.frc2023.subsystems.LED;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
-import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
-import org.ghrobotics.frc2023.commands.DriveBalance;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,9 +36,15 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final Limelight limelight_ = new Limelight("limelight");
+  private final Elevator elevator_ = new Elevator();
+  private final Extender extender_ = new Extender();
+  private final Arm arm_ = new Arm();
   private final Grabber grabber_ = new Grabber();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
   private final LED led_ = new LED();
+
+  // Superstructure
+  private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_);
 
   // Commands - (needed for autobalancing)
   private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);
@@ -46,18 +57,17 @@ public class Robot extends TimedRobot {
   private final XboxController operator_controller_ = new XboxController(1);
 
   // Telemetry
-  private final Telemetry telemetry_ = new Telemetry(drivetrain_, pose_estimator_, limelight_,
-      auto_selector_);
-
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+  private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
+      pose_estimator_,
+      limelight_, auto_selector_);
 
   @Override
   public void robotInit() {
     // Set default commands
     drivetrain_.setDefaultCommand(new DriveTeleop(drivetrain_, driver_controller_));
+
+    // Set teleop controls
+    setupTeleopControls();
   }
 
   @Override
@@ -65,20 +75,17 @@ public class Robot extends TimedRobot {
     // Run command scheduler
     CommandScheduler.getInstance().run();
 
-    new Trigger(driver_controller_::getAButton).onTrue(new RunCommand(() -> grabber_.setPivot(true)));
-    new Trigger(driver_controller_::getBButton).onTrue(new RunCommand(() -> grabber_.setPivot(false)));
-
     // Run telemetry periodic functions
     telemetry_.periodic();
     updateLEDs();
-    setupTeleopControls();
-  
   }
 
   @Override
   public void autonomousInit() {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
+
+    new DriveBalance(drivetrain_).schedule();
 
     // Run auto
     //auto_selector_.run(drivetrain_, pose_estimator_);
@@ -100,7 +107,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     // Set drivetrain coast mode after 5 sec
-    //new DriveBrakeMode(drivetrain_).schedule();
+    new DriveBrakeMode(drivetrain_).schedule();
   }
 
   @Override
@@ -119,7 +126,24 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {}
 
-  private void setupTeleopControls(){
+  private void setupTeleopControls() {
+    // Testing
+    new JoystickButton(driver_controller_,
+        XboxController.Button.kY.value).onTrue(superstructure_.setPosition(
+        Superstructure.Position.INTAKE));
+
+    new JoystickButton(driver_controller_,
+        XboxController.Button.kA.value).onTrue(superstructure_.setPosition(
+        Superstructure.Position.TEST));
+
+    new JoystickButton(driver_controller_,
+        XboxController.Button.kLeftBumper.value).onTrue(new InstantCommand(() -> grabber_.setPercent(-0.2)))
+        .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
+
+    new JoystickButton(driver_controller_,
+        XboxController.Button.kRightBumper.value).onTrue(new InstantCommand(() -> grabber_.setPercent(1.0)))
+        .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
+
     //Driver Controller
     /*Arcade Drive --> Left Joystick
      * Quick Turn --> X Button
@@ -144,29 +168,23 @@ public class Robot extends TimedRobot {
    * limelight working, arm, autobalancing).
    */
 
-  // For future reference, find a way to detect errors and add them to the requirement for LED change
+  // For future reference, find a way to detect errors and add them to the requirement for LED
+  // change
   public void updateLEDs() {
-    if(isDisabled()){
+    if (isDisabled()) {
       //System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
-    }
-
-    else if(isEnabled()){
+    } else if (isEnabled()) {
       //System.out.println("LEDs: Robot is enabled");
       led_.setOutput(LED.OutputType.ENABLED_READY);
-    }
-
-    else if(limelight_.hasTarget()){
+    } else if (limelight_.hasTarget()) {
       //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
-    }
-
-    else if(drive_balance_.isFinished()){
+    } else if (drive_balance_.isFinished()) {
       //System.out.println("LEDs: Balanced");
       led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
   }
-
 
 
 }

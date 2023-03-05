@@ -133,7 +133,7 @@ public class Drivetrain extends SubsystemBase {
     io_.l_velocity = left_encoder_.getVelocity();
     io_.r_velocity = right_encoder_.getVelocity();
     io_.angle = Math.toRadians(gyro_.getYaw());
-    io_.pitch = Math.toRadians(gyro_.getRoll());
+    io_.pitch = Math.toRadians(-gyro_.getRoll());
 
     SmartDashboard.putNumber("Gyro Yaw", getAngle());
     SmartDashboard.putNumber("Gyro Pitch", getPitch());
@@ -271,10 +271,10 @@ public class Drivetrain extends SubsystemBase {
 
   public static class Constants {
     // Motor Controller IDs
-    public static final int kLeftLeaderId = 1;
-    public static final int kLeftFollowerId = 2;
-    public static final int kRightLeaderId = 3;
-    public static final int kRightFollowerId = 4;
+    public static final int kLeftLeaderId = 3;
+    public static final int kLeftFollowerId = 4;
+    public static final int kRightLeaderId = 1;
+    public static final int kRightFollowerId = 2;
 
     // Gyro IDs
     public static final int kGyroId = 17;
@@ -290,8 +290,8 @@ public class Drivetrain extends SubsystemBase {
     public static final double kAngularKv = 2.9518;
     public static final double kAngularKa = 0.30714;
 
-    public static final double kLeftKp = 0.0001;
-    public static final double kRightKp = 0.0001;
+    public static final double kLeftKp = 0.00001;
+    public static final double kRightKp = 0.00001;
 
     // Output Limit
     public static final double kOutputLimit = 0.3;

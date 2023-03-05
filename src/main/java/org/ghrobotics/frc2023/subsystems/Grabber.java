@@ -53,8 +53,8 @@ public class Grabber extends SubsystemBase {
       io_.wants_pneumatic_update = false;
     }
 
-    //left_leader_.set(io_.demand);
-    //right_leader_.set(io_.demand);
+    left_leader_.set(io_.demand);
+    right_leader_.set(io_.demand);
   }
 
   // Percent Setter
