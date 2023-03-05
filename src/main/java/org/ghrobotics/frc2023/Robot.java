@@ -7,6 +7,9 @@ package org.ghrobotics.frc2023;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
@@ -28,6 +31,7 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final Drivetrain drivetrain_ = new Drivetrain();
   private final Limelight limelight_ = new Limelight("limelight");
+  private final Grabber grabber_ = new Grabber();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
   private final LED led_ = new LED();
   private final Grabber grabber_ = new Grabber();
@@ -40,6 +44,7 @@ public class Robot extends TimedRobot {
 
   // Xbox Controller
   private final XboxController driver_controller_ = new XboxController(0);
+  private final XboxController operator_controller_ = new XboxController(1);
 
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(grabber_);
@@ -64,9 +69,14 @@ public class Robot extends TimedRobot {
     // Run command scheduler
     CommandScheduler.getInstance().run();
 
+    new Trigger(driver_controller_::getAButton).onTrue(new RunCommand(() -> grabber_.setPivot(true)));
+    new Trigger(driver_controller_::getBButton).onTrue(new RunCommand(() -> grabber_.setPivot(false)));
+
     // Run telemetry periodic functions
     telemetry_.periodic();
     updateLEDs();
+    setupTeleopControls();
+  
   }
 
   @Override
@@ -75,7 +85,7 @@ public class Robot extends TimedRobot {
     drivetrain_.setBrakeMode(true);
 
     // Run auto
-    auto_selector_.run(drivetrain_, pose_estimator_);
+    //auto_selector_.run(drivetrain_, pose_estimator_);
   }
 
   @Override
@@ -94,7 +104,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     // Set drivetrain coast mode after 5 sec
-    new DriveBrakeMode(drivetrain_).schedule();
+    //new DriveBrakeMode(drivetrain_).schedule();
   }
 
   @Override
@@ -113,6 +123,26 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {}
 
+  private void setupTeleopControls(){
+    //Driver Controller
+    /*Arcade Drive --> Left Joystick
+     * Quick Turn --> X Button
+     * Pick-up from ground with grabber open --> A Button
+     * Pick-up from substation with grabber open --> Y Button
+     * Hold object position --> B Button
+     */
+
+    //Operator Controller
+    /*Grabber Close and Open --> Left Bumper
+     * Grabber Intake --> Right Bumper
+     * Grabber Eject --> Right Trigger
+     * Score High Level --> Up Arrow
+     * Score Mid Level --> Down Arrow
+     * Go into Balance Mode (with all subsystems in) --> Start Button
+     *     Balance Mode means that the robot will move slower based off driver input
+     */
+  }
+
   /**
    * Updates the status of the LEDs periodically based on the various states of the robot (e.g.
    * limelight working, arm, autobalancing).
@@ -121,22 +151,22 @@ public class Robot extends TimedRobot {
   // For future reference, find a way to detect errors and add them to the requirement for LED change
   public void updateLEDs() {
     if(isDisabled()){
-      System.out.println("LEDs: Robot is disabled");
+      //System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
     }
 
     else if(isEnabled()){
-      System.out.println("LEDs: Robot is enabled");
+      //System.out.println("LEDs: Robot is enabled");
       led_.setOutput(LED.OutputType.ENABLED_READY);
     }
 
     else if(limelight_.hasTarget()){
-      System.out.println("LEDs: Intake");
+      //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
     }
 
     else if(drive_balance_.isFinished()){
-      System.out.println("LEDs: Balanced");
+      //System.out.println("LEDs: Balanced");
       led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
 

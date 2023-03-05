@@ -49,12 +49,12 @@ public class Grabber extends SubsystemBase {
 
     // Write outputs
     if (io_.wants_pneumatic_update) {
-      pivot_.set(io_.pivot_value);
+      //pivot_.set(io_.pivot_value);
       io_.wants_pneumatic_update = false;
     }
 
-    left_leader_.set(io_.demand);
-    right_leader_.set(io_.demand);
+    //left_leader_.set(io_.demand);
+    //right_leader_.set(io_.demand);
   }
 
   // Percent Setter

@@ -19,6 +19,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
@@ -133,6 +134,9 @@ public class Drivetrain extends SubsystemBase {
     io_.r_velocity = right_encoder_.getVelocity();
     io_.angle = Math.toRadians(gyro_.getYaw());
     io_.pitch = Math.toRadians(gyro_.getRoll());
+
+    SmartDashboard.putNumber("Gyro Yaw", getAngle());
+    SmartDashboard.putNumber("Gyro Pitch", getPitch());
 
     switch (output_type_) {
       case PERCENT:
