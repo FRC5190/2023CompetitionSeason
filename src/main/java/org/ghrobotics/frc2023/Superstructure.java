@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
@@ -57,7 +58,10 @@ public class Superstructure {
     INTAKE(0, 0, -20),
 
     // Exhaust cube out the back of the robot
-    BACK_EXHAUST(31, 0, 125);
+    BACK_EXHAUST(29, 0, 125),
+
+    // Testing
+    TEST(20, 5, 30);
 
     final double height;
     final double extension;

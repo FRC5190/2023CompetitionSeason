@@ -7,10 +7,18 @@ package org.ghrobotics.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.io.PipedOutputStream;
 
 public class Arm extends SubsystemBase {
   // Motor Controller
@@ -23,6 +31,10 @@ public class Arm extends SubsystemBase {
   private final ArmFeedforward ff_;
   private final ProfiledPIDController fb_;
   private boolean reset_pid_ = false;
+
+  // Simulation
+  private final SingleJointedArmSim physics_sim_;
+  private final SimDeviceSim leader_sim_;
 
   // IO
   private final PeriodicIO io_ = new PeriodicIO();
@@ -47,6 +59,14 @@ public class Arm extends SubsystemBase {
     fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
         Constants.kMaxVelocity, Constants.kMaxAcceleration));
 
+    // Initialize simulation
+    physics_sim_ = new SingleJointedArmSim(
+        LinearSystemId.identifyPositionSystem(Constants.kV, Constants.kA),
+        DCMotor.getNEO(1), Constants.kGearRatio, Constants.kArmLength, Constants.kMinAngle,
+        Constants.kMaxAngle, false
+    );
+    leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeaderId + "]");
+
     // Safety features
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
@@ -56,6 +76,7 @@ public class Arm extends SubsystemBase {
 
     // Reset encoder
     encoder_.setPosition(Constants.kMaxAngle);
+    physics_sim_.setState(VecBuilder.fill(Constants.kMaxAngle, 0));
   }
 
   @Override
@@ -74,6 +95,11 @@ public class Arm extends SubsystemBase {
     switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
+
+        // Set simulated inputs
+        if (RobotBase.isSimulation())
+          leader_sim_.getDouble("Applied Output").set(io_.demand * 12);
+
         break;
       case ANGLE:
         double feedback = fb_.calculate(io_.angle);
@@ -85,6 +111,22 @@ public class Arm extends SubsystemBase {
         leader_.setVoltage(feedback + feedforward);
         break;
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // Update physics sim with inputs
+    double voltage = leader_.getAppliedOutput();
+    if (output_type_ == OutputType.ANGLE)
+      voltage -= Constants.kG * Math.cos(io_.angle);
+    physics_sim_.setInputVoltage(voltage);
+
+    // Update physics sim forward in time
+    physics_sim_.update(0.02);
+
+    // Update encoder values
+    leader_sim_.getDouble("Position").set(physics_sim_.getAngleRads());
+    leader_sim_.getDouble("Velocity").set(physics_sim_.getVelocityRadPerSec());
   }
 
   public void setPercent(double percent) {
@@ -136,6 +178,7 @@ public class Arm extends SubsystemBase {
     public static final double kGearRatio = 49.0 * 33.0 / 15.0;
     public static final double kMinAngle = Math.toRadians(-20);
     public static final double kMaxAngle = Math.toRadians(126);
+    public static final double kArmLength = 0.15;
 
     // Feedforward
     public static final double kA = 0.041608; //volts * seconds^2 / radians

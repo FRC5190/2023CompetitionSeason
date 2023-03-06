@@ -8,8 +8,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
@@ -23,6 +28,10 @@ public class Extender extends SubsystemBase {
   // Control
   private final ProfiledPIDController fb_;
   private final SimpleMotorFeedforward ff_;
+
+  // Simulation
+  private final ElevatorSim physics_sim_;
+  private final SimDeviceSim leader_sim_;
 
   // IO
   private final PeriodicIO io_ = new PeriodicIO();
@@ -48,11 +57,20 @@ public class Extender extends SubsystemBase {
     fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
         Constants.kMaxVelocity, Constants.kMaxAcceleration));
 
+    // Initialize simulation
+    physics_sim_ = new ElevatorSim(
+        LinearSystemId.identifyPositionSystem(
+            Constants.kV, Constants.kA), DCMotor.getNEO(1),
+        Constants.kGearRatio, Constants.kSprocketDiameter / 2, Constants.kMinLength,
+        Constants.kMaxLength, false);
+    leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeaderId + "]");
+
     // Safety features
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinLength);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxLength);
 
+    // Reset encoder position
     encoder_.setPosition(0);
   }
 
@@ -66,6 +84,11 @@ public class Extender extends SubsystemBase {
     switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
+
+        // Set simulated inputs
+        if (RobotBase.isSimulation())
+          leader_sim_.getDouble("Applied Output").set(io_.demand * 12);
+
         break;
       case POSITION:
         fb_.setGoal(io_.demand);
@@ -78,6 +101,19 @@ public class Extender extends SubsystemBase {
         leader_.setVoltage(feedback + feedforward);
         break;
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // Update physics sim with inputs
+    physics_sim_.setInputVoltage(leader_.getAppliedOutput());
+
+    // Update physics sim forward in time
+    physics_sim_.update(0.02);
+
+    // Update encoder values
+    leader_sim_.getDouble("Position").set(physics_sim_.getPositionMeters());
+    leader_sim_.getDouble("Velocity").set(physics_sim_.getVelocityMetersPerSecond());
   }
 
   public void setPercent(double percent) {

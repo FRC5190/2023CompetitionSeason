@@ -8,8 +8,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
@@ -25,6 +30,10 @@ public class Elevator extends SubsystemBase {
   private final ProfiledPIDController fb_;
   private final ElevatorFeedforward ff_;
   private boolean reset_pid_ = true;
+
+  // Simulation
+  private final ElevatorSim physics_sim_;
+  private final SimDeviceSim leader_sim_;
 
   // IO
   private final PeriodicIO io_ = new PeriodicIO();
@@ -51,14 +60,22 @@ public class Elevator extends SubsystemBase {
 
     // Initialize control
     ff_ = new ElevatorFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
-    fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
-        Constants.kMaxVelocity, Constants.kMaxAcceleration));
+    fb_ = new ProfiledPIDController(Constants.kP, 0, 0,
+        new TrapezoidProfile.Constraints(Constants.kMaxVelocity, Constants.kMaxAcceleration));
+
+    // Initialize simulation
+    physics_sim_ = new ElevatorSim(
+        LinearSystemId.identifyPositionSystem(Constants.kV, Constants.kA), DCMotor.getNEO(2),
+        Constants.kGearRatio, Constants.kSprocketDiameter / 2, Constants.kMinHeight,
+        Constants.kMaxHeight, false);
+    leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeaderId + "]");
 
     // Safety features
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinHeight);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxHeight);
 
+    // Reset encoder position
     encoder_.setPosition(0);
   }
 
@@ -78,6 +95,11 @@ public class Elevator extends SubsystemBase {
     switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
+
+        // Set simulated inputs
+        if (RobotBase.isSimulation())
+          leader_sim_.getDouble("Applied Output").set(io_.demand * 12);
+
         break;
       case POSITION:
         double feedback = fb_.calculate(io_.position);
@@ -89,6 +111,21 @@ public class Elevator extends SubsystemBase {
         leader_.setVoltage(feedback + feedforward);
         break;
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // Update physics sim with inputs
+    double voltage = leader_.getAppliedOutput();
+    if (output_type_ == OutputType.POSITION) voltage -= Constants.kG;
+    physics_sim_.setInputVoltage(voltage);
+
+    // Update physics sim forward in time
+    physics_sim_.update(0.02);
+
+    // Update encoder values
+    leader_sim_.getDouble("Position").set(physics_sim_.getPositionMeters());
+    leader_sim_.getDouble("Velocity").set(physics_sim_.getVelocityMetersPerSecond());
   }
 
   public void setPercent(double percent) {

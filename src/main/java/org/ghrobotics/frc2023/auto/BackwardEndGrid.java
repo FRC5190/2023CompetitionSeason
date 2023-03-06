@@ -6,8 +6,10 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.ArrayList;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
@@ -59,15 +61,20 @@ public class BackwardEndGrid extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
         // Exhaust cube
-//        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST),
+        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST),
 
         // Drive to cube pickup while intaking
         new ParallelDeadlineGroup(
-            new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
+            new SequentialCommandGroup(
+                new WaitCommand(1.5),
+                new DriveTrajectory(drivetrain, pose_estimator, () -> t1)),
             superstructure.setPosition(Superstructure.Position.INTAKE)),
 
         // Drive to charge station
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+        new ParallelCommandGroup(
+            new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+            superstructure.setPosition(Superstructure.Position.STOW)
+        ),
 
         // Balance
         new DriveBalance(drivetrain)
