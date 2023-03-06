@@ -9,6 +9,7 @@ public class AutoSelector {
   private final SendableChooser<Side> side_chooser_;
   private final SendableChooser<Height> height_chooser_;
   private final SendableChooser<Balance> balance_chooser_;
+  private final SendableChooser<Routine> routine_chooser_;
 
   // Constructor
   public AutoSelector() {
@@ -28,6 +29,9 @@ public class AutoSelector {
     balance_chooser_ = new SendableChooser<>();
     balance_chooser_.setDefaultOption("Yes", Balance.YES);
     balance_chooser_.addOption("No", Balance.NO);
+
+    routine_chooser_ = new SendableChooser<>();
+    routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
   }
 
   // Side Chooser Getter
@@ -61,5 +65,9 @@ public class AutoSelector {
 
   public enum Balance {
     YES, NO
+  }
+
+  public enum Routine {
+    SCOREONETAXI
   }
 }
