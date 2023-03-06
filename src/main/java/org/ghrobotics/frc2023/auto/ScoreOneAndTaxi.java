@@ -15,9 +15,9 @@ import org.ghrobotics.frc2023.commands.DriveTrajectory;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
-public class ScoreOne extends SequentialCommandGroup {
+public class ScoreOneAndTaxi extends SequentialCommandGroup {
   // Constructor
-  public ScoreOne(Drivetrain drivetrain, PoseEstimator pose_estimator,
+  public ScoreOneAndTaxi(Drivetrain drivetrain, PoseEstimator pose_estimator,
                   AutoSelector.Side side, AutoSelector.Height height,
                   AutoSelector.Balance balance) {
     // Trajectory
@@ -78,6 +78,9 @@ public class ScoreOne extends SequentialCommandGroup {
         )
 
         // Place game piece
+
+        //Taxi Backwards and Turn?
+
     );
   }
 }

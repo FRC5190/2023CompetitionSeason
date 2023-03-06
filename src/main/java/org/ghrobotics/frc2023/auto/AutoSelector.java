@@ -47,7 +47,7 @@ public class AutoSelector {
 
   // Run Auto
   public void run(Drivetrain drivetrain, PoseEstimator pose_estimator) {
-    new ScoreOne(drivetrain, pose_estimator, side_chooser_.getSelected(),
+    new ScoreOneAndTaxi(drivetrain, pose_estimator, side_chooser_.getSelected(),
         height_chooser_.getSelected(), balance_chooser_.getSelected()).schedule();
   }
 
