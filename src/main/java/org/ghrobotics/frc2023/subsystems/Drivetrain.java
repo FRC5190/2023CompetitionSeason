@@ -133,7 +133,7 @@ public class Drivetrain extends SubsystemBase {
     io_.l_velocity = left_encoder_.getVelocity();
     io_.r_velocity = right_encoder_.getVelocity();
     io_.angle = Math.toRadians(gyro_.getYaw());
-    io_.pitch = Math.toRadians(-gyro_.getRoll());
+    io_.pitch = Math.toRadians(gyro_.getRoll());
 
     SmartDashboard.putNumber("Gyro Yaw", getAngle());
     SmartDashboard.putNumber("Gyro Pitch", getPitch());

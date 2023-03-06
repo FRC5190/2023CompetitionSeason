@@ -4,16 +4,14 @@
 
 package org.ghrobotics.frc2023;
 
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.ghrobotics.frc2023.auto.AutoSelector;
+import org.ghrobotics.frc2023.auto.BackwardEndGrid;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
@@ -85,10 +83,9 @@ public class Robot extends TimedRobot {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
 
-    new DriveBalance(drivetrain_).schedule();
-
     // Run auto
-    //auto_selector_.run(drivetrain_, pose_estimator_);
+    new BackwardEndGrid(drivetrain_, superstructure_, pose_estimator_,
+        DriverStation.getAlliance()).schedule();
   }
 
   @Override
@@ -134,14 +131,16 @@ public class Robot extends TimedRobot {
 
     new JoystickButton(driver_controller_,
         XboxController.Button.kA.value).onTrue(superstructure_.setPosition(
-        Superstructure.Position.TEST));
+        Superstructure.Position.STOW));
 
     new JoystickButton(driver_controller_,
-        XboxController.Button.kLeftBumper.value).onTrue(new InstantCommand(() -> grabber_.setPercent(-0.2)))
+        XboxController.Button.kLeftBumper.value).onTrue(
+            new InstantCommand(() -> grabber_.setPercent(-0.2)))
         .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
 
     new JoystickButton(driver_controller_,
-        XboxController.Button.kRightBumper.value).onTrue(new InstantCommand(() -> grabber_.setPercent(1.0)))
+        XboxController.Button.kRightBumper.value).onTrue(
+            new InstantCommand(() -> grabber_.setPercent(1.0)))
         .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
 
     //Driver Controller

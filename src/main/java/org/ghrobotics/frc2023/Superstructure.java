@@ -2,10 +2,12 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import org.ghrobotics.frc2023.commands.ArmToPosition;
+import org.ghrobotics.frc2023.commands.ElevateToPosition;
+import org.ghrobotics.frc2023.commands.ExtendToPosition;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Elevator;
 import org.ghrobotics.frc2023.subsystems.Extender;
@@ -27,32 +29,35 @@ public class Superstructure {
   // Position Setter
   public Command setPosition(Position pos) {
     // Find the arm's "elevator movement" position -- where the arm should be when the
-    // elevator is moving. This is max(kElevatorMovementPosition, desired arm position)
+    // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
     double arm_elev_mvmt_pos = Math.max(pos.angle, Constants.kElevatorMovementArmPosition);
 
     // Create and return command group
     return new SequentialCommandGroup(
-        new PrintCommand("in here"),
         // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
-        // Also, bring extension back in
-        new InstantCommand(() -> elevator_.setPosition(pos.height)),
-        new InstantCommand(() -> arm_.setAngle(arm_elev_mvmt_pos)),
-        new InstantCommand(() -> extender_.setPosition(Constants.kExtenderStowPosition)),
+        // Also, bring extension back in. End this when we reach the desired elevator height.
+        new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
+            new ExtendToPosition(extender_, Constants.kExtenderStowPosition),
+            new ArmToPosition(arm_, arm_elev_mvmt_pos)
+        ),
 
-        // Wait for the elevator to reach desired position within tolerance
-        new WaitUntilCommand(() -> Math.abs(
-            pos.height - elevator_.getPosition()) < Constants.kElevatorHeightTolerance),
-
-        // Take extender and arm to final position
-        new InstantCommand(() -> extender_.setPosition(pos.extension)),
-        new InstantCommand(() -> arm_.setAngle(pos.angle))
-    );
+        // Take extender and arm to final position.
+        new ParallelCommandGroup(
+            new ExtendToPosition(extender_, pos.extension),
+            new ArmToPosition(arm_, pos.angle)
+        ));
   }
 
   // Positions
   public enum Position {
+    // Stowed position, everything inside the robot
+    STOW(0, 0, 125),
+
+    // Intaking a game piece
     INTAKE(0, 0, -20),
-    TEST(31, 9, 30);
+
+    // Exhaust cube out the back of the robot
+    BACK_EXHAUST(31, 0, 125);
 
     final double height;
     final double extension;

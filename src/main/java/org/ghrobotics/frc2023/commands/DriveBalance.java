@@ -30,23 +30,21 @@ public class DriveBalance extends CommandBase {
 
   @Override
   public void execute() {
-    drivetrain_.setVelocity(0.2, 0.2);
+    // Based on whether we are on the platform or not, set speed
+    double speed = on_platform_ ? Constants.kInclineSpeed : Constants.kFlatSpeed;
+    drivetrain_.setVelocity(speed, speed);
 
-//    // Based on whether we are on the platform or not, set speed
-//    double speed = on_platform_ ? Constants.kInclineSpeed : Constants.kFlatSpeed;
-//    drivetrain_.setVelocity(speed, speed);
-//
-//    // If we weren't on the platform before, check whether we are now
-//    if (!on_platform_ && (drivetrain_.getPitch() - baseline_pitch_) > Constants.kOnPlatformThreshold)
-//      on_platform_ = true;
-//
-//    // If we are on the platform and weren't balanced, check whether we are now
-//    if (on_platform_ && !is_balanced_ && (drivetrain_.getPitch() - baseline_pitch_) < Constants.kBalanceThreshold)
-//      is_balanced_ = true;
-//
-//    // Telemetry: delete later
-//    SmartDashboard.putBoolean("on_platform", on_platform_);
-//    SmartDashboard.putBoolean("is_balanced", is_balanced_);
+    // If we weren't on the platform before, check whether we are now
+    if (!on_platform_ && (drivetrain_.getPitch() - baseline_pitch_) > Constants.kOnPlatformThreshold)
+      on_platform_ = true;
+
+    // If we are on the platform and weren't balanced, check whether we are now
+    if (on_platform_ && !is_balanced_ && (drivetrain_.getPitch() - baseline_pitch_) < Constants.kBalanceThreshold)
+      is_balanced_ = true;
+
+    // Telemetry: delete later
+    SmartDashboard.putBoolean("on_platform", on_platform_);
+    SmartDashboard.putBoolean("is_balanced", is_balanced_);
   }
 
   @Override
@@ -66,7 +64,7 @@ public class DriveBalance extends CommandBase {
     public static final double kBalanceThreshold = Math.toRadians(8);
 
     // Speeds
-    public static final double kFlatSpeed = 0.2;
-    public static final double kInclineSpeed = 0.1;
+    public static final double kFlatSpeed = -0.2;
+    public static final double kInclineSpeed = -0.1;
   }
 }
