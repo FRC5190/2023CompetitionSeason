@@ -6,14 +6,12 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
-import org.ghrobotics.frc2023.auto.BackwardEndGrid;
+import org.ghrobotics.frc2023.auto.ScoreBackwardThenPickup;
 import org.ghrobotics.frc2023.auto.ScoreOneAndTaxi;
-import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Arm;
@@ -32,9 +30,9 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
  * project.
  */
 public class Robot extends TimedRobot {
-    //Balance mode
-    private boolean balance_mode_ = false;
-    
+  // Balance Mode
+  private boolean balance_mode_ = false;
+
   // Subsystems
   private final Drivetrain drivetrain_ = new Drivetrain(() -> balance_mode_);
   private final Limelight limelight_ = new Limelight("limelight");
@@ -49,20 +47,16 @@ public class Robot extends TimedRobot {
   private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_,
       grabber_);
 
-  // Commands - (needed for autobalancing)
-  private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);
-
   // Auto Selector
   private final AutoSelector auto_selector_ = new AutoSelector();
 
-  // Xbox Controller
-  private final XboxController driver_controller_ = new XboxController(0);
-  private final XboxController operator_controller_ = new XboxController(1);
+  // Xbox Controllers
+  private final CommandXboxController driver_controller_ = new CommandXboxController(0);
+  private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
-      pose_estimator_,
-      limelight_, auto_selector_);
+      pose_estimator_, limelight_, auto_selector_);
 
   @Override
   public void robotInit() {
@@ -88,10 +82,14 @@ public class Robot extends TimedRobot {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
 
+    // Calibrate drivetrain pitch
+    drivetrain_.calibratePitch();
+
     // Run auto
-    //new BackwardEndGrid(drivetrain_, superstructure_, pose_estimator_,
-      //  DriverStation.getAlliance()).schedule();
-      new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
+    new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_,
+      DriverStation.getAlliance()).schedule();
+//    new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_,
+//        DriverStation.getAlliance()).schedule();
   }
 
   @Override
@@ -130,50 +128,40 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {}
 
   private void setupTeleopControls() {
-    // Testing
-    new JoystickButton(driver_controller_,
-        XboxController.Button.kY.value).onTrue(superstructure_.setPosition(
-        Superstructure.Position.INTAKE));
+    // Driver Controller
+    //  * B:  Balance Mode
+    driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
+    //  * LB: Intake Cone
+    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> 0.4, true));
+    //  * LT: Outtake Cone
+    driver_controller_.leftTrigger(0.2).whileTrue(superstructure_.setGrabber(() -> 0.0, true));
+    //  * RB: Intake Cube
+    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> 0.4, true));
+    //  * RT: Outtake Cube
+    driver_controller_.rightTrigger(0.2).whileTrue(
+        superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
 
-    new JoystickButton(driver_controller_,
-        XboxController.Button.kA.value).onTrue(superstructure_.setPosition(
-        Superstructure.Position.STOW));
-
-    new JoystickButton(driver_controller_,
-        XboxController.Button.kLeftBumper.value).onTrue(
-            new InstantCommand(() -> grabber_.setPercent(-0.2)))
-        .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
-
-    new JoystickButton(driver_controller_,
-        XboxController.Button.kRightBumper.value).onTrue(
-            new InstantCommand(() -> grabber_.setPercent(1.0)))
-        .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
-
-    new JoystickButton(driver_controller_, XboxController.Button.kB.value)
-      .onTrue(superstructure_.sestPosition(Superstructure.Position.SUBSTATION));
-
-    //Driver Controller
-    /*Arcade Drive --> Left Joystick
-     * Quick Turn --> X Button
-     * Intake cone --> Left Bumper
-     * Outtake cone --> Left Trigger
-     * Intake cube --> Right Bumper
-     * Outake cube --> Right Trigger
-     * Balance mode --> B button
-     *   Balance Mode means that the robot will move slower based off driver input with all subsystems in stow position
-     */
-
-    //Operator Controller
-    /*Grabber Close and Open --> Left Bumper
-     * Grabber Intake --> Right Bumper
-     * Grabber Eject --> Right Trigger
-     * Score High Level --> Up Arrow
-     * Score Mid Level --> Down Arrow
-     * Substation Preset --> A Button
-     * Pick-up from ground --> Y Button
-     * Hold Position --> B button
-
-     */
+    // Operator Controller
+    //  * Y:       L3 Cone
+    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.CONE_L3));
+    //  * B:       L2 Cone
+    operator_controller_.b().onTrue(superstructure_.setPosition(Superstructure.Position.CONE_L2));
+    //  * A:       L1 Cone / Cube / Intake
+    operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
+    //  * X:       Stow
+    operator_controller_.x().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
+    //  * LB:      Substation
+    operator_controller_.leftBumper().onTrue(
+        superstructure_.setPosition(Superstructure.Position.SUBSTATION));
+    //  * POV 0:   L3 Cube
+    operator_controller_.pov(0).onTrue(
+        superstructure_.setPosition(Superstructure.Position.CUBE_L3));
+    //  * POV 90:  L2 Cube
+    operator_controller_.pov(90).onTrue(
+        superstructure_.setPosition(Superstructure.Position.CUBE_L2));
+    //  * POV 270: Backward Cube
+    operator_controller_.pov(270).onTrue(
+        superstructure_.setPosition(Superstructure.Position.BACK_EXHAUST));
   }
 
   /**
@@ -193,11 +181,6 @@ public class Robot extends TimedRobot {
     } else if (limelight_.hasTarget()) {
       //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
-    } else if (drive_balance_.isFinished()) {
-      //System.out.println("LEDs: Balanced");
-      led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     }
   }
-
-
 }

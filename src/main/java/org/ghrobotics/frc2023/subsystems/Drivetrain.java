@@ -12,7 +12,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -20,11 +19,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static com.revrobotics.CANSparkMax.ControlType;
-
 import java.util.function.BooleanSupplier;
+import static com.revrobotics.CANSparkMax.ControlType;
 
 public class Drivetrain extends SubsystemBase {
   // Motor Controllers
@@ -38,14 +35,17 @@ public class Drivetrain extends SubsystemBase {
   private final RelativeEncoder right_encoder_;
   private final WPI_Pigeon2 gyro_;
 
+  private double baseline_pitch_ = 0.0;
+
   // Control
   private final SparkMaxPIDController left_pid_controller_;
   private final SparkMaxPIDController right_pid_controller_;
   private final DifferentialDriveKinematics kinematics_;
-  private final DifferentialDriveFeedforward ff_;
-
   private final SimpleMotorFeedforward l_ff_;
   private final SimpleMotorFeedforward r_ff_;
+
+  private double l_setpoint_ = 0;
+  private double r_setpoint_ = 0;
 
   // Simulation
   private final DifferentialDrivetrainSim physics_sim_;
@@ -53,21 +53,15 @@ public class Drivetrain extends SubsystemBase {
   private final SimDeviceSim right_leader_sim_;
   private final BasePigeonSimCollection gyro_sim_;
 
-  private double l_setpoint_ = 0;
-  private double r_setpoint_ = 0;
-
-  // Output Limit
-  private final boolean limit_output_ = false;
-
   // IO
   private OutputType output_type_ = OutputType.PERCENT;
   private final PeriodicIO io_ = new PeriodicIO();
 
-  //Balance Mode
+  // Balance Mode
   private final BooleanSupplier balance_mode_;
 
   // Constructor
-  public Drivetrain(BooleanSupplier balanceMode) {
+  public Drivetrain(BooleanSupplier balance_mode) {
     // Initialize motor controllers
     left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
     left_leader_.restoreFactoryDefaults();
@@ -117,9 +111,6 @@ public class Drivetrain extends SubsystemBase {
     right_pid_controller_.setP(Constants.kRightKp);
 
     // Initialize feedforward.
-    ff_ = new DifferentialDriveFeedforward(
-        Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa
-    );
     l_ff_ = new SimpleMotorFeedforward(Constants.kLKs, Constants.kLKv, Constants.kLKa);
     r_ff_ = new SimpleMotorFeedforward(Constants.kRKs, Constants.kRKv, Constants.kRKa);
 
@@ -138,8 +129,8 @@ public class Drivetrain extends SubsystemBase {
     right_leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kRightLeaderId + "]");
     gyro_sim_ = gyro_.getSimCollection();
 
-    //Initialize Balance Mode
-    balance_mode_ = balanceMode;
+    // Initialize Balance Mode
+    balance_mode_ = balance_mode;
   }
 
   @Override
@@ -152,8 +143,8 @@ public class Drivetrain extends SubsystemBase {
     io_.angle = Math.toRadians(gyro_.getYaw());
     io_.pitch = Math.toRadians(gyro_.getRoll());
 
-    SmartDashboard.putNumber("Gyro Yaw", getAngle());
-    SmartDashboard.putNumber("Gyro Pitch", getPitch());
+    // Set output limit in balance mode
+    boolean limit_output_ = balance_mode_.getAsBoolean();
 
     switch (output_type_) {
       case PERCENT:
@@ -181,8 +172,6 @@ public class Drivetrain extends SubsystemBase {
         l_setpoint_ = io_.l_demand;
         r_setpoint_ = io_.r_demand;
 
-//        System.out.println("L: " + l_volts + ", R: " + r_volts);
-
         left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0, l_volts);
         right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0, r_volts);
 
@@ -192,10 +181,6 @@ public class Drivetrain extends SubsystemBase {
           right_leader_sim_.getDouble("Applied Output").set(r_volts);
         }
         break;
-    }
-
-    if (balance_mode_.getAsBoolean()){
-      setPercent(0.4, 0.4);
     }
   }
 
@@ -215,11 +200,18 @@ public class Drivetrain extends SubsystemBase {
     gyro_sim_.setRawHeading(physics_sim_.getHeading().getDegrees());
   }
 
+  // Pitch Calibration
+  public void calibratePitch() {
+    baseline_pitch_ = io_.pitch;
+  }
+
   // Percent Setter
   public void setPercent(double l, double r) {
     output_type_ = OutputType.PERCENT;
     io_.l_demand = l;
     io_.r_demand = r;
+    l_setpoint_ = 0;
+    r_setpoint_ = 0;
   }
 
   // Velocity Setter
@@ -265,7 +257,7 @@ public class Drivetrain extends SubsystemBase {
 
   // Pitch Getter
   public double getPitch() {
-    return io_.pitch;
+    return io_.pitch - baseline_pitch_;
   }
 
   // Average Velocity Getter
@@ -328,6 +320,6 @@ public class Drivetrain extends SubsystemBase {
     public static final double kRightKp = 1.0;
 
     // Output Limit
-    public static final double kOutputLimit = 0.3;
+    public static final double kOutputLimit = 0.4;
   }
 }

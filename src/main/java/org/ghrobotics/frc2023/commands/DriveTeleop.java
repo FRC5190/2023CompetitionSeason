@@ -4,9 +4,9 @@
 
 package org.ghrobotics.frc2023.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 
 
@@ -15,9 +15,9 @@ import org.ghrobotics.frc2023.subsystems.Drivetrain;
  */
 public class DriveTeleop extends CommandBase {
   private final Drivetrain drivetrain_;
-  private final XboxController controller_;
+  private final CommandXboxController controller_;
 
-  public DriveTeleop(Drivetrain drivetrain, XboxController controller) {
+  public DriveTeleop(Drivetrain drivetrain, CommandXboxController controller) {
     drivetrain_ = drivetrain;
     controller_ = controller;
 
@@ -29,7 +29,7 @@ public class DriveTeleop extends CommandBase {
   public void execute() {
     double forward = -controller_.getLeftY();
     double curvature = -controller_.getLeftX();
-    boolean quick_turn = controller_.getXButton();
+    boolean quick_turn = controller_.x().getAsBoolean();
 
     DifferentialDrive.WheelSpeeds speeds = DifferentialDrive.curvatureDriveIK(
         forward, curvature, quick_turn);

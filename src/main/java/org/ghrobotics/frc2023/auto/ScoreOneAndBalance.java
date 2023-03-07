@@ -34,30 +34,30 @@ public class ScoreOneAndBalance extends SequentialCommandGroup {
 
        // Check if we need to mirror poses
        boolean should_mirror = alliance == DriverStation.Alliance.Red;
-    
+
        // Get starting positions
        //Pose2d kBotStartingPos = pose_estimator.getPosition();
        Pose2d start_pos = should_mirror ? mirror(kBotStartingPos) : kBotStartingPos;
        Pose2d score_pos = should_mirror ? mirror(kScoringPos) : kScoringPos;
-   
-           
+
+
        Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos, new ArrayList<>(), score_pos, AutoConfig.kForwardConfig);
 
     addCommands(
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
-      superstructure.setPosition(Superstructure.Position.SCOREHIGH),
-      
-      new DriveTrajectory(drivetrain, pose_estimator, () -> t1), 
+      superstructure.setPosition(Superstructure.Position.CUBE_L3),
+
+      new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
 
       new ParallelCommandGroup(
         new WaitCommand(1.5),
         //Run Grabber
-        superstructure.setGrabber(0.4, false)
+        superstructure.setGrabber(() -> 0.4, false)
       ),
 
       new DriveBalance(drivetrain)
-  
+
     );
   }
 

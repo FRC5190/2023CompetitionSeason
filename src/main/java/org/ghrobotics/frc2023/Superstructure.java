@@ -2,14 +2,14 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import java.util.function.DoubleSupplier;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
 import org.ghrobotics.frc2023.commands.ExtendToPosition;
-import org.ghrobotics.frc2023.commands.GrabberPercent;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Elevator;
 import org.ghrobotics.frc2023.subsystems.Extender;
@@ -53,8 +53,27 @@ public class Superstructure {
         ));
   }
 
-  public Command setGrabber(double percent, boolean pivot) {
-    return new GrabberPercent(grabber_, percent, pivot);
+  // Grabber Setter
+  public Command setGrabber(DoubleSupplier percent, boolean open) {
+    return new FunctionalCommand(
+        // Initialize
+        () -> grabber_.setPivot(open),
+
+        // Execute
+        () -> grabber_.setPercent(percent.getAsDouble()),
+
+        // End
+        (interrupted) -> {
+          grabber_.setPercent(0);
+          grabber_.setPivot(false);
+        },
+
+        // Is Finished
+        () -> false,
+
+        // Subsystem Requirement
+        grabber_
+    );
   }
 
   // Positions
@@ -68,14 +87,16 @@ public class Superstructure {
     // Exhaust cube out the back of the robot
     BACK_EXHAUST(31, 0, 125),
 
-    // Testing
-    TEST(20, 5, 30),
+    // Pick up from substation
+    SUBSTATION(31, 0, 10),
 
-    //Score High
-    SCOREHIGH(20, 5, 30),
+    // Cube scoring
+    CUBE_L2(14, 6, 20),
+    CUBE_L3(20, 6, 20),
 
-    //Substation
-    SUBSTATION(31, 0, 10);
+    // Cone scoring
+    CONE_L2(20, 6, 20),
+    CONE_L3(30, 9, 30);
 
     final double height;
     final double extension;
