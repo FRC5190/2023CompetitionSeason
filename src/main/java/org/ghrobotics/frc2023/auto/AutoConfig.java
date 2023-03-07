@@ -9,8 +9,8 @@ import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstrain
 
 public class AutoConfig {
   // Constraints
-  public static final double kMaxVelocity = 3.0;
-  public static final double kMaxAcceleration = 2.0;
+  public static final double kMaxVelocity = 1.0;
+  public static final double kMaxAcceleration = 0.2;
   public static final double kMaxCentripetalAcceleration = 2.5;
 
   // Trajectory Configs

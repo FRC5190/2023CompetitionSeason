@@ -64,7 +64,6 @@ public class DriveTrajectory extends CommandBase {
 
     // Get robot pose at the current time.
     Pose2d current_state = pose_estimator_.getPosition();
-    System.out.println(current_state);
 
     // Calculate chassis speeds to track desired state.
     ChassisSpeeds wanted_chassis_speeds = controller_.calculate(current_state, desired_state);

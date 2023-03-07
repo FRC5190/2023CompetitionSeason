@@ -13,6 +13,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -41,11 +42,17 @@ public class Drivetrain extends SubsystemBase {
   private final DifferentialDriveKinematics kinematics_;
   private final DifferentialDriveFeedforward ff_;
 
+  private final SimpleMotorFeedforward l_ff_;
+  private final SimpleMotorFeedforward r_ff_;
+
   // Simulation
   private final DifferentialDrivetrainSim physics_sim_;
   private final SimDeviceSim left_leader_sim_;
   private final SimDeviceSim right_leader_sim_;
   private final BasePigeonSimCollection gyro_sim_;
+
+  private double l_setpoint_ = 0;
+  private double r_setpoint_ = 0;
 
   // Output Limit
   private final boolean limit_output_ = false;
@@ -108,6 +115,8 @@ public class Drivetrain extends SubsystemBase {
     ff_ = new DifferentialDriveFeedforward(
         Constants.kLinearKv, Constants.kLinearKa, Constants.kAngularKv, Constants.kAngularKa
     );
+    l_ff_ = new SimpleMotorFeedforward(Constants.kLKs, Constants.kLKv, Constants.kLKa);
+    r_ff_ = new SimpleMotorFeedforward(Constants.kRKs, Constants.kRKv, Constants.kRKa);
 
     // Initialize kinematics
     kinematics_ = new DifferentialDriveKinematics(Constants.kTrackWidth);
@@ -155,18 +164,24 @@ public class Drivetrain extends SubsystemBase {
         break;
       case VELOCITY:
         // Calculate feedforward value and add to built-in motor controller PID.
-        var wheel_voltages = ff_.calculate(
-            io_.l_velocity, io_.l_demand, io_.r_velocity, io_.r_demand, 0.02);
+        double l_acc = (io_.l_demand - l_setpoint_) / 0.02;
+        double r_acc = (io_.r_demand - r_setpoint_) / 0.02;
 
-        left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0,
-            wheel_voltages.left);
-        right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0,
-            wheel_voltages.right);
+        double l_volts = l_ff_.calculate(io_.l_demand, l_acc);
+        double r_volts = r_ff_.calculate(io_.r_demand, r_acc);
+
+        l_setpoint_ = io_.l_demand;
+        r_setpoint_ = io_.r_demand;
+
+//        System.out.println("L: " + l_volts + ", R: " + r_volts);
+
+        left_pid_controller_.setReference(io_.l_demand, ControlType.kVelocity, 0, l_volts);
+        right_pid_controller_.setReference(io_.r_demand, ControlType.kVelocity, 0, r_volts);
 
         // Set simulated inputs
         if (RobotBase.isSimulation()) {
-          left_leader_sim_.getDouble("Applied Output").set(wheel_voltages.left);
-          right_leader_sim_.getDouble("Applied Output").set(wheel_voltages.right);
+          left_leader_sim_.getDouble("Applied Output").set(l_volts);
+          right_leader_sim_.getDouble("Applied Output").set(r_volts);
         }
         break;
     }
@@ -285,13 +300,20 @@ public class Drivetrain extends SubsystemBase {
     public static double kTrackWidth = 0.65921;
 
     // Control
-    public static final double kLinearKv = 2.6221;
-    public static final double kLinearKa = 0.29686;
-    public static final double kAngularKv = 2.9518;
-    public static final double kAngularKa = 0.30714;
+    public static final double kLinearKv = 2.6642;
+    public static final double kLinearKa = 0.6999;
+    public static final double kAngularKv = 2.9663;
+    public static final double kAngularKa = 0.5675;
 
-    public static final double kLeftKp = 0.00001;
-    public static final double kRightKp = 0.00001;
+    public static final double kLKs = 0.1168;
+    public static final double kLKv = 2.7628;
+    public static final double kLKa = 0.26228;
+    public static final double kRKs = 0.02646;
+    public static final double kRKv = 2.6882;
+    public static final double kRKa = 0.41251;
+
+    public static final double kLeftKp = 1.0;
+    public static final double kRightKp = 1.0;
 
     // Output Limit
     public static final double kOutputLimit = 0.3;

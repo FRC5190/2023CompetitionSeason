@@ -9,22 +9,26 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
 import org.ghrobotics.frc2023.commands.ExtendToPosition;
+import org.ghrobotics.frc2023.commands.GrabberPercent;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Elevator;
 import org.ghrobotics.frc2023.subsystems.Extender;
+import org.ghrobotics.frc2023.subsystems.Grabber;
 
 public class Superstructure {
   // Subsystems
   private final Elevator elevator_;
   private final Extender extender_;
   private final Arm arm_;
+  private final Grabber grabber_;
 
   // Constructor
-  public Superstructure(Elevator elevator, Extender extender, Arm arm) {
+  public Superstructure(Elevator elevator, Extender extender, Arm arm, Grabber grabber) {
     // Assign member variables
     elevator_ = elevator;
     extender_ = extender;
     arm_ = arm;
+    grabber_ = grabber;
   }
 
   // Position Setter
@@ -49,6 +53,10 @@ public class Superstructure {
         ));
   }
 
+  public Command setGrabber(double percent) {
+    return new GrabberPercent(grabber_, percent);
+  }
+
   // Positions
   public enum Position {
     // Stowed position, everything inside the robot
@@ -58,7 +66,7 @@ public class Superstructure {
     INTAKE(0, 0, -20),
 
     // Exhaust cube out the back of the robot
-    BACK_EXHAUST(29, 0, 125),
+    BACK_EXHAUST(31, 0, 125),
 
     // Testing
     TEST(20, 5, 30);

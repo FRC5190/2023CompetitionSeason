@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase {
     // Write outputs
     switch (output_type_) {
       case PERCENT:
-        leader_.set(io_.demand);
+        leader_.set(0);
 
         // Set simulated inputs
         if (RobotBase.isSimulation())
@@ -108,7 +108,7 @@ public class Elevator extends SubsystemBase {
         double acceleration_setpoint = (velocity_setpoint - io_.velocity) / 0.02;
         double feedforward = ff_.calculate(velocity_setpoint, acceleration_setpoint);
 
-        leader_.setVoltage(feedback + feedforward);
+        leader_.setVoltage(0);
         break;
     }
   }
@@ -188,8 +188,8 @@ public class Elevator extends SubsystemBase {
     public static final double kCurrentLimit = 50;
 
     // Control
-    public static double kMaxVelocity = 0.6;
-    public static double kMaxAcceleration = 0.6;
-    public static double kP = 0.05;
+    public static double kMaxVelocity = 1.0;
+    public static double kMaxAcceleration = 1.0;
+    public static double kP = 0.15;
   }
 }

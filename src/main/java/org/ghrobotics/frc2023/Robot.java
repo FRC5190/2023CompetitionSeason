@@ -42,7 +42,8 @@ public class Robot extends TimedRobot {
   private final LED led_ = new LED();
 
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_);
+  private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_,
+      grabber_);
 
   // Commands - (needed for autobalancing)
   private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);

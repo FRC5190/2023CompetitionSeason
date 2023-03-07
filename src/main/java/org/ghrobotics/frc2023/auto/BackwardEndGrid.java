@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
+import org.ghrobotics.frc2023.commands.GrabberPercent;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -61,19 +62,20 @@ public class BackwardEndGrid extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST),
+//        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2.0),
+//        superstructure.setGrabber(1.0).withTimeout(0.5),
 
         // Drive to cube pickup while intaking
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(1.5),
-                new DriveTrajectory(drivetrain, pose_estimator, () -> t1)),
-            superstructure.setPosition(Superstructure.Position.INTAKE)),
+                new DriveTrajectory(drivetrain, pose_estimator, () -> t1))),
+//            superstructure.setPosition(Superstructure.Position.INTAKE),
+//            superstructure.setGrabber(0.4)),
 
         // Drive to charge station
         new ParallelCommandGroup(
-            new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
-            superstructure.setPosition(Superstructure.Position.STOW)
+            new DriveTrajectory(drivetrain, pose_estimator, () -> t2)
+//            superstructure.setPosition(Superstructure.Position.STOW)
         ),
 
         // Balance
