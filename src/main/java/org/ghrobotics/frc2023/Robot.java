@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.auto.BackwardEndGrid;
+import org.ghrobotics.frc2023.auto.ScoreOneAndTaxi;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
@@ -31,8 +32,11 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
  * project.
  */
 public class Robot extends TimedRobot {
+    //Balance mode
+    private boolean balance_mode_ = false;
+    
   // Subsystems
-  private final Drivetrain drivetrain_ = new Drivetrain();
+  private final Drivetrain drivetrain_ = new Drivetrain(() -> balance_mode_);
   private final Limelight limelight_ = new Limelight("limelight");
   private final Elevator elevator_ = new Elevator();
   private final Extender extender_ = new Extender();
@@ -85,8 +89,9 @@ public class Robot extends TimedRobot {
     drivetrain_.setBrakeMode(true);
 
     // Run auto
-    new BackwardEndGrid(drivetrain_, superstructure_, pose_estimator_,
-        DriverStation.getAlliance()).schedule();
+    //new BackwardEndGrid(drivetrain_, superstructure_, pose_estimator_,
+      //  DriverStation.getAlliance()).schedule();
+      new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
   }
 
   @Override
@@ -144,12 +149,18 @@ public class Robot extends TimedRobot {
             new InstantCommand(() -> grabber_.setPercent(1.0)))
         .onFalse(new InstantCommand(() -> grabber_.setPercent(0.0)));
 
+    new JoystickButton(driver_controller_, XboxController.Button.kB.value)
+      .onTrue(superstructure_.sestPosition(Superstructure.Position.SUBSTATION));
+
     //Driver Controller
     /*Arcade Drive --> Left Joystick
      * Quick Turn --> X Button
-     * Pick-up from ground with grabber open --> A Button
-     * Pick-up from substation with grabber open --> Y Button
-     * Hold object position --> B Button
+     * Intake cone --> Left Bumper
+     * Outtake cone --> Left Trigger
+     * Intake cube --> Right Bumper
+     * Outake cube --> Right Trigger
+     * Balance mode --> B button
+     *   Balance Mode means that the robot will move slower based off driver input with all subsystems in stow position
      */
 
     //Operator Controller
@@ -158,8 +169,10 @@ public class Robot extends TimedRobot {
      * Grabber Eject --> Right Trigger
      * Score High Level --> Up Arrow
      * Score Mid Level --> Down Arrow
-     * Go into Balance Mode (with all subsystems in) --> Start Button
-     *     Balance Mode means that the robot will move slower based off driver input
+     * Substation Preset --> A Button
+     * Pick-up from ground --> Y Button
+     * Hold Position --> B button
+
      */
   }
 

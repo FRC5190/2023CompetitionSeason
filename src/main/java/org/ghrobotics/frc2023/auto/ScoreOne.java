@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.ghrobotics.frc2023.Arena;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
+import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -19,7 +20,7 @@ public class ScoreOne extends SequentialCommandGroup {
   // Constructor
   public ScoreOne(Drivetrain drivetrain, PoseEstimator pose_estimator,
                   AutoSelector.Side side, AutoSelector.Height height,
-                  AutoSelector.Balance balance) {
+                  AutoSelector.Balance balance, Superstructure superstructure) {
     // Trajectory
     AtomicReference<Trajectory> trajectory = new AtomicReference<>(new Trajectory());
 
@@ -75,6 +76,7 @@ public class ScoreOne extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new DriveTrajectory(drivetrain, pose_estimator, trajectory::get)
             // Superstructure
+            //superstructure.setPosition(Superstructure.Position.SCOREHIGH)
         )
 
         // Place game piece

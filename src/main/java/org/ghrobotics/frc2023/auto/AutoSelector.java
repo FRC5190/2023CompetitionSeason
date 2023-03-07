@@ -1,6 +1,8 @@
 package org.ghrobotics.frc2023.auto;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
+import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -32,6 +34,8 @@ public class AutoSelector {
 
     routine_chooser_ = new SendableChooser<>();
     routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
+
+
   }
 
   // Side Chooser Getter
@@ -51,8 +55,8 @@ public class AutoSelector {
 
   // Run Auto
   public void run(Drivetrain drivetrain, PoseEstimator pose_estimator) {
-    new ScoreOne(drivetrain, pose_estimator, side_chooser_.getSelected(),
-        height_chooser_.getSelected(), balance_chooser_.getSelected()).schedule();
+    /*new ScoreOne(drivetrain, pose_estimator, side_chooser_.getSelected(),
+        height_chooser_.getSelected(), balance_chooser_.getSelected()).schedule();*/
   }
 
   public enum Side {

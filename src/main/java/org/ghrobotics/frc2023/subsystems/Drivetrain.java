@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.revrobotics.CANSparkMax.ControlType;
 
+import java.util.function.BooleanSupplier;
+
 public class Drivetrain extends SubsystemBase {
   // Motor Controllers
   private final CANSparkMax left_leader_;
@@ -61,8 +63,11 @@ public class Drivetrain extends SubsystemBase {
   private OutputType output_type_ = OutputType.PERCENT;
   private final PeriodicIO io_ = new PeriodicIO();
 
+  //Balance Mode
+  private final BooleanSupplier balance_mode_;
+
   // Constructor
-  public Drivetrain() {
+  public Drivetrain(BooleanSupplier balanceMode) {
     // Initialize motor controllers
     left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
     left_leader_.restoreFactoryDefaults();
@@ -132,6 +137,9 @@ public class Drivetrain extends SubsystemBase {
     left_leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeftLeaderId + "]");
     right_leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kRightLeaderId + "]");
     gyro_sim_ = gyro_.getSimCollection();
+
+    //Initialize Balance Mode
+    balance_mode_ = balanceMode;
   }
 
   @Override
@@ -184,6 +192,10 @@ public class Drivetrain extends SubsystemBase {
           right_leader_sim_.getDouble("Applied Output").set(r_volts);
         }
         break;
+    }
+
+    if (balance_mode_.getAsBoolean()){
+      setPercent(0.4, 0.4);
     }
   }
 

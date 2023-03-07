@@ -53,8 +53,8 @@ public class Superstructure {
         ));
   }
 
-  public Command setGrabber(double percent) {
-    return new GrabberPercent(grabber_, percent);
+  public Command setGrabber(double percent, boolean pivot) {
+    return new GrabberPercent(grabber_, percent, pivot);
   }
 
   // Positions
@@ -69,7 +69,13 @@ public class Superstructure {
     BACK_EXHAUST(31, 0, 125),
 
     // Testing
-    TEST(20, 5, 30);
+    TEST(20, 5, 30),
+
+    //Score High
+    SCOREHIGH(20, 5, 30),
+
+    //Substation
+    SUBSTATION(31, 0, 10);
 
     final double height;
     final double extension;
