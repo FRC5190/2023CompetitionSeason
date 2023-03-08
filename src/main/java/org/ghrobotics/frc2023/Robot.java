@@ -181,6 +181,8 @@ public class Robot extends TimedRobot {
     } else if (limelight_.hasTarget()) {
       //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
+    } else{
+      led_.setOutput(LED.StandardLEDOutput.BLANK);
     }
   }
 }
