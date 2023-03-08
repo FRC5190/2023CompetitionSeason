@@ -17,12 +17,8 @@
     },
     "windows": {
       "/Shuffleboard/2023/Field": {
-        "bottom": 544,
-        "height": 8.013679504394531,
-        "image": "/Users/prateekma/git/2023CompetitionSeason/2023-field.png",
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "height": 8.020000457763672,
+        "image": "C:\\Users\\sdiya\\FRC5190Programming\\2023Code\\2023-field.png",
         "width": 16.541748046875,
         "window": {
           "visible": true

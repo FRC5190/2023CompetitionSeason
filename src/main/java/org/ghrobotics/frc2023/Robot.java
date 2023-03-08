@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.auto.ScoreBackwardThenPickup;
+import org.ghrobotics.frc2023.auto.ScoreOneAndBalance;
 import org.ghrobotics.frc2023.auto.ScoreOneAndTaxi;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
@@ -87,11 +88,10 @@ public class Robot extends TimedRobot {
 //    drivetrain_.calibratePitch();
 
     // Run auto
-    new DriveBalance(drivetrain_).schedule();
-//    new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_,
-//      DriverStation.getAlliance()).schedule();
-//    new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_,
-//        DriverStation.getAlliance()).schedule();
+    //new DriveBalance(drivetrain_).schedule();
+    //new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
+    //new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
+    new ScoreOneAndBalance(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
   }
 
   @Override

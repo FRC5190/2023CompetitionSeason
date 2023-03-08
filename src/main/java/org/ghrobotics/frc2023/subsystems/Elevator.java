@@ -182,7 +182,7 @@ public class Elevator extends SubsystemBase {
     public static final double kG = 0.23;
     public static final double kS = 0.07966;
     public static final double kV = 16.846;
-    public static final double kA = 0.35;
+    public static final double kA = 0.175;
 
     // Current Limit
     public static final double kCurrentLimit = 50;
