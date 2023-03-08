@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2023.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -19,10 +20,15 @@ public class DriveBalance extends CommandBase {
     drivetrain_ = drivetrain;
 
     // Initialize PID controller
-    balance_controller_ = new PIDController(Constants.kP, 0, 0);
+    balance_controller_ = new PIDController(Constants.kP, 0, Constants.kD);
 
     // Add subsystem requirements
     addRequirements(drivetrain_);
+  }
+
+  @Override
+  public void initialize() {
+    balance_controller_.setSetpoint(0);
   }
 
   @Override
@@ -31,7 +37,10 @@ public class DriveBalance extends CommandBase {
     double output_speed = balance_controller_.calculate(drivetrain_.getPitch());
 
     // Set speed
-    drivetrain_.setVelocity(-output_speed, -output_speed);
+    if (Math.abs(drivetrain_.getPitch()) < Math.toRadians(8)) {
+      output_speed = MathUtil.clamp(output_speed, -0.05, 0.05);
+    }
+    drivetrain_.setVelocity(output_speed, output_speed);
   }
 
   @Override
@@ -46,5 +55,6 @@ public class DriveBalance extends CommandBase {
 
     // PID Constants
     public static final double kP = AutoConfig.kBalanceRampApproachSpeed / kRampAngle;
+    public static final double kD = 0.001;
   }
 }

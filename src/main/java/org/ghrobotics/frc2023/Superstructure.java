@@ -85,14 +85,14 @@ public class Superstructure {
     INTAKE(0, 0, -20),
 
     // Exhaust cube out the back of the robot
-    BACK_EXHAUST(31, 0, 125),
+    BACK_EXHAUST(29, 0, 125),
 
     // Pick up from substation
     SUBSTATION(31, 0, 10),
 
     // Cube scoring
-    CUBE_L2(14, 6, 20),
-    CUBE_L3(20, 6, 20),
+    CUBE_L2(20, 6, 20),
+    CUBE_L3(27, 6, 20),
 
     // Cone scoring
     CONE_L2(20, 6, 20),

@@ -191,7 +191,7 @@ public class Arm extends SubsystemBase {
 
     // Control
     public static double kMaxVelocity = 3.14;
-    public static double kMaxAcceleration = 4.5;
+    public static double kMaxAcceleration = 3.14;
     public static double kP = 0.01;
   }
 }

@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ScoreOneAndTaxi extends SequentialCommandGroup {
     // Starting Positions (on blue side)
-    private static final Pose2d kBotStartingPos = new Pose2d(4.5, 4.5, new Rotation2d(Math.PI));
-    private static final Pose2d kScoringPos = new Pose2d(2.5, 4.5, new Rotation2d(Math.PI));
-    private static final Pose2d kEndPos = new Pose2d(6.5, 4.5, new Rotation2d(Math.PI));
+    private static final Pose2d kBotStartingPos = new Pose2d(1.9, 4.5, new Rotation2d(Math.PI));
+    //private static final Pose2d kScoringPos = new Pose2d(2.5, 4.5, new Rotation2d(Math.PI));
+    private static final Pose2d kEndPos = new Pose2d(4.5, 4.5, new Rotation2d());
     //private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, new Rotation2d());
 
 
@@ -46,31 +46,33 @@ public class ScoreOneAndTaxi extends SequentialCommandGroup {
     // Get starting positions
     //Pose2d kBotStartingPos = pose_estimator.getPosition();
     Pose2d start_pos = should_mirror ? mirror(kBotStartingPos) : kBotStartingPos;
-    Pose2d score_pos = should_mirror ? mirror(kScoringPos) : kScoringPos;
+    //Pose2d score_pos = should_mirror ? mirror(kScoringPos) : kScoringPos;
     Pose2d end_pos = should_mirror ? mirror(kEndPos) : kEndPos;
 
 
-    Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos, new ArrayList<>(), score_pos, AutoConfig.kForwardConfig);
-    Trajectory t2 = TrajectoryGenerator.generateTrajectory(score_pos, new ArrayList<>(), end_pos, AutoConfig.kReverseConfig);
+    //Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos, new ArrayList<>(), score_pos, AutoConfig.kForwardConfig);
+    Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos, new ArrayList<>(), end_pos, AutoConfig.kReverseConfig);
 
     addCommands(
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
       superstructure.setPosition(Superstructure.Position.CUBE_L3),
 
-      new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
+      //new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
 
       new ParallelCommandGroup(
         new WaitCommand(1.5),
         //Run Grabber
-        superstructure.setGrabber(() -> 0.4, false)
+        superstructure.setGrabber(() -> 0.4, false).withTimeout(0.5)
       ),
 
       new ParallelCommandGroup(
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+        new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
         superstructure.setPosition(Superstructure.Position.STOW)
-      )
-
+      ) /*
+         new WaitCommand(1.5),
+         superstructure.setPosition(Superstructure.Position.INTAKE),
+         superstructure.setGrabber(() -> -0.4, true)*/
     );
   }
 

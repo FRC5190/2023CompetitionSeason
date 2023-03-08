@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.auto.ScoreBackwardThenPickup;
 import org.ghrobotics.frc2023.auto.ScoreOneAndTaxi;
+import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Arm;
@@ -83,11 +84,12 @@ public class Robot extends TimedRobot {
     drivetrain_.setBrakeMode(true);
 
     // Calibrate drivetrain pitch
-    drivetrain_.calibratePitch();
+//    drivetrain_.calibratePitch();
 
     // Run auto
-    new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_,
-      DriverStation.getAlliance()).schedule();
+    new DriveBalance(drivetrain_).schedule();
+//    new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_,
+//      DriverStation.getAlliance()).schedule();
 //    new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_,
 //        DriverStation.getAlliance()).schedule();
   }
@@ -132,11 +134,11 @@ public class Robot extends TimedRobot {
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
-    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> 0.4, true));
+    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.4, true));
     //  * LT: Outtake Cone
     driver_controller_.leftTrigger(0.2).whileTrue(superstructure_.setGrabber(() -> 0.0, true));
     //  * RB: Intake Cube
-    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> 0.4, true));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.4, true));
     //  * RT: Outtake Cube
     driver_controller_.rightTrigger(0.2).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));

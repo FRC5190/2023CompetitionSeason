@@ -32,8 +32,8 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
   private static final Pose2d kTopCube = new Pose2d(6.541, 4.589, new Rotation2d());
 
   // Charge Station Positions
-  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.422, new Rotation2d());
-  private static final Pose2d kChargeStation = new Pose2d(4.794, 2.422, new Rotation2d());
+  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.022, new Rotation2d());
+  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.022, new Rotation2d());
 
   // Constructor
   public ScoreBackwardThenPickup(Drivetrain drivetrain, Superstructure superstructure,
@@ -64,8 +64,8 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST),
-        superstructure.setGrabber(() -> 1.0, false).withTimeout(0.5),
+        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
+        superstructure.setGrabber(() -> 0.35, false).withTimeout(0.5),
 
         // Drive to cube pickup while intaking
         new ParallelDeadlineGroup(

@@ -5,6 +5,7 @@
 package org.ghrobotics.frc2023.subsystems;
 
 import com.ctre.phoenix.sensors.BasePigeonSimCollection;
+import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -35,7 +36,7 @@ public class Drivetrain extends SubsystemBase {
   private final RelativeEncoder right_encoder_;
   private final WPI_Pigeon2 gyro_;
 
-  private double baseline_pitch_ = 0.0;
+  private double baseline_pitch_ = Math.toRadians(-2.5927734375);
 
   // Control
   private final SparkMaxPIDController left_pid_controller_;
@@ -102,6 +103,7 @@ public class Drivetrain extends SubsystemBase {
 
     // Initialize gyro
     gyro_ = new WPI_Pigeon2(Constants.kGyroId);
+    gyro_.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
 
     // Initialize PID controllers.
     left_pid_controller_ = left_leader_.getPIDController();
