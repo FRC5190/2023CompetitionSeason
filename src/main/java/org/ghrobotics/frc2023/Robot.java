@@ -183,6 +183,9 @@ public class Robot extends TimedRobot {
     } else if (limelight_.hasTarget()) {
       //System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
+    } else if(drivetrain_.getAngle() > 5){
+      //System.out.println("LEDs: Balancing")
+      led_.setOutput(LED.StandardLEDOutput.AUTOBALANCING);
     } else{
       led_.setOutput(LED.StandardLEDOutput.BLANK);
     }
