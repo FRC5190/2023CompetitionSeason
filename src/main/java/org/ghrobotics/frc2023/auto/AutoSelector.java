@@ -25,6 +25,7 @@ public class AutoSelector {
     routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
     routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
     routine_chooser_.addOption("Score One and Balance", Routine.SCOREONEBALANCE);
+    routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
 
     //Initialize grid chooser
     grid_chooser_ = new SendableChooser<>();
@@ -94,6 +95,10 @@ public class AutoSelector {
       autonomous_command_ = new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
       return autonomous_command_;
     }
+    else if (routine_chooser_.getSelected() == Routine.SCORETWOTAXI) {
+      autonomous_command_ = new ScoreTwoAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
+      return autonomous_command_;
+    }
     else {
       return new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
     }
@@ -102,7 +107,7 @@ public class AutoSelector {
   }
 
   public enum Routine {
-    SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE, SCOREONEBALANCE
+    SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE, SCOREONEBALANCE, SCORETWOTAXI
   }
 
   public enum Grid {

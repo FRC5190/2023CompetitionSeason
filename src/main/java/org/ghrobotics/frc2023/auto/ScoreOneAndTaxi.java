@@ -39,10 +39,6 @@ public class ScoreOneAndTaxi extends SequentialCommandGroup {
     private static final Pose2d kTopEndPos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(0));
     private static final Pose2d kBotEndPos = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(0));
 
-    //private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, new Rotation2d());
-
-
-
   // Constructor
   public ScoreOneAndTaxi(Drivetrain drivetrain, Superstructure superstructure,
                         PoseEstimator pose_estimator, DriverStation.Alliance alliance,
