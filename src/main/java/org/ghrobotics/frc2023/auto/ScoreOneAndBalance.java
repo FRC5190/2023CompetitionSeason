@@ -31,7 +31,8 @@ public class ScoreOneAndBalance extends SequentialCommandGroup {
     private static final Pose2d kOnChargeStation = new Pose2d(5.0, 3.0, new Rotation2d());
 
   /** Creates a new ScoreOneAndBalance. */
-  public ScoreOneAndBalance(Drivetrain drivetrain, Superstructure superstructure, PoseEstimator pose_estimator, DriverStation.Alliance alliance) {
+  public ScoreOneAndBalance(Drivetrain drivetrain, Superstructure superstructure, 
+                            PoseEstimator pose_estimator, DriverStation.Alliance alliance) {
 
        // Check if we need to mirror poses
        boolean should_mirror = alliance == DriverStation.Alliance.Red;

@@ -32,25 +32,31 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
   private static final Pose2d kTopCube = new Pose2d(6.541, 4.589, new Rotation2d());
 
   // Charge Station Positions
-  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.022, new Rotation2d());
+  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.022, new Rotation2d());
   private static final Pose2d kChargeStation = new Pose2d(4.594, 2.022, new Rotation2d());
 
   // Constructor
   public ScoreBackwardThenPickup(Drivetrain drivetrain, Superstructure superstructure,
-                                 PoseEstimator pose_estimator, DriverStation.Alliance alliance) {
+                                 PoseEstimator pose_estimator, DriverStation.Alliance alliance,
+                                 AutoSelector.Grid grid_selection) {
+
+    //Assign top or bottom position
+    Pose2d start_pos = grid_selection == AutoSelector.Grid.TOP ? kTopStartingPos : kBotStartingPos;
+    Pose2d cube_pos = grid_selection == AutoSelector.Grid.TOP ? kTopCube : kBotCube;
+
     // Check if we need to mirror poses
     boolean should_mirror = alliance == DriverStation.Alliance.Red;
 
     // Get starting, cube, and charge station positions
-    Pose2d start_pos = should_mirror ? AutoConfig.mirror(kBotStartingPos) : kBotStartingPos;
-    Pose2d cube_pos = should_mirror ? AutoConfig.mirror(kBotCube) : kBotCube;
+    Pose2d start_pos_ = should_mirror ? AutoConfig.mirror(start_pos) : start_pos;
+    cube_pos = should_mirror ? AutoConfig.mirror(cube_pos) : cube_pos;
     Pose2d charge_station_w_pos = should_mirror ? AutoConfig.mirror(
-        kChargeStationWaypoint) : kChargeStationWaypoint;
+        kBotChargeStationWaypoint) : kBotChargeStationWaypoint;
     Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
     Trajectory t1 = TrajectoryGenerator.generateTrajectory(
-        start_pos, new ArrayList<>(), cube_pos,
+        start_pos_, new ArrayList<>(), cube_pos,
         AutoConfig.kForwardConfig);
 
     // Generate trajectory from cube pos to charge station
@@ -61,7 +67,7 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
     // Add commands
     addCommands(
         // Reset pose estimator to starting position
-        new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
+        new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
         superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),

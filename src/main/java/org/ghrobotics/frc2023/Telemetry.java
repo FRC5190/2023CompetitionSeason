@@ -70,12 +70,17 @@ public class Telemetry {
     ShuffleboardLayout auto_layout = tab_.getLayout("Autonomous", BuiltInLayouts.kList)
         .withSize(2, 2)
         .withPosition(0, 0);
+    auto_layout.add("Routine", auto_selector.getRoutineChooser())
+        .withSize(2,1);
+    auto_layout.add("Grid", auto_selector.getGridChooser())
+        .withSize(2,1);
+    /*
     auto_layout.add("Side", auto_selector.getSideChooser())
         .withSize(2, 1);
     auto_layout.add("Height", auto_selector.getHeightChooser())
         .withSize(2, 1);
     auto_layout.add("Balance", auto_selector.getBalanceChooser())
-        .withSize(2, 1);
+        .withSize(2, 1);*/
 
     // Add pose estimator information
     ShuffleboardLayout pose_estimator_layout = tab_.getLayout("Pose Estimator",

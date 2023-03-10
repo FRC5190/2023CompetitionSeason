@@ -13,14 +13,18 @@ public class DriveBalance extends CommandBase {
 
   // PID Controller
   private final PIDController balance_controller_;
+  private boolean begin_balance = false;
 
   // Constructor
   public DriveBalance(Drivetrain drivetrain) {
     // Assign member variables
     drivetrain_ = drivetrain;
-
+    
     // Initialize PID controller
     balance_controller_ = new PIDController(Constants.kP, 0, Constants.kD);
+
+    //Set begin_balance
+    begin_balance = false;
 
     // Add subsystem requirements
     addRequirements(drivetrain_);
@@ -41,6 +45,7 @@ public class DriveBalance extends CommandBase {
       output_speed = MathUtil.clamp(output_speed, -0.05, 0.05);
     }
     drivetrain_.setVelocity(output_speed, output_speed);
+        
   }
 
   @Override

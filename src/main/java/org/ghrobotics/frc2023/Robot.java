@@ -6,6 +6,7 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -84,14 +85,18 @@ public class Robot extends TimedRobot {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
 
+    DriverStation.Alliance alliance = DriverStation.getAlliance();
+
+    auto_selector_.run(drivetrain_, pose_estimator_, superstructure_, alliance).schedule();
+
     // Calibrate drivetrain pitch
 //    drivetrain_.calibratePitch();
 
     // Run auto
     //new DriveBalance(drivetrain_).schedule();
     //new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
-    //new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
-    new ScoreOneAndBalance(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
+    //new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, alliance).schedule();
+    //new ScoreOneAndBalance(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
   }
 
   @Override
@@ -134,11 +139,11 @@ public class Robot extends TimedRobot {
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
-    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.4, true));
+    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
     //  * LT: Outtake Cone
-    driver_controller_.leftTrigger(0.2).whileTrue(superstructure_.setGrabber(() -> 0.0, true));
+    driver_controller_.leftTrigger(0.2).whileTrue(superstructure_.setGrabber(() -> 0.4, false));
     //  * RB: Intake Cube
-    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.4, true));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube
     driver_controller_.rightTrigger(0.2).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
@@ -175,13 +180,13 @@ public class Robot extends TimedRobot {
   // change
   public void updateLEDs() {
     if (isDisabled()) {
-      //System.out.println("LEDs: Robot is disabled");
+      // System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
     } else if (isEnabled()) {
-      //System.out.println("LEDs: Robot is enabled");
+      // System.out.println("LEDs: Robot is enabled");
       led_.setOutput(LED.OutputType.ENABLED_READY);
     } else if (limelight_.hasTarget()) {
-      //System.out.println("LEDs: Intake");
+      // System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
     } else{
       led_.setOutput(LED.StandardLEDOutput.BLANK);
