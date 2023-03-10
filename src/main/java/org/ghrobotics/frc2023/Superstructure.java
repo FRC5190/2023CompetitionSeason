@@ -22,6 +22,8 @@ public class Superstructure {
   private final Arm arm_;
   private final Grabber grabber_;
 
+  private Position position_;
+
   // Constructor
   public Superstructure(Elevator elevator, Extender extender, Arm arm, Grabber grabber) {
     // Assign member variables
@@ -33,6 +35,9 @@ public class Superstructure {
 
   // Position Setter
   public Command setPosition(Position pos) {
+    //Update Position
+    position_ = pos;
+
     // Find the arm's "elevator movement" position -- where the arm should be when the
     // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
     double arm_elev_mvmt_pos = Math.max(pos.angle, Constants.kElevatorMovementArmPosition);
@@ -51,6 +56,12 @@ public class Superstructure {
             new ExtendToPosition(extender_, pos.extension),
             new ArmToPosition(arm_, pos.angle)
         ));
+  }
+
+  //GetPosition of Superstructure
+  public Position getPosition()
+  {
+    return position_;
   }
 
   // Grabber Setter

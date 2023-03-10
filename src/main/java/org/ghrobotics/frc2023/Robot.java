@@ -140,8 +140,8 @@ public class Robot extends TimedRobot {
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
     driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
-    //  * LT: Outtake Cone
-    driver_controller_.leftTrigger(0.2).whileTrue(superstructure_.setGrabber(() -> 0.4, false));
+    //  * LT: Outtake Cone (shoot only if CONE_L3)
+    driver_controller_.leftTrigger(0.2).whileTrue((superstructure_.getPosition() == Superstructure.Position.CONE_L3) ? superstructure_.setGrabber(() -> -0.25, false) : superstructure_.setGrabber(() -> 0, false));
     //  * RB: Intake Cube
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube

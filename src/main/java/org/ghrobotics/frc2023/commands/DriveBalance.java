@@ -40,6 +40,9 @@ public class DriveBalance extends CommandBase {
     // Calculate controller output
     double output_speed = balance_controller_.calculate(drivetrain_.getPitch());
 
+    //During testing if speed is too much, uncomment this to clamp the speed
+    //output_speed = MathUtil.clamp(output_speed, -0.1, 0.1);
+    
     // Set speed
     if (Math.abs(drivetrain_.getPitch()) < Math.toRadians(8)) {
       output_speed = MathUtil.clamp(output_speed, -0.05, 0.05);
