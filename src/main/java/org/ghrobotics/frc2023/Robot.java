@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
 
     // Run telemetry periodic functions
     telemetry_.periodic();
+    //System.out.println(superstructure_.position_);
     updateLEDs();
   }
 
@@ -135,17 +136,19 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {}
 
   private void setupTeleopControls() {
+    
     // Driver Controller
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
     driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
     //  * LT: Outtake Cone (shoot only if CONE_L3)
-    driver_controller_.leftTrigger(0.2).whileTrue((superstructure_.getPosition() == Superstructure.Position.CONE_L3) ? superstructure_.setGrabber(() -> -0.25, false) : superstructure_.setGrabber(() -> 0, false));
+    driver_controller_.leftTrigger(0.2).whileTrue(
+      superstructure_.state.equals("CONE_L3") ? superstructure_.setGrabber(() -> 0.25, false) : superstructure_.setGrabber(() -> 0, true));
     //  * RB: Intake Cube
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube
-    driver_controller_.rightTrigger(0.2).whileTrue(
+    driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
 
     // Operator Controller

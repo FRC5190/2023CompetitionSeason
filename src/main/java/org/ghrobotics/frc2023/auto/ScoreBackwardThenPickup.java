@@ -32,8 +32,8 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
   private static final Pose2d kTopCube = new Pose2d(6.541, 4.589, new Rotation2d());
 
   // Charge Station Positions
-  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.022, new Rotation2d());
-  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.022, new Rotation2d());
+  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.900, new Rotation2d());
+  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, new Rotation2d());
 
   // Constructor
   public ScoreBackwardThenPickup(Drivetrain drivetrain, Superstructure superstructure,

@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2023;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -21,8 +22,9 @@ public class Superstructure {
   private final Extender extender_;
   private final Arm arm_;
   private final Grabber grabber_;
-
-  private Position position_;
+  
+  //Store Position
+  public String state = "STOW";
 
   // Constructor
   public Superstructure(Elevator elevator, Extender extender, Arm arm, Grabber grabber) {
@@ -35,8 +37,8 @@ public class Superstructure {
 
   // Position Setter
   public Command setPosition(Position pos) {
-    //Update Position
-    position_ = pos;
+    this.state =pos.posname;
+    SmartDashboard.putString("Superstructure Position",this.state);
 
     // Find the arm's "elevator movement" position -- where the arm should be when the
     // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
@@ -59,9 +61,9 @@ public class Superstructure {
   }
 
   //GetPosition of Superstructure
-  public Position getPosition()
+  public String getState()
   {
-    return position_;
+    return state;
   }
 
   // Grabber Setter
@@ -90,33 +92,35 @@ public class Superstructure {
   // Positions
   public enum Position {
     // Stowed position, everything inside the robot
-    STOW(0, 0, 125),
+    STOW(0, 0, 125,"STOW"),
 
     // Intaking a game piece
-    INTAKE(0, 0, -20),
+    INTAKE(0, 0, -20,"INTAKE"),
 
     // Exhaust cube out the back of the robot
-    BACK_EXHAUST(29, 0, 125),
+    BACK_EXHAUST(29, 0, 125,"BACK_EXHAUST"),
 
     // Pick up from substation
-    SUBSTATION(31, 0, 10),
+    SUBSTATION(32, 0, 0,"SUBSTATION"),
 
     // Cube scoring
-    CUBE_L2(20, 6, 20),
-    CUBE_L3(27, 6, 20),
+    CUBE_L2(20, 6, 20,"CUBE_L2"),
+    CUBE_L3(27, 6, 20,"CUBE_L3"),
 
     // Cone scoring
-    CONE_L2(20, 6, 20),
-    CONE_L3(30, 9, 30);
+    CONE_L2(30, 6, 35,"CONE_L2"),
+    CONE_L3(30, 9, 45,"CONE_L3");
 
     final double height;
     final double extension;
     final double angle;
+    final String posname;
 
-    Position(double height_in, double extension_in, double angle_deg) {
+    Position(double height_in, double extension_in, double angle_deg, String name) {
       this.height = Units.inchesToMeters(height_in);
       this.extension = Units.inchesToMeters(extension_in);
       this.angle = Math.toRadians(angle_deg);
+      this.posname = name;
     }
   }
 

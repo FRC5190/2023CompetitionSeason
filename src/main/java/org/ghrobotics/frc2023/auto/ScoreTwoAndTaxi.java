@@ -25,17 +25,20 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 
 public class ScoreTwoAndTaxi extends SequentialCommandGroup {
-  // Starting Positions (on blue side)
+  // Positions (on blue side)
+  //Top Routine
   private static final Pose2d kTopStartingPos = new Pose2d(1.9, 4.5, Rotation2d.fromDegrees(0));
-  private static final Pose2d kBotStartingPos = new Pose2d(1.9, 1.071, Rotation2d.fromDegrees(0));
   private static final Pose2d kTopFirstPickupPos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopSecondScorePos = new Pose2d(2.5, 4.6, Rotation2d.fromDegrees(5));
+  private static final Pose2d kTopPickupWaypoint = new Pose2d(6.55, 4.6, Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopEndPos = new Pose2d(6.95, 4.022, Rotation2d.fromDegrees(-75));
+
+  //Bottom Routine
+  private static final Pose2d kBotStartingPos = new Pose2d(1.9, 1.071, Rotation2d.fromDegrees(0));
   private static final Pose2d kBotFirstPickupPos = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(0));
-  private static final Pose2d kTopSecondScorePos = new Pose2d(2.5, 4.5, Rotation2d.fromDegrees(0));
-  private static final Pose2d kBotSecondScorePos = new Pose2d(2.5, 1.071, Rotation2d.fromDegrees(0));
-  private static final Pose2d kTopPickupWaypoint = new Pose2d(6.46, 4.5, Rotation2d.fromDegrees(0));
-  private static final Pose2d kBotPickupWaypoint = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(0)); //change rot2d
-  private static final Pose2d kTopEndPos = new Pose2d(6.46, 4.65, Rotation2d.fromDegrees(0));
-  private static final Pose2d kBotEndPos = new Pose2d(6.46, 2.5, Rotation2d.fromDegrees(0)); //change points
+  private static final Pose2d kBotSecondScorePos = new Pose2d(2.5, 0.922, Rotation2d.fromDegrees(5));
+  private static final Pose2d kBotPickupWaypoint = new Pose2d(6.55, 0.922,Rotation2d.fromDegrees(0)); //change rot2d
+  private static final Pose2d kBotEndPos = new Pose2d(6.95, 1.5, Rotation2d.fromDegrees(75)); //change points6.9, 75
 
   //Constructor
   public ScoreTwoAndTaxi(Drivetrain drivetrain, Superstructure superstructure,
@@ -67,27 +70,27 @@ public class ScoreTwoAndTaxi extends SequentialCommandGroup {
 
       superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
       superstructure.setGrabber(() -> 0.4, false).withTimeout(0.5),
-      superstructure.setPosition(Superstructure.Position.INTAKE),
-
+      
       new ParallelDeadlineGroup( 
+        superstructure.setPosition(Superstructure.Position.INTAKE),
         new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
-        superstructure.setGrabber(() -> -0.4, true).withTimeout(3.5)), 
+        superstructure.setGrabber(() -> -0.4, true).withTimeout(2.5)), 
 
-        superstructure.setPosition(Superstructure.Position.STOW),
+       //superstructure.setPosition(Superstructure.Position.STOW),
 
       new ParallelCommandGroup(
         new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
-        new WaitCommand(0.5),
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST)
+        //new WaitCommand(0.5),
+        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2.5),
+        superstructure.setGrabber(() -> 0.4, false).withTimeout(0.5)
       ),
 
-      superstructure.setPosition(Superstructure.Position.STOW),
+      //superstructure.setPosition(Superstructure.Position.STOW),
 
       new ParallelCommandGroup(
         superstructure.setPosition(Superstructure.Position.INTAKE),
         new DriveTrajectory(drivetrain, pose_estimator, () -> t3),
         superstructure.setGrabber(() -> -0.4, false).withTimeout(3.5)), 
-
         superstructure.setPosition(Superstructure.Position.STOW)
 
     );
