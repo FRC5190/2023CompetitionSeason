@@ -19,32 +19,27 @@ import org.ghrobotics.frc2023.commands.DriveTrajectory;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
-// Backward End Grid:
-//  * line up backward at one of the end grids (aligned to center)
-//  * shoot cube into L3
-//  * pick up cube
-//  * back into charge station and balance
-public class ScoreBackwardThenPickup extends SequentialCommandGroup {
+public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
   // Starting Positions (on blue side)
-  private static final Pose2d kBotStartingPos = new Pose2d(1.900, 1.071, new Rotation2d());
-  private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, new Rotation2d());
+  private static final Pose2d kBotStartingPos = new Pose2d(1.900, 1.071, Rotation2d.fromDegrees(180));
+  private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, Rotation2d.fromDegrees(180));
 
   // Cube Positions (on blue side)
-  private static final Pose2d kBotCube = new Pose2d(6.541, 0.922, new Rotation2d());
-  private static final Pose2d kTopCube = new Pose2d(6.541, 4.589, new Rotation2d());
+  private static final Pose2d kBotCubeWaypoint = new Pose2d(5.5, 0.922, Rotation2d.fromDegrees(180));
+  private static final Pose2d kTopCubeWaypoint = new Pose2d(5.5, 4.589, Rotation2d.fromDegrees(180));
 
   // Charge Station Positions
   private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.900, new Rotation2d());
   private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, new Rotation2d());
 
   // Constructor
-  public ScoreBackwardThenPickup(Drivetrain drivetrain, Superstructure superstructure,
+  public ScoreForwardExitBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,
                                  PoseEstimator pose_estimator, DriverStation.Alliance alliance,
                                  AutoSelector.Grid grid_selection) {
 
     //Assign top or bottom position
     Pose2d start_pos = grid_selection == AutoSelector.Grid.TOP ? kTopStartingPos : kBotStartingPos;
-    Pose2d cube_pos = grid_selection == AutoSelector.Grid.TOP ? kTopCube : kBotCube;
+    Pose2d cube_pos = grid_selection == AutoSelector.Grid.TOP ? kTopCubeWaypoint : kBotCubeWaypoint;
 
     // Check if we need to mirror poses
     boolean should_mirror = alliance == DriverStation.Alliance.Red;
@@ -57,13 +52,13 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
     Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
-    Trajectory t1 = TrajectoryGenerator.generateTrajectory(
+    /*Trajectory t1 = TrajectoryGenerator.generateTrajectory(
         start_pos_, new ArrayList<>(), cube_pos,
-        AutoConfig.kForwardConfig);
+        AutoConfig.kReverseConfig);*/
 
     // Generate trajectory from cube pos to charge station
-    Trajectory t2 = TrajectoryGenerator.generateTrajectory(
-        cube_pos, List.of(charge_station_w_pos.getTranslation()), charge_station_pos,
+    Trajectory t1 = TrajectoryGenerator.generateTrajectory(
+        start_pos, List.of(cube_pos.getTranslation(), charge_station_w_pos.getTranslation()), charge_station_pos,
         AutoConfig.kReverseToBalanceConfig);
 
     // Add commands
@@ -72,29 +67,23 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
-        superstructure.setGrabber(() -> 0.67, true).withTimeout(0.5),
+        superstructure.setPosition(Superstructure.Position.CUBE_L3),
+        superstructure.setGrabber(() -> 0.6, false).withTimeout(0.5),
 
-        // Drive to cube pickup while intaking
-        new ParallelDeadlineGroup(
-            new SequentialCommandGroup(
-                new WaitCommand(0.5),
-                new DriveTrajectory(drivetrain, pose_estimator, () -> t1)
-            ),
-            new SequentialCommandGroup(
-                superstructure.setPosition(Superstructure.Position.INTAKE),
-                superstructure.setGrabber(() -> -0.4, true).withTimeout(1.5))
-            ),
-            
-
-        // Drive to charge station
         new ParallelCommandGroup(
-            new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
-            superstructure.setPosition(Superstructure.Position.STOW)
+          superstructure.setPosition(Superstructure.Position.STOW),
+          new DriveTrajectory(drivetrain, pose_estimator, () -> t1)
         ),
 
+        //new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         // Balance
         new DriveBalance(drivetrain)
     );
   }
+      //Flip Poses for Red Alliance
+      private static Pose2d mirror(Pose2d pose) {
+        return new Pose2d(16.54175 - pose.getX(), pose.getY(),
+          new Rotation2d(Math.PI).minus(pose.getRotation()));
+      }
+
 }

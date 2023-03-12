@@ -20,48 +20,43 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ScoreOneAndBalance extends SequentialCommandGroup {
-    private static final Pose2d kBotStartingPos = new Pose2d(1.9, 3.5, new Rotation2d());
-    private static final Pose2d kOutOfCommunityPos = new Pose2d(5.5, 3.0, new Rotation2d());
-    private static final Pose2d kOnChargeStation = new Pose2d(5.0, 3.0, new Rotation2d());
+public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
+  private static final Pose2d kStartPos = new Pose2d(1.750, 2.749, Rotation2d.fromDegrees(180));
+  private static final Pose2d kOnChargeStation = new Pose2d(3.00, 2.755, Rotation2d.fromDegrees(180));
 
-  /** Creates a new ScoreOneAndBalance. */
-  public ScoreOneAndBalance(Drivetrain drivetrain, Superstructure superstructure, 
-                            PoseEstimator pose_estimator, DriverStation.Alliance alliance) {
+  /** Creates a new ScoreForwardBalanceBackward. */
+  public ScoreForwardBalanceBackward(Drivetrain drivetrain, Superstructure superstructure,
+    PoseEstimator pose_estimator, DriverStation.Alliance alliance){
+    //AutoSelector.Grid grid_selection) {
 
-       // Check if we need to mirror poses
-       boolean should_mirror = alliance == DriverStation.Alliance.Red;
+      boolean should_mirror = alliance == DriverStation.Alliance.Red;
 
-       // Get starting positions
-       //Pose2d kBotStartingPos = pose_estimator.getPosition();
-       Pose2d start_pos = should_mirror ? mirror(kBotStartingPos) : kBotStartingPos;
-       Pose2d out_of_comm = should_mirror ? mirror(kOutOfCommunityPos) : kOutOfCommunityPos;
-       Pose2d on_charge_station = should_mirror ? mirror(kOnChargeStation) : kOnChargeStation;
+      Pose2d start_pos  = should_mirror ? AutoConfig.mirror(kStartPos) : kStartPos;
+      Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kOnChargeStation) : kOnChargeStation;
+
+      Trajectory t1 = TrajectoryGenerator.generateTrajectory(
+        start_pos, new ArrayList<>(), charge_station_pos,
+        AutoConfig.kReverseConfig);
 
 
-       Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos, new ArrayList<>(), out_of_comm, AutoConfig.kForwardConfig);
-       Trajectory t2 = TrajectoryGenerator.generateTrajectory(out_of_comm, new ArrayList<>(), on_charge_station, AutoConfig.kReverseConfig);
-
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
     addCommands(
+      // Reset pose estimator to starting position
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
-
-      superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
-      superstructure.setGrabber(() -> 0.35, false).withTimeout(0.5),
+      superstructure.setPosition(Superstructure.Position.CUBE_L3),
+      superstructure.setGrabber(() -> 0.67, true).withTimeout(1.0),
 
       new ParallelCommandGroup(
         new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
         superstructure.setPosition(Superstructure.Position.STOW)
       ),
 
-      new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
-
       new DriveBalance(drivetrain)
-
     );
   }
 

@@ -68,22 +68,28 @@ public class ScoreTwoAndTaxi extends SequentialCommandGroup {
     addCommands(
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
+      // Exhaust cube
       superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
-      superstructure.setGrabber(() -> 0.4, false).withTimeout(0.5),
+      superstructure.setGrabber(() -> 1.0, false).withTimeout(1.0),
       
-      new ParallelDeadlineGroup( 
-        superstructure.setPosition(Superstructure.Position.INTAKE),
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
-        superstructure.setGrabber(() -> -0.4, true).withTimeout(2.5)), 
-
-       //superstructure.setPosition(Superstructure.Position.STOW),
-
+      // Drive to cube pickup while intaking
+        new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                 new WaitCommand(0.5),
+                 new DriveTrajectory(drivetrain, pose_estimator, () -> t1)
+              ),
+            new SequentialCommandGroup(
+                  superstructure.setPosition(Superstructure.Position.INTAKE),
+                  superstructure.setGrabber(() -> -0.4, true).withTimeout(1.5))
+              ),
+      /*
       new ParallelCommandGroup(
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+          new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         //new WaitCommand(0.5),
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2.5),
-        superstructure.setGrabber(() -> 0.4, false).withTimeout(0.5)
+          superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2.5)
+          
       ),
+      superstructure.setGrabber(() -> 0.6, false).withTimeout(0.5),
 
       //superstructure.setPosition(Superstructure.Position.STOW),
 
@@ -91,6 +97,7 @@ public class ScoreTwoAndTaxi extends SequentialCommandGroup {
         superstructure.setPosition(Superstructure.Position.INTAKE),
         new DriveTrajectory(drivetrain, pose_estimator, () -> t3),
         superstructure.setGrabber(() -> -0.4, false).withTimeout(3.5)), 
+        */
         superstructure.setPosition(Superstructure.Position.STOW)
 
     );

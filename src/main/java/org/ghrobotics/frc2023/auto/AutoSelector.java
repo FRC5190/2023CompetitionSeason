@@ -22,10 +22,12 @@ public class AutoSelector {
   public AutoSelector() {
     //Intialize routine chooser
     routine_chooser_ = new SendableChooser<>();
-    routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
-    routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
-    routine_chooser_.addOption("Score One and Balance", Routine.SCOREONEBALANCE);
+    routine_chooser_.setDefaultOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
+    routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
     routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
+    routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
+    routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
+    routine_chooser_.addOption("Score Backward and Balance", Routine.SCOREBACKWARDBALANCE);
 
     //Initialize grid chooser
     grid_chooser_ = new SendableChooser<>();
@@ -83,8 +85,8 @@ public class AutoSelector {
 
   // Run Auto
   public Command run(Drivetrain drivetrain, PoseEstimator pose_estimator, Superstructure superstructure, DriverStation.Alliance alliance) {
-    if (routine_chooser_.getSelected() == Routine.SCOREONEBALANCE) {
-      autonomous_command_ = new ScoreOneAndBalance(drivetrain, superstructure, pose_estimator, alliance);
+    if (routine_chooser_.getSelected() == Routine.SCOREBACKWARDBALANCE) {
+      autonomous_command_ = new ScoreForwardExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
       return autonomous_command_;
     } 
     else if (routine_chooser_.getSelected() == Routine.SCOREBACKWARDPICKUPBALANCE) {
@@ -99,6 +101,14 @@ public class AutoSelector {
       autonomous_command_ = new ScoreTwoAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
       return autonomous_command_;
     }
+    else if (routine_chooser_.getSelected() == Routine.SCOREFORWARDBALANCEBACKWARD){
+      autonomous_command_ = new ScoreForwardBalanceBackward(drivetrain, superstructure, pose_estimator, alliance);
+      return autonomous_command_;
+    }
+    else if (routine_chooser_.getSelected() == Routine.SCOREFORWARDEXITBALANCEBACKWARD) {
+      autonomous_command_ = new ScoreForwardExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
+      return autonomous_command_;
+    }
     else {
       return new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
     }
@@ -107,7 +117,10 @@ public class AutoSelector {
   }
 
   public enum Routine {
-    SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE, SCOREONEBALANCE, SCORETWOTAXI
+    SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE, 
+    SCORETWOTAXI, SCOREBACKWARDBALANCE, 
+    SCOREFORWARDBALANCEBACKWARD, 
+    SCOREFORWARDEXITBALANCEBACKWARD
   }
 
   public enum Grid {

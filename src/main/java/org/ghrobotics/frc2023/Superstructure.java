@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -37,8 +38,8 @@ public class Superstructure {
 
   // Position Setter
   public Command setPosition(Position pos) {
-    this.state =pos.posname;
-    SmartDashboard.putString("Superstructure Position",this.state);
+    this.state = pos.posname;
+    //SmartDashboard.putString("Superstructure Position",this.state);
 
     // Find the arm's "elevator movement" position -- where the arm should be when the
     // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
@@ -46,6 +47,7 @@ public class Superstructure {
 
     // Create and return command group
     return new SequentialCommandGroup(
+        new InstantCommand(() -> this.state = pos.posname),
         // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
         // Also, bring extension back in. End this when we reach the desired elevator height.
         new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
@@ -98,17 +100,17 @@ public class Superstructure {
     INTAKE(0, 0, -20,"INTAKE"),
 
     // Exhaust cube out the back of the robot
-    BACK_EXHAUST(29, 0, 125,"BACK_EXHAUST"),
+    BACK_EXHAUST(29, 0, 120,"BACK_EXHAUST"),
 
     // Pick up from substation
-    SUBSTATION(32, 0, 0,"SUBSTATION"),
+    SUBSTATION(32, 0, 5,"SUBSTATION"),
 
     // Cube scoring
-    CUBE_L2(20, 6, 20,"CUBE_L2"),
+    CUBE_L2(20, 6, 10,"CUBE_L2"),
     CUBE_L3(27, 6, 20,"CUBE_L3"),
 
     // Cone scoring
-    CONE_L2(30, 6, 35,"CONE_L2"),
+    CONE_L2(26, 9, 5,"CONE_L2"),
     CONE_L3(30, 9, 45,"CONE_L3");
 
     final double height;

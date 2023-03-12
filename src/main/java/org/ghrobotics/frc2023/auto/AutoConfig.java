@@ -11,12 +11,13 @@ import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstrain
 
 public class AutoConfig {
   // Constraints
-  public static final double kMaxVelocity = 3.0;
+  public static final double kMaxVelocity = 2.75;
   public static final double kMaxAcceleration = 1.2;
   public static final double kMaxCentripetalAcceleration = 2.5;
 
   public static final double kBalanceRampApproachAcceleration = 0.3;
   public static final double kBalanceRampApproachSpeed = 0.25;
+  public static final double kAggressiveCentripetalAcceleration = 5.0;
 
   // Trajectory Configs
   public static final TrajectoryConfig kForwardConfig = new TrajectoryConfig(kMaxVelocity,
@@ -29,7 +30,7 @@ public class AutoConfig {
 
   public static final TrajectoryConfig kReverseToBalanceConfig = new TrajectoryConfig(kMaxVelocity,
       kBalanceRampApproachAcceleration).setReversed(true).addConstraint(
-       new CentripetalAccelerationConstraint(kMaxCentripetalAcceleration)
+       new CentripetalAccelerationConstraint(kAggressiveCentripetalAcceleration)
       ).setEndVelocity(kBalanceRampApproachSpeed);
 
   // Flip Poses for Red Alliance
