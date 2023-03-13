@@ -7,7 +7,10 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+import java.time.Instant;
 import java.util.function.DoubleSupplier;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
@@ -51,15 +54,17 @@ public class Superstructure {
         // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
         // Also, bring extension back in. End this when we reach the desired elevator height.
         new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
+          //new PrintCommand("Inside Parallel Deadine Group"),
             new ExtendToPosition(extender_, Constants.kExtenderStowPosition),
             new ArmToPosition(arm_, arm_elev_mvmt_pos)
         ),
 
         // Take extender and arm to final position.
         new ParallelCommandGroup(
+          //new PrintCommand("Inside Parallel Command Group"),
             new ExtendToPosition(extender_, pos.extension),
-            new ArmToPosition(arm_, pos.angle)
-        ));
+            new ArmToPosition(arm_, pos.angle))
+        );
   }
 
   //GetPosition of Superstructure

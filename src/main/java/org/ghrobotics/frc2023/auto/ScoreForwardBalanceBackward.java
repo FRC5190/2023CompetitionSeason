@@ -20,13 +20,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
   private static final Pose2d kStartPos = new Pose2d(1.750, 2.749, Rotation2d.fromDegrees(180));
-  private static final Pose2d kOnChargeStation = new Pose2d(3.00, 2.755, Rotation2d.fromDegrees(180));
+  private static final Pose2d kOnChargeStation = new Pose2d(3.50, 2.755, Rotation2d.fromDegrees(180));
 
   /** Creates a new ScoreForwardBalanceBackward. */
   public ScoreForwardBalanceBackward(Drivetrain drivetrain, Superstructure superstructure,
@@ -35,8 +36,8 @@ public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
 
       boolean should_mirror = alliance == DriverStation.Alliance.Red;
 
-      Pose2d start_pos  = should_mirror ? AutoConfig.mirror(kStartPos) : kStartPos;
-      Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kOnChargeStation) : kOnChargeStation;
+      Pose2d start_pos  = should_mirror ? mirror(kStartPos) : kStartPos;
+      Pose2d charge_station_pos = should_mirror ? mirror(kOnChargeStation) : kOnChargeStation;
 
       Trajectory t1 = TrajectoryGenerator.generateTrajectory(
         start_pos, new ArrayList<>(), charge_station_pos,
@@ -48,8 +49,16 @@ public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
     addCommands(
       // Reset pose estimator to starting position
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
-      superstructure.setPosition(Superstructure.Position.CUBE_L3),
-      superstructure.setGrabber(() -> 0.67, true).withTimeout(1.0),
+
+      new WaitCommand(1.0),
+/*
+      new ParallelCommandGroup(
+        superstructure.setPosition(Superstructure.Position.CUBE_L3).withTimeout(6.5),
+          new SequentialCommandGroup(
+            new WaitCommand(3.0),
+            superstructure.setGrabber(() -> 0.67, true).withTimeout(2.5)
+          )
+      ), */
 
       new ParallelCommandGroup(
         new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
