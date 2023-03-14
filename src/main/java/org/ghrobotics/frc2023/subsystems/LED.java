@@ -57,7 +57,7 @@ public class LED extends SubsystemBase {
         break;
 
       case ENABLED_READY:
-        setSnake(Color.kGreen);
+        setMayhem();
         break;
 
       /**
@@ -135,7 +135,7 @@ public class LED extends SubsystemBase {
     if (snake_first_index_ == Constants.kBufferSize - Constants.kSnakeOnLEDs)
       snake_multiplier_ = -1;
 
-    // Set all LEDs to black.
+    // Set all LEDs to background color.
     for (int i = 0; i < Constants.kBufferSize; i++)
       led_buffer_.setRGB(i, 0, 0, 0);
 
@@ -145,6 +145,22 @@ public class LED extends SubsystemBase {
 
     // Increment first index.
     snake_first_index_ += snake_multiplier_;
+  }
+
+  private void setMayhem() {
+    for (int i = 0; i < Constants.kBufferSize; i++){
+      int randomRedValue = (int)(Math.random() * 256);
+      int randomGreenValue = (int)(Math.random() * 256);
+      int randomBlueValue = (int)(Math.random() * 256);
+
+      // public static final Color randomColor = new Color(12,12, 12);
+      led_buffer_.setLED(i, setColor(randomRedValue, randomGreenValue, randomBlueValue));
+    }
+  }
+
+  public Color setColor(int red, int green, int blue) {
+    final Color randColor = new Color(red,green,blue);
+    return randColor;
   }
 
   public enum OutputType {
