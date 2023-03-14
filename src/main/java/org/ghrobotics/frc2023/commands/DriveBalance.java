@@ -56,6 +56,10 @@ public class DriveBalance extends CommandBase {
     drivetrain_.setVelocity(0, 0);
   }
 
+  public boolean isBalancing(){
+    return (Math.abs(drivetrain_.getPitch()) > Math.toRadians(7)) ? true : false;
+  }
+
   // Constants
   private static class Constants {
     // Ramp Angle

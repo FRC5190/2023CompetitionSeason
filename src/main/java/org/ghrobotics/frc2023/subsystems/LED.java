@@ -57,22 +57,12 @@ public class LED extends SubsystemBase {
         break;
 
       case ENABLED_READY:
-        setMayhem();
+        setSnake(Color.kPapayaWhip);
         break;
 
-      /**
-       case AUTOBALANCING:
-       setSnake(Color.kDeepPink);
-       break;
-
-       case ERROR:
-       setSnake(Color.kRed);
-       break;
-
-       case LIMELIGHT_ERROR:
-       setSnake(Color.kOrange);
-       break;
-       **/
+      case AUTOBALANCING:
+        setMayhem();
+        break;
     }
 
 
@@ -137,7 +127,7 @@ public class LED extends SubsystemBase {
 
     // Set all LEDs to background color.
     for (int i = 0; i < Constants.kBufferSize; i++)
-      led_buffer_.setRGB(i, 0, 0, 0);
+      led_buffer_.setRGB(i, 104, 10, 15);
 
     // Set snake pattern LEDs to color.
     for (int i = 0; i < Constants.kSnakeOnLEDs; i++)
@@ -164,7 +154,7 @@ public class LED extends SubsystemBase {
   }
 
   public enum OutputType {
-    STANDARD, DISABLED_READY, ENABLED_READY, //AUTOBALANCING, ERROR, LIMELIGHT_ERROR
+    STANDARD, DISABLED_READY, ENABLED_READY, AUTOBALANCING,
   }
 
   public enum StandardLEDOutput {
@@ -173,9 +163,9 @@ public class LED extends SubsystemBase {
 
     // Robot Cases
     // ENABLED_READY(Color.kGreen, 1.0, 0.0),
-    AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
+    // AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
     ERROR(Color.kRed, 1.0, 0.0),
-    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0);
+    ARM_OUT(Color.kOrange, 1.0, 0.0);
 
 
     // Stores the color and on percentage for the current output.
@@ -202,6 +192,6 @@ public class LED extends SubsystemBase {
     public static final int kPortId = 0;
     public static final int kBufferSize = 34;
 
-    public static final int kSnakeOnLEDs = 3;
+    public static final int kSnakeOnLEDs = 10;
   }
 }
