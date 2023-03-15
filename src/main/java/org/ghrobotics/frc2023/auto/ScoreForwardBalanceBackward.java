@@ -22,9 +22,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+// Score forward cube L3 
+// * enter the charge station backwards
+// * run the drive balance command
+
 public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
   private static final Pose2d kStartPos = new Pose2d(1.750, 2.749, Rotation2d.fromDegrees(180));
   private static final Pose2d kOnChargeStation = new Pose2d(3.50, 2.755, Rotation2d.fromDegrees(180));

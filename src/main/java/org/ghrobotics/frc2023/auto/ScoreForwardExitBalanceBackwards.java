@@ -19,6 +19,13 @@ import org.ghrobotics.frc2023.commands.DriveTrajectory;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
+//Score cube (high) forwards
+// * score L3 cube forward
+// * move backward out of the community
+// * go to the charge station waypoint backwards to align with the middle of the charge station
+// * go onto the charge station
+// * run the drive balance command
+
 public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
   // Starting Positions (on blue side)
   private static final Pose2d kBotStartingPos = new Pose2d(1.900, 1.071, Rotation2d.fromDegrees(180));

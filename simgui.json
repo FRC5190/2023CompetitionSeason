@@ -17,6 +17,11 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon 2 [17]": "Gyro",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/2023/Autonomous/Balance": "String Chooser",
       "/Shuffleboard/2023/Autonomous/Grid": "String Chooser",
       "/Shuffleboard/2023/Autonomous/Height": "String Chooser",

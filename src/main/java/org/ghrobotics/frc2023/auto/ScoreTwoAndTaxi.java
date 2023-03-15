@@ -23,6 +23,11 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+//Score cube (high) backwards
+// * pickup another cube outside community moving forward
+// * enter community and score second cube mid
+// * exit community again and go to the previous cube way point
+// * turn to the side and pick up third game piece
 
 public class ScoreTwoAndTaxi extends SequentialCommandGroup {
   // Positions (on blue side)

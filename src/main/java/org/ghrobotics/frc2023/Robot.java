@@ -185,7 +185,7 @@ public class Robot extends TimedRobot {
   // change
   public void updateLEDs() {
     if (isDisabled()) {
-      // System.out.println("LEDs: Robot is disabled");
+      //System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
     } else if (isEnabled()) {
       // System.out.println("LEDs: Robot is enabled");
