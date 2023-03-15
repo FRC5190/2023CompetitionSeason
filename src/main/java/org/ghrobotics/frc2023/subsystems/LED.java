@@ -57,22 +57,12 @@ public class LED extends SubsystemBase {
         break;
 
       case ENABLED_READY:
-        setSnake(Color.kGreen);
+        setSnake(Color.kPapayaWhip);
         break;
 
-      /**
-       case AUTOBALANCING:
-       setSnake(Color.kDeepPink);
-       break;
-
-       case ERROR:
-       setSnake(Color.kRed);
-       break;
-
-       case LIMELIGHT_ERROR:
-       setSnake(Color.kOrange);
-       break;
-       **/
+      case AUTOBALANCING:
+        setMayhem();
+        break;
     }
 
 
@@ -134,9 +124,9 @@ public class LED extends SubsystemBase {
     if (snake_first_index_ == Constants.kBufferSize - Constants.kSnakeOnLEDs)
       snake_multiplier_ = -1;
 
-    // Set all LEDs to black.
+    // Set all LEDs to background color.
     for (int i = 0; i < Constants.kBufferSize; i++)
-      led_buffer_.setRGB(i, 0, 0, 0);
+      led_buffer_.setRGB(i, 104, 10, 15);
 
     // Set snake pattern LEDs to color.
     for (int i = 0; i < Constants.kSnakeOnLEDs; i++)
@@ -146,8 +136,24 @@ public class LED extends SubsystemBase {
     snake_first_index_ += snake_multiplier_;
   }
 
+  private void setMayhem() {
+    for (int i = 0; i < Constants.kBufferSize; i++){
+      int randomRedValue = (int)(Math.random() * 256);
+      int randomGreenValue = (int)(Math.random() * 256);
+      int randomBlueValue = (int)(Math.random() * 256);
+
+      // public static final Color randomColor = new Color(12,12, 12);
+      led_buffer_.setLED(i, setColor(randomRedValue, randomGreenValue, randomBlueValue));
+    }
+  }
+
+  public Color setColor(int red, int green, int blue) {
+    final Color randColor = new Color(red,green,blue);
+    return randColor;
+  }
+
   public enum OutputType {
-    STANDARD, DISABLED_READY, ENABLED_READY, //AUTOBALANCING, ERROR, LIMELIGHT_ERROR
+    STANDARD, DISABLED_READY, ENABLED_READY, AUTOBALANCING,
   }
 
   public enum StandardLEDOutput {
@@ -156,9 +162,9 @@ public class LED extends SubsystemBase {
 
     // Robot Cases
     // ENABLED_READY(Color.kGreen, 1.0, 0.0),
-    AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
+    // AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
     ERROR(Color.kRed, 1.0, 0.0),
-    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0);
+    ARM_OUT(Color.kOrange, 1.0, 0.0);
 
 
     // Stores the color and on percentage for the current output.
@@ -185,6 +191,6 @@ public class LED extends SubsystemBase {
     public static final int kPortId = 9;
     public static final int kBufferSize = 4;
 
-    public static final int kSnakeOnLEDs = 3;
+    public static final int kSnakeOnLEDs = 10;
   }
 }

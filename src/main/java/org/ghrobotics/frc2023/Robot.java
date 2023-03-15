@@ -6,6 +6,7 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -54,9 +55,15 @@ public class Robot extends TimedRobot {
   // Auto Selector
   private final AutoSelector auto_selector_ = new AutoSelector();
 
+  // Commands
+  private final DriveBalance drive_balance_ = new DriveBalance(drivetrain_);
+
   // Xbox Controllers
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+
+  // LED Triggers
+  private boolean armOut;
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
@@ -190,9 +197,11 @@ public class Robot extends TimedRobot {
     } else if (isEnabled()) {
       // System.out.println("LEDs: Robot is enabled");
       led_.setOutput(LED.OutputType.ENABLED_READY);
-    } else if (limelight_.hasTarget()) {
-      // System.out.println("LEDs: Intake");
-      led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
+      // Timer.delay(0.5);
+    } else if (drive_balance_.isBalancing()){
+      led_.setOutput(LED.OutputType.AUTOBALANCING);
+    } else if (armOut){
+      led_.setOutput(LED.StandardLEDOutput.ARM_OUT);
     } else{
       led_.setOutput(LED.StandardLEDOutput.BLANK);
     }
