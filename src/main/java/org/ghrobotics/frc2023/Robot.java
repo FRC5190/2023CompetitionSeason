@@ -78,6 +78,7 @@ public class Robot extends TimedRobot {
 
     // Run telemetry periodic functions
     telemetry_.periodic();
+    //superstructure_.periodic();
     //System.out.println(superstructure_.position_);
     updateLEDs();
   }
@@ -144,12 +145,12 @@ public class Robot extends TimedRobot {
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
     driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
-    //  * LT: Outtake Cone (shoot only if CONE_L3)
+    //  * LT: Outtake Cone
     driver_controller_.leftTrigger(0.2).whileTrue(
-      superstructure_.state.equals("CONE_L3") ? superstructure_.setGrabber(() -> 0.25, false) : superstructure_.setGrabber(() -> 0, true));
+      superstructure_.setGrabber(() -> 0, true));
     //  * RB: Intake Cube
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
-    //  * RT: Outtake Cube
+    //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
 

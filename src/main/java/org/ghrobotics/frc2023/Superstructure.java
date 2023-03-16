@@ -30,6 +30,9 @@ public class Superstructure {
   //Store Position
   public String state = "STOW";
 
+  //Error
+  private double elevatorPosError = 0.04;
+
   // Constructor
   public Superstructure(Elevator elevator, Extender extender, Arm arm, Grabber grabber) {
     // Assign member variables
@@ -39,18 +42,27 @@ public class Superstructure {
     grabber_ = grabber;
   }
 
+  public void periodic(){
+    //double elevator_pos_ = elevator_.getPosition().inchesToMeters
+    if (elevator_.getPosition() >= (Position.CONE_L3.height - elevatorPosError)){
+      this.state = "CONE_L3";
+    } else {
+      this.state = "OTHER";
+    }
+    System.out.println(this.state);
+    SmartDashboard.putString("Superstructure Position",this.state);
+    SmartDashboard.putNumber("Elevator Height", elevator_.getPosition());
+    SmartDashboard.putNumber("Cone L3 Height", Position.CONE_L3.height);
+  }
+
   // Position Setter
   public Command setPosition(Position pos) {
-    this.state = pos.posname;
-    //SmartDashboard.putString("Superstructure Position",this.state);
-
     // Find the arm's "elevator movement" position -- where the arm should be when the
     // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
     double arm_elev_mvmt_pos = Math.max(pos.angle, Constants.kElevatorMovementArmPosition);
 
     // Create and return command group
     return new SequentialCommandGroup(
-        new InstantCommand(() -> this.state = pos.posname),
         // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
         // Also, bring extension back in. End this when we reach the desired elevator height.
         new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
@@ -70,6 +82,7 @@ public class Superstructure {
   //GetPosition of Superstructure
   public String getState()
   {
+    //System.out.println(state);
     return state;
   }
 
@@ -77,10 +90,22 @@ public class Superstructure {
   public Command setGrabber(DoubleSupplier percent, boolean open) {
     return new FunctionalCommand(
         // Initialize
-        () -> grabber_.setPivot(open),
+        () -> {
+          if (this.state.equals("CONE_L3")) {
+            grabber_.setPivot(false);
+          } else {
+            grabber_.setPivot(open);
+          }  
+        },
 
         // Execute
-        () -> grabber_.setPercent(percent.getAsDouble()),
+        () -> {
+        if (this.state.equals("CONE_L3")) {
+          grabber_.setPercent(0.25);
+        } else {
+          grabber_.setPercent(percent.getAsDouble());
+        }
+      },
 
         // End
         (interrupted) -> {
