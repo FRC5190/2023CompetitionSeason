@@ -140,7 +140,7 @@ public class Superstructure {
     CUBE_L3(27, 6, 20,"CUBE_L3"),
 
     // Cone scoring
-    CONE_L2(26, 9, 5,"CONE_L2"),
+    CONE_L2(29, 9, 5,"CONE_L2"),
     CONE_L3(30, 9, 45,"CONE_L3");
 
     final double height;

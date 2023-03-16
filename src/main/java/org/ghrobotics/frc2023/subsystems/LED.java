@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
   // LED and LED buffer.
-  private final AddressableLED led_;
+  private final AddressableLED om_;
   private final AddressableLEDBuffer led_buffer_;
 
   // Keeps track of rainbow pattern.
@@ -25,9 +25,9 @@ public class LED extends SubsystemBase {
   public LED() {
     // Initialize LED and LED buffer.
     led_buffer_ = new AddressableLEDBuffer(Constants.kBufferSize);
-    led_ = new AddressableLED(Constants.kPortId);
-    led_.setLength(led_buffer_.getLength());
-    led_.start();
+    om_ = new AddressableLED(Constants.kPortId);
+    om_.setLength(led_buffer_.getLength());
+    om_.start();
   }
 
   /**
@@ -77,7 +77,7 @@ public class LED extends SubsystemBase {
 
 
     // Set the LED data.
-    led_.setData(led_buffer_);
+    om_.setData(led_buffer_);
   }
 
   /**
@@ -182,7 +182,7 @@ public class LED extends SubsystemBase {
   }
 
   public static class Constants {
-    public static final int kPortId = 9;
+    public static final int kPortId = 0;
     public static final int kBufferSize = 4;
 
     public static final int kSnakeOnLEDs = 3;

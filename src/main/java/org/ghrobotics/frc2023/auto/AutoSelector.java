@@ -27,6 +27,7 @@ public class AutoSelector {
     routine_chooser_.addOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
     routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
     routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
+    routine_chooser_.addOption("Score Coop Exit Balance", Routine.SCORECOOPEXITBALANCE);
     //routine_chooser_.addOption("Score Backward and Balance", Routine.SCOREBACKWARDBALANCE);
 
     //Initialize grid chooser
@@ -105,6 +106,10 @@ public class AutoSelector {
       autonomous_command_ = new ScoreForwardExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
       return autonomous_command_;
     }
+    else if (routine_chooser_.getSelected() == Routine.SCORECOOPEXITBALANCE) {
+      autonomous_command_ = new ScoreCoopertitionExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance);
+      return autonomous_command_;
+    }
     else {
       return new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
     }
@@ -116,7 +121,8 @@ public class AutoSelector {
     SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE, 
     SCORETWOTAXI, 
     SCOREFORWARDBALANCEBACKWARD, 
-    SCOREFORWARDEXITBALANCEBACKWARD
+    SCOREFORWARDEXITBALANCEBACKWARD,
+    SCORECOOPEXITBALANCE
   }
 
   public enum Grid {
