@@ -87,7 +87,7 @@ public class ScoreTwoAndTaxi extends SequentialCommandGroup {
                   superstructure.setPosition(Superstructure.Position.INTAKE),
                   superstructure.setGrabber(() -> -0.4, true).withTimeout(1.5))
               ),
-      /*
+      
       new ParallelCommandGroup(
           new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         //new WaitCommand(0.5),
@@ -102,7 +102,7 @@ public class ScoreTwoAndTaxi extends SequentialCommandGroup {
         superstructure.setPosition(Superstructure.Position.INTAKE),
         new DriveTrajectory(drivetrain, pose_estimator, () -> t3),
         superstructure.setGrabber(() -> -0.4, false).withTimeout(3.5)), 
-        */
+        
         superstructure.setPosition(Superstructure.Position.STOW)
 
     );

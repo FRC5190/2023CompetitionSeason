@@ -52,14 +52,14 @@ public class ScoreForwardBalanceBackward extends SequentialCommandGroup {
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
 
       new WaitCommand(1.0),
-/*
+
       new ParallelCommandGroup(
         superstructure.setPosition(Superstructure.Position.CUBE_L3).withTimeout(6.5),
           new SequentialCommandGroup(
             new WaitCommand(3.0),
             superstructure.setGrabber(() -> 0.67, true).withTimeout(2.5)
           )
-      ), */
+      ), 
 
       new ParallelCommandGroup(
         new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
