@@ -8,6 +8,8 @@ import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
 public class AutoSelector {
   private Command autonomous_command_ = null;
 
@@ -22,10 +24,10 @@ public class AutoSelector {
   public AutoSelector() {
     //Intialize routine chooser
     routine_chooser_ = new SendableChooser<>();
-    routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
+    routine_chooser_.setDefaultOption("Score Two and Taxi", Routine.SCORETWOTAXI);
+    routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
     routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
     routine_chooser_.addOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
-    routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
     routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
     routine_chooser_.addOption("Score Coop Exit Balance", Routine.SCORECOOPEXITBALANCE);
     //routine_chooser_.addOption("Score Backward and Balance", Routine.SCOREBACKWARDBALANCE);

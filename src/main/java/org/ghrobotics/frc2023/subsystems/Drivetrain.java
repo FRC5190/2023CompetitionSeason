@@ -199,7 +199,7 @@ public class Drivetrain extends SubsystemBase {
     left_leader_sim_.getDouble("Velocity").set(physics_sim_.getLeftVelocityMetersPerSecond());
     right_leader_sim_.getDouble("Position").set(physics_sim_.getRightPositionMeters());
     right_leader_sim_.getDouble("Velocity").set(physics_sim_.getRightVelocityMetersPerSecond());
-    gyro_sim_.setRawHeading(physics_sim_.getHeading().getDegrees());
+    gyro_sim_.setRawHeading(physics_sim_.getHeading().getRadians());
   }
 
   // Pitch Calibration
@@ -254,7 +254,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Angle Getter
   public double getAngle() {
-    return io_.angle;
+    // System.out.println(io_.angle * 180 / Math.PI);
+    return (io_.angle % (Math.PI * 2));
   }
 
   // Pitch Getter
