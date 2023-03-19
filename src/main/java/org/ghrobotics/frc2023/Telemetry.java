@@ -125,6 +125,8 @@ public class Telemetry {
     elevator_layout.addNumber("Velocity Setpoint (ips)",
             () -> Units.metersToInches(elevator.getVelocitySetpoint()))
         .withPosition(0, 1);
+    elevator_layout.addNumber("Voltage", () -> elevator.getVoltage())
+        .withPosition(1, 1);
 
     // Add arm information
     ShuffleboardLayout arm_layout = tab_.getLayout("Arm", BuiltInLayouts.kGrid)

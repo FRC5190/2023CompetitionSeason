@@ -84,6 +84,7 @@ public class Elevator extends SubsystemBase {
     // Read inputs
     io_.position = encoder_.getPosition();
     io_.velocity = encoder_.getVelocity();
+    io_.voltage = leader_.getAppliedOutput() * 12;
 
     // Reset controller if we have to
     if (reset_pid_) {
@@ -139,6 +140,10 @@ public class Elevator extends SubsystemBase {
     fb_.setGoal(position);
   }
 
+  public double getVoltage() {
+    return io_.voltage;
+  }
+
   public double getPosition() {
     return io_.position;
   }
@@ -161,6 +166,7 @@ public class Elevator extends SubsystemBase {
     // Inputs
     double position;
     double velocity;
+    double voltage;
 
     // Outputs
     double demand;
@@ -179,17 +185,17 @@ public class Elevator extends SubsystemBase {
     public static final double kMaxHeight = Units.inchesToMeters(31);
 
     // Feedforward
-    public static final double kG = 0.23;
-    public static final double kS = 0.07966;
-    public static final double kV = 16.846;
-    public static final double kA = 0.175;
+    public static final double kG = 0.27391;
+    public static final double kS = 0.10675;
+    public static final double kV = 17.981;
+    public static final double kA = 0.75595;
 
     // Current Limit
     public static final double kCurrentLimit = 50;
 
     // Control
-    public static double kMaxVelocity = 1.2;
-    public static double kMaxAcceleration = 0.5;
-    public static double kP = 0.45;
+    public static double kMaxVelocity = 0.6;
+    public static double kMaxAcceleration = 1.0;
+    public static double kP = 0.005;
   }
 }

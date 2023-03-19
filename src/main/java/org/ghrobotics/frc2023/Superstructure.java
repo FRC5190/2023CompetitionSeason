@@ -7,8 +7,11 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import java.time.Instant;
 import java.util.function.DoubleSupplier;
@@ -63,17 +66,9 @@ public class Superstructure {
 
     // Create and return command group
     return new SequentialCommandGroup(
-        // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
-        // Also, bring extension back in. End this when we reach the desired elevator height.
-        new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
-          //new PrintCommand("Inside Parallel Deadine Group"),
-            new ExtendToPosition(extender_, Constants.kExtenderStowPosition),
-            new ArmToPosition(arm_, arm_elev_mvmt_pos)
-        ),
-
         // Take extender and arm to final position.
         new ParallelCommandGroup(
-          //new PrintCommand("Inside Parallel Command Group"),
+            new ElevateToPosition(elevator_, pos.height),
             new ExtendToPosition(extender_, pos.extension),
             new ArmToPosition(arm_, pos.angle))
         );
@@ -124,7 +119,7 @@ public class Superstructure {
   // Positions
   public enum Position {
     // Stowed position, everything inside the robot
-    STOW(0, 0, 125,"STOW"),
+    STOW(0.3, 0, 125,"STOW"),
 
     // Intaking a game piece
     INTAKE(0, 0, -20,"INTAKE"),
@@ -133,14 +128,14 @@ public class Superstructure {
     BACK_EXHAUST(29, 0, 120,"BACK_EXHAUST"),
 
     // Pick up from substation
-    SUBSTATION(32, 0, 5,"SUBSTATION"),
+    SUBSTATION(29, 0, 15,"SUBSTATION"),
 
     // Cube scoring
     CUBE_L2(20, 6, 10,"CUBE_L2"),
     CUBE_L3(27, 6, 20,"CUBE_L3"),
 
     // Cone scoring
-    CONE_L2(29, 9, 5,"CONE_L2"),
+    CONE_L2(29, 9, 35,"CONE_L2"),
     CONE_L3(30, 9, 45,"CONE_L3");
 
     final double height;
@@ -160,6 +155,7 @@ public class Superstructure {
   private static class Constants {
     // Tolerances
     public static final double kElevatorHeightTolerance = 0.051;
+    public static final double kElevatorClearHeight = 0.254;
 
     // Misc
     public static final double kExtenderStowPosition = 0.0;

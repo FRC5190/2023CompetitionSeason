@@ -1,6 +1,15 @@
 {
   "NetworkTables": {
     "transitory": {
+      "Shuffleboard": {
+        "2023": {
+          "Elevator": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "open": true
       }
@@ -10,18 +19,49 @@
       "/Shuffleboard/2023/Autonomous Height Selector": "String Chooser",
       "/Shuffleboard/2023/Autonomous Mode Selector": "String Chooser",
       "/Shuffleboard/2023/Autonomous Side Selector": "String Chooser",
+      "/Shuffleboard/2023/Autonomous/Grid": "String Chooser",
+      "/Shuffleboard/2023/Autonomous/Routine": "String Chooser",
+      "/Shuffleboard/2023/Field": "Field2d",
+      "/Shuffleboard/2023/Superstructure": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d"
-    },
-    "windows": {
-      "/SmartDashboard/Field": {
-        "window": {
-          "visible": true
-        }
-      }
     }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
     "serverTeam": "5190"
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "height": 384,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/2023/Elevator/Velocity (ips)"
+            }
+          ]
+        },
+        {
+          "height": 384,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/2023/Elevator/Position (in)"
+            }
+          ]
+        }
+      ]
+    }
   }
 }
