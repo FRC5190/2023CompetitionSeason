@@ -13,10 +13,12 @@ public class TurnDegrees extends CommandBase {
 
   private final Drivetrain drivetrain_;
   private final double angle_;
+  private final double local_angle_;
 
   public TurnDegrees(Drivetrain drivetrain, double angle) {
     drivetrain_ = drivetrain;
     angle_ = Math.toRadians(angle);
+    local_angle_ = Math.toRadians(drivetrain_.getAngle());
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain_);
@@ -41,11 +43,12 @@ public class TurnDegrees extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return drivetrain_.getAngle() - angle_ < Constants.kTolerance;
+    double current_angle_ = Math.abs(drivetrain_.getAngle() - local_angle_);
+    return Math.abs(current_angle_ - angle_) < Constants.kTolerance;
   }
 
   public static class Constants {
-    public static final double kTolerance = 2;
+    public static final double kTolerance = Math.toRadians(2);
   }
 
 }
