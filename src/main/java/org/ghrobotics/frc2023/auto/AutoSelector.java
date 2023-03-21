@@ -22,7 +22,8 @@ public class AutoSelector {
   public AutoSelector() {
     //Intialize routine chooser
     routine_chooser_ = new SendableChooser<>();
-    routine_chooser_.setDefaultOption("Score One and Taxi", Routine.SCOREONETAXI);
+    routine_chooser_.setDefaultOption("One Cone Taxi", Routine.ONECONETAXI);
+    routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
     routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
     routine_chooser_.addOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
     routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
@@ -110,6 +111,10 @@ public class AutoSelector {
       autonomous_command_ = new ScoreCoopertitionExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance);
       return autonomous_command_;
     }
+    else if (routine_chooser_.getSelected() == Routine.ONECONETAXI) {
+      autonomous_command_ = new OneConeTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
+      return autonomous_command_;
+    }
     else {
       return new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
     }
@@ -122,7 +127,8 @@ public class AutoSelector {
     SCORETWOTAXI, 
     SCOREFORWARDBALANCEBACKWARD, 
     SCOREFORWARDEXITBALANCEBACKWARD,
-    SCORECOOPEXITBALANCE
+    SCORECOOPEXITBALANCE,
+    ONECONETAXI
   }
 
   public enum Grid {

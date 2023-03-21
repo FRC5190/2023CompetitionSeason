@@ -1,13 +1,5 @@
 {
   "HALProvider": {
-    "Addressable LEDs": {
-      "0": {
-        "serpentine": true
-      },
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "window": {
         "visible": false
@@ -17,16 +9,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Drivetrain": "Subsystem",
+      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon 2 [17]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
-      "/Shuffleboard/2023/Autonomous/Balance": "String Chooser",
       "/Shuffleboard/2023/Autonomous/Grid": "String Chooser",
-      "/Shuffleboard/2023/Autonomous/Height": "String Chooser",
       "/Shuffleboard/2023/Autonomous/Routine": "String Chooser",
-      "/Shuffleboard/2023/Autonomous/Side": "String Chooser",
       "/Shuffleboard/2023/Field": "Field2d",
       "/Shuffleboard/2023/Superstructure": "Mechanism2d"
     },
@@ -44,7 +36,7 @@
       "/Shuffleboard/2023/Field": {
         "bottom": 544,
         "height": 8.013679504394531,
-        "image": "C:\\Users\\FRC5190\\Documents\\GitHub\\2023CompetitionSeason\\2023-field.png",
+        "image": "C:\\Users\\sdiya\\FRC5190Programming\\2023Code\\2023CompetitionSeason\\2023-field.png",
         "left": 46,
         "right": 1088,
         "top": 36,
@@ -59,8 +51,5 @@
         }
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }
