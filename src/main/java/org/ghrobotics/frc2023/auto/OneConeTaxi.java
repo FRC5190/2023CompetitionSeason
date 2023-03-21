@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class OneConeTaxi extends SequentialCommandGroup {
   // Starting Positions (on blue side)
+  //CHANGE starting positions for cones
   private static final Pose2d kTopStartingPos = new Pose2d(1.9, 4.5, Rotation2d.fromDegrees(180));
   private static final Pose2d kBotStartingPos = new Pose2d(1.9, 1.071, Rotation2d.fromDegrees(180));
   private static final Pose2d kTopConePos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(180));
@@ -52,16 +53,16 @@ public class OneConeTaxi extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
-
-      superstructure.setPosition(Superstructure.Position.CONE_L2).withTimeout(2),
+      superstructure.setPosition(Superstructure.Position.CONE_L2).withTimeout(3.0),
+      //superstructure.setPosition(Superstructure.Position.CONE_L2_AUTO).withTimeout(3.0),
       //new WaitCommand(2.0),
       superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
-      new WaitCommand(2.0),
-      superstructure.setPosition(Superstructure.Position.STOW),
+      //new WaitCommand(2.0),
+      superstructure.setPosition(Superstructure.Position.STOW)
 
-      new TurnToDegreesProfiled(Math.toRadians(180), drivetrain),
-      new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
-      new TurnToDegreesProfiled(Math.toRadians(180), drivetrain)
+      //new TurnToDegreesProfiled(Math.toRadians(180), drivetrain)
+      //new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
+      //new TurnToDegreesProfiled(Math.toRadians(180), drivetrain)
 
     );
   }
