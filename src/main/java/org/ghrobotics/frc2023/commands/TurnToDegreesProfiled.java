@@ -39,7 +39,7 @@ public class TurnToDegreesProfiled extends ProfiledPIDCommand {
         // This uses the output
         (output, setpoint) -> 
         {          
-          drive.setPercent(MathUtil.clamp(-output,-70,70), MathUtil.clamp(output,-70,70));
+          drive.setPercent(MathUtil.clamp(-output,-0.9,0.9), MathUtil.clamp(output,-0.9,0.9));
         },
           // Use the output (and setpoint, if desired) here
         drive);
