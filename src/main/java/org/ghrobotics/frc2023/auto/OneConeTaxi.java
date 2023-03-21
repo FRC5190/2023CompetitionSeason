@@ -30,9 +30,13 @@ public class OneConeTaxi extends SequentialCommandGroup {
   //CHANGE starting positions for cones
   private static final Pose2d kTopStartingPos = new Pose2d(1.9, 4.5, Rotation2d.fromDegrees(180));
   private static final Pose2d kBotStartingPos = new Pose2d(1.9, 1.071, Rotation2d.fromDegrees(180));
-  private static final Pose2d kTopConePos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(180));
-  private static final Pose2d kBotConePos = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(180));
-  
+  private static final Pose2d kTopStartingTrajPos = new Pose2d(1.9, 4.5, Rotation2d.fromDegrees(0));
+  private static final Pose2d kBotStartingTrajPos = new Pose2d(1.9, 1.071, Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopConePos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(0));
+  private static final Pose2d kBotConePos = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopConeTrajPos = new Pose2d(6.46, 4.6, Rotation2d.fromDegrees(180));
+  private static final Pose2d kBotConeTrajPos = new Pose2d(6.46, 0.922,Rotation2d.fromDegrees(180));
+    
 
   /** Creates a new OneConeTaxi. */
   public OneConeTaxi(Drivetrain drivetrain, Superstructure superstructure,
@@ -40,13 +44,17 @@ public class OneConeTaxi extends SequentialCommandGroup {
   AutoSelector.Grid grid_selection) {
     Pose2d start_pos = grid_selection == AutoSelector.Grid.TOP ? kTopStartingPos : kBotStartingPos;
     Pose2d cone_pos = grid_selection == AutoSelector.Grid.TOP ? kTopConePos : kBotConePos;
+    Pose2d start_traj_pos = grid_selection == AutoSelector.Grid.TOP ? kTopStartingTrajPos : kBotStartingTrajPos;
+    Pose2d cone_traj_pos = grid_selection == AutoSelector.Grid.TOP ? kTopConeTrajPos : kBotConeTrajPos;
 
     boolean should_mirror = alliance == DriverStation.Alliance.Red;
 
     Pose2d start_pos_ = should_mirror ? mirror(start_pos) : start_pos;
     Pose2d cone_pos_ = should_mirror ? mirror(cone_pos) : cone_pos;
+    Pose2d start_traj_pos_ = should_mirror ? mirror(start_traj_pos) : start_traj_pos;
+    Pose2d cone_traj_pos_ = should_mirror ? mirror(cone_traj_pos) : cone_traj_pos;
 
-    Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_pos_, new ArrayList<>(), cone_pos_, AutoConfig.kForwardConfig);
+    Trajectory t1 = TrajectoryGenerator.generateTrajectory(start_traj_pos_, new ArrayList<>(), cone_pos_, AutoConfig.kForwardConfig);
 
 
     // Add your commands in the addCommands() call, e.g.
@@ -58,11 +66,11 @@ public class OneConeTaxi extends SequentialCommandGroup {
       //new WaitCommand(2.0),
       superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
       //new WaitCommand(2.0),
-      superstructure.setPosition(Superstructure.Position.STOW)
-
-      //new TurnToDegreesProfiled(Math.toRadians(180), drivetrain)
-      //new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
-      //new TurnToDegreesProfiled(Math.toRadians(180), drivetrain)
+      superstructure.setPosition(Superstructure.Position.STOW),
+ 
+      new TurnToDegreesProfiled(Math.toRadians(180), drivetrain),
+      new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
+      new TurnToDegreesProfiled(Math.toRadians(0), drivetrain)
 
     );
   }

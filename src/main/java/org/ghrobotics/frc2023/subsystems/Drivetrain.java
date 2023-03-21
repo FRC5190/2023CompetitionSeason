@@ -199,7 +199,7 @@ public class Drivetrain extends SubsystemBase {
     left_leader_sim_.getDouble("Velocity").set(physics_sim_.getLeftVelocityMetersPerSecond());
     right_leader_sim_.getDouble("Position").set(physics_sim_.getRightPositionMeters());
     right_leader_sim_.getDouble("Velocity").set(physics_sim_.getRightVelocityMetersPerSecond());
-    gyro_sim_.setRawHeading(physics_sim_.getHeading().getRadians());
+    gyro_sim_.setRawHeading(physics_sim_.getHeading().getDegrees());
   }
 
   // Pitch Calibration
