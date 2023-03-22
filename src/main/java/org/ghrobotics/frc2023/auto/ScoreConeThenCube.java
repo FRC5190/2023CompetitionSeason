@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -30,13 +31,12 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 public class ScoreConeThenCube extends SequentialCommandGroup {
   // Poses (assuming origin on blue side)
   private static final Pose2d kStartPos = new Pose2d(1.90, 4.50, new Rotation2d(Math.PI));
-  private static final Pose2d kCubePickupPos = new Pose2d(1.85, 4.95, new Rotation2d());
+  private static final Pose2d kCubePickupPos = new Pose2d(6.54, 4.59, new Rotation2d());
   private static final Pose2d kCubeScorePos = new Pose2d(1.90, 4.42, new Rotation2d(Math.PI));
 
   // Constructor
   public ScoreConeThenCube(Drivetrain drivetrain, Superstructure superstructure,
-                           PoseEstimator pose_estimator, DriverStation.Alliance alliance,
-                           AutoSelector.Grid grid_selection) {
+                           PoseEstimator pose_estimator, DriverStation.Alliance alliance) {
 
     // Get true poses from alliance
     Pose2d start_pos = AutoConfig.adjustPoseForAlliance(kStartPos, alliance);
@@ -65,6 +65,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
         new WaitCommand(0.5), // TODO: figure out why this is needed
 
         // Score cone in L2:
+        new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
         superstructure.setPosition(Superstructure.Position.CONE_L2),
         superstructure.setGrabber(0.0, true).withTimeout(0.3),
 

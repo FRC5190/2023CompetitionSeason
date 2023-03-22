@@ -112,7 +112,7 @@ public class AutoSelector {
       return autonomous_command_;
     }
     else if (routine_chooser_.getSelected() == Routine.SCORE_CONE_THEN_CUBE) {
-      autonomous_command_ = new ScoreConeThenCube(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
+      autonomous_command_ = new ScoreConeThenCube(drivetrain, superstructure, pose_estimator, alliance);
       return autonomous_command_;
     }
     else {
