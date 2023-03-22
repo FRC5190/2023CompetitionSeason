@@ -202,7 +202,7 @@ public class Elevator extends SubsystemBase {
 
     // Control
     public static double kMaxVelocity = 0.6;
-    public static double kMaxAcceleration = 1.0;
+    public static double kMaxAcceleration = 1.2;
     public static double kP = 0.0001;
   }
 }

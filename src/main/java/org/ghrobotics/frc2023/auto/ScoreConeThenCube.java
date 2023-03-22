@@ -30,9 +30,10 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 //  * score cube on top grid
 public class ScoreConeThenCube extends SequentialCommandGroup {
   // Poses (assuming origin on blue side)
-  private static final Pose2d kStartPos = new Pose2d(1.90, 4.50, new Rotation2d(Math.PI));
-  private static final Pose2d kCubePickupPos = new Pose2d(6.54, 4.59, new Rotation2d());
-  private static final Pose2d kCubeScorePos = new Pose2d(1.90, 4.42, new Rotation2d(Math.PI));
+  private static final Pose2d kStartPos = new Pose2d(1.90, 5.00, new Rotation2d(Math.PI));
+  private static final Pose2d kCubePickupPos = new Pose2d(6.34, 4.75, new Rotation2d());
+  private static final Pose2d kCubeScorePos = new Pose2d(1.90, 4.52, Rotation2d.fromDegrees(175));
+  private static final Pose2d kIntermediatePos = new Pose2d(3.9, 4.785, new Rotation2d());
 
   // Constructor
   public ScoreConeThenCube(Drivetrain drivetrain, Superstructure superstructure,
@@ -42,9 +43,10 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
     Pose2d start_pos = AutoConfig.adjustPoseForAlliance(kStartPos, alliance);
     Pose2d cube_pickup_pos = AutoConfig.adjustPoseForAlliance(kCubePickupPos, alliance);
     Pose2d cube_score_pos = AutoConfig.adjustPoseForAlliance(kCubeScorePos, alliance);
+    Pose2d intermediate_pos = AutoConfig.adjustPoseForAlliance(kIntermediatePos, alliance);
 
     // Calculate angles to turn to
-    double angle1 = alliance == DriverStation.Alliance.Red ? 140 : 40;
+    double angle1 = alliance == DriverStation.Alliance.Red ? 160 : 20;
     double angle2 = alliance == DriverStation.Alliance.Red ? 0 : 180;
 
     // Create 180 deg transform
@@ -57,8 +59,8 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
 
     // Create trajectory from cube pickup to cube scoring pos
     Trajectory t2 = TrajectoryGenerator.generateTrajectory(
-        cube_pickup_pos.transformBy(turn_transform), List.of(), cube_score_pos,
-        AutoConfig.kForwardConfig);
+        cube_pickup_pos.transformBy(turn_transform), List.of(intermediate_pos.getTranslation()),
+        cube_score_pos, AutoConfig.kForwardConfig);
 
     // Add commands
     addCommands(
@@ -72,15 +74,15 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
         // Pickup cube:
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(() -> drivetrain.setPercent(-0.2, -0.2), drivetrain)
-                    .withTimeout(0.3),
+                new RunCommand(() -> drivetrain.setPercent(-0.1, -0.3), drivetrain)
+                    .withTimeout(0.5),
                 new TurnToAngle(Math.toRadians(angle1), drivetrain, pose_estimator),
                 new DriveTrajectory(drivetrain, pose_estimator, t1)
             ),
             new SequentialCommandGroup(
                 superstructure.setPosition(Superstructure.Position.STOW),
                 superstructure.setPosition(Superstructure.Position.INTAKE),
-                superstructure.setGrabber(0.5, true)
+                superstructure.setGrabber(-0.5, true)
             )
         ),
 
@@ -93,8 +95,8 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 superstructure.setPosition(Superstructure.Position.STOW).withTimeout(0.1),
                 new WaitCommand(t2.getTotalTimeSeconds() - 0.5),
-                superstructure.setPosition(Superstructure.Position.CUBE_L2),
-                superstructure.setGrabber(-0.75, false).withTimeout(0.5)
+                superstructure.setPosition(Superstructure.Position.CUBE_L3),
+                superstructure.setGrabber(0.75, false).withTimeout(0.5)
             )
         ),
 
