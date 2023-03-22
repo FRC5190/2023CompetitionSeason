@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
-import org.ghrobotics.frc2023.commands.TurnToDegreesProfiled;
+import org.ghrobotics.frc2023.commands.TurnToAngle;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -73,7 +73,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new RunCommand(() -> drivetrain.setPercent(-0.2, -0.2), drivetrain)
                     .withTimeout(0.3),
-                new TurnToDegreesProfiled(Math.toRadians(angle1), drivetrain, pose_estimator),
+                new TurnToAngle(Math.toRadians(angle1), drivetrain, pose_estimator),
                 new DriveTrajectory(drivetrain, pose_estimator, t1)
             ),
             new SequentialCommandGroup(
@@ -86,7 +86,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
         // Score cube:
         new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new TurnToDegreesProfiled(Math.toRadians(angle2), drivetrain, pose_estimator),
+                new TurnToAngle(Math.toRadians(angle2), drivetrain, pose_estimator),
                 new DriveTrajectory(drivetrain, pose_estimator, t2)
             ),
             new SequentialCommandGroup(

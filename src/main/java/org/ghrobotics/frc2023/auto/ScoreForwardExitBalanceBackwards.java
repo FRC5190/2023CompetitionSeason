@@ -7,16 +7,13 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
-import org.ghrobotics.frc2023.commands.TurnToDegreesProfiled;
+import org.ghrobotics.frc2023.commands.TurnToAngle;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -79,7 +76,7 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
         superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
 
         new ParallelCommandGroup(
-        new TurnToDegreesProfiled(180, drivetrain, pose_estimator),
+        new TurnToAngle(180, drivetrain, pose_estimator),
           superstructure.setPosition(Superstructure.Position.STOW)
         ),
 

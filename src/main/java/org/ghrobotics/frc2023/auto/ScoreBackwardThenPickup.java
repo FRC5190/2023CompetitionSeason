@@ -17,7 +17,7 @@ import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
-import org.ghrobotics.frc2023.commands.TurnToDegreesProfiled;
+import org.ghrobotics.frc2023.commands.TurnToAngle;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -84,7 +84,7 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
         superstructure.setPosition(Superstructure.Position.CONE_L2).withTimeout(2),
         superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
         new RunCommand(() -> drivetrain.setPercent(-0.1, -0.1), drivetrain).withTimeout(0.5),
-        new TurnToDegreesProfiled(Math.toRadians(-40), drivetrain, pose_estimator),
+        new TurnToAngle(Math.toRadians(-40), drivetrain, pose_estimator),
 
         // Drive to cube pickup while intaking
         new ParallelDeadlineGroup(
@@ -96,7 +96,7 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
                 superstructure.setPosition(Superstructure.Position.INTAKE),
                 superstructure.setGrabber(() -> -0.4, true).withTimeout(1.5))
             ),
-            
+
 
         // Drive to charge station
         new ParallelCommandGroup(
