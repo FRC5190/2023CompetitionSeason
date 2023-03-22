@@ -22,6 +22,7 @@ public class ExtendToPosition extends CommandBase {
 
   @Override
   public void initialize() {
+    extender_.resetFeedback();
     extender_.setPosition(position_);
   }
 

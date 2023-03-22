@@ -88,19 +88,13 @@ public class Robot extends TimedRobot {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
 
+    // Run auto
     DriverStation.Alliance alliance = DriverStation.getAlliance();
-
     auto_selector_.run(drivetrain_, pose_estimator_, superstructure_, alliance).schedule();
+    System.out.println("AUTO ENABLE");
 
     // Calibrate drivetrain pitch
 //    drivetrain_.calibratePitch();
-
-    // Run auto
-    //new DriveBalance(drivetrain_).schedule();
-    //new ScoreBackwardThenPickup(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
-    //new ScoreOneAndTaxi(drivetrain_, superstructure_, pose_estimator_, alliance).schedule();
-    //new ScoreOneAndBalance(drivetrain_, superstructure_, pose_estimator_, DriverStation.getAlliance()).schedule();
-    //new ScoreForwardBalanceBackward(drivetrain_, superstructure_, pose_estimator_, alliance).schedule();
   }
 
   @Override
@@ -139,7 +133,7 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {}
 
   private void setupTeleopControls() {
-    
+
     // Driver Controller
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));

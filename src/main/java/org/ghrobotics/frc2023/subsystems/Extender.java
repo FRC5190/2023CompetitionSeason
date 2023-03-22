@@ -28,6 +28,7 @@ public class Extender extends SubsystemBase {
   // Control
   private final ProfiledPIDController fb_;
   private final SimpleMotorFeedforward ff_;
+  private boolean reset_pid_ = true;
 
   // Simulation
   private final ElevatorSim physics_sim_;
@@ -80,6 +81,12 @@ public class Extender extends SubsystemBase {
     io_.position = encoder_.getPosition();
     io_.velocity = encoder_.getVelocity();
 
+    // Reset controller if we have to
+    if (reset_pid_) {
+      reset_pid_ = false;
+      fb_.reset(io_.position, io_.velocity);
+    }
+
     // Write outputs
     switch (output_type_) {
       case PERCENT:
@@ -114,6 +121,10 @@ public class Extender extends SubsystemBase {
     // Update encoder values
     leader_sim_.getDouble("Position").set(physics_sim_.getPositionMeters());
     leader_sim_.getDouble("Velocity").set(physics_sim_.getVelocityMetersPerSecond());
+  }
+
+  public void resetFeedback() {
+    reset_pid_ = true;
   }
 
   public void setPercent(double percent) {
@@ -166,16 +177,16 @@ public class Extender extends SubsystemBase {
     public static final double kMaxLength = Units.inchesToMeters(10);
 
     // Feedforward
-    public static final double kS = 0.086;
-    public static final double kV = 10.705;
-    public static final double kA = 0.23276;
+    public static final double kS = 0.090508;
+    public static final double kV = 10.654;
+    public static final double kA = 0.1604;
 
     // Current Limit
     public static final double kCurrentLimit = 50;
 
     // Control
-    public static double kMaxVelocity = 0.5;
-    public static double kMaxAcceleration = 0.6;
-    public static double kP = 0.03;
+    public static double kMaxVelocity = 0.6;
+    public static double kMaxAcceleration = 0.4;
+    public static double kP = 0.003;
   }
 }

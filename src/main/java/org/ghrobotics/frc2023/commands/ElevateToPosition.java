@@ -21,7 +21,7 @@ public class ElevateToPosition extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public void initialize() {
     elevator_.setPosition(position_);
   }
 

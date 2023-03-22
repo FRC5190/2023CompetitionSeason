@@ -12,6 +12,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
@@ -77,6 +78,7 @@ public class Elevator extends SubsystemBase {
 
     // Reset encoder position
     encoder_.setPosition(0);
+    fb_.reset(0);
   }
 
   @Override
@@ -84,12 +86,17 @@ public class Elevator extends SubsystemBase {
     // Read inputs
     io_.position = encoder_.getPosition();
     io_.velocity = encoder_.getVelocity();
-    io_.voltage = leader_.getAppliedOutput() * 12;
+
+    if (!DriverStation.isEnabled()) {
+      reset_pid_ = true;
+      return;
+    }
 
     // Reset controller if we have to
     if (reset_pid_) {
       reset_pid_ = false;
       fb_.reset(io_.position, io_.velocity);
+      System.out.println("Reset to " + io_.position + "," + io_.velocity);
     }
 
     // Write outputs
@@ -196,6 +203,6 @@ public class Elevator extends SubsystemBase {
     // Control
     public static double kMaxVelocity = 0.6;
     public static double kMaxAcceleration = 1.0;
-    public static double kP = 0.005;
+    public static double kP = 0.0001;
   }
 }
