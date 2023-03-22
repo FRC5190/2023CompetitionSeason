@@ -71,8 +71,8 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
         // Pickup cube:
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(() -> drivetrain.setPercent(-0.2, -0.2), drivetrain).withTimeout(
-                    0.3),
+                new RunCommand(() -> drivetrain.setPercent(-0.2, -0.2), drivetrain)
+                    .withTimeout(0.3),
                 new TurnToDegreesProfiled(Math.toRadians(angle1), drivetrain, pose_estimator),
                 new DriveTrajectory(drivetrain, pose_estimator, t1)
             ),
