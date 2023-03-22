@@ -16,6 +16,7 @@ import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
+import org.ghrobotics.frc2023.commands.TurnToDegreesProfiled;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -52,11 +53,11 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
     boolean should_mirror = alliance == DriverStation.Alliance.Red;
 
     // Get starting, cube, and charge station positions
-    Pose2d start_pos_ = should_mirror ? AutoConfig.mirror(start_pos) : start_pos;
-    cube_pos = should_mirror ? AutoConfig.mirror(cube_pos) : cube_pos;
-    Pose2d charge_station_w_pos = should_mirror ? AutoConfig.mirror(
+    Pose2d start_pos_ = should_mirror ? mirror(start_pos) : start_pos;
+    cube_pos = should_mirror ? mirror(cube_pos) : cube_pos;
+    Pose2d charge_station_w_pos = should_mirror ? mirror(
         kBotChargeStationWaypoint) : kBotChargeStationWaypoint;
-    Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kChargeStation) : kChargeStation;
+    Pose2d charge_station_pos = should_mirror ? mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
     /*Trajectory t1 = TrajectoryGenerator.generateTrajectory(
@@ -74,13 +75,15 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.CUBE_L3),
-        superstructure.setGrabber(() -> 0.6, false).withTimeout(0.5),
+        superstructure.setPosition(Superstructure.Position.CONE_L2),
+        superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
 
         new ParallelCommandGroup(
-          superstructure.setPosition(Superstructure.Position.STOW),
-          new DriveTrajectory(drivetrain, pose_estimator, () -> t1)
+        new TurnToDegreesProfiled(180, drivetrain, pose_estimator),
+          superstructure.setPosition(Superstructure.Position.STOW)
         ),
+
+        new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
 
         //new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         // Balance
