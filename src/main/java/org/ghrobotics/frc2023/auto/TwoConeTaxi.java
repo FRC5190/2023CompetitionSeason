@@ -30,11 +30,11 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class TwoConeTaxi extends SequentialCommandGroup {
   // Starting Positions (on blue side)
-  private static final Pose2d kTopSecConePos = new Pose2d(1.85, 5.00, Rotation2d.fromDegrees(180));
-  private static final Pose2d kBotSecConePos = new Pose2d(1.85, 0.62, Rotation2d.fromDegrees(180));
+  private static final Pose2d kTopSecConePos = new Pose2d(1.85, 4.95, Rotation2d.fromDegrees(180));
+  private static final Pose2d kBotSecConePos = new Pose2d(1.85, 0.53, Rotation2d.fromDegrees(180));
 
-  private static final Pose2d kTopConePos = new Pose2d(5.86, 4.638, Rotation2d.fromDegrees(0));
-  private static final Pose2d kBotConePos = new Pose2d(5.86, 0.927, Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopConePos = new Pose2d(5.7, 4.638, Rotation2d.fromDegrees(0)); //6.95, .89
+  private static final Pose2d kBotConePos = new Pose2d(5.7, 0.927, Rotation2d.fromDegrees(0));
 
   private static final Pose2d kTopStartingPos = new Pose2d(1.9, 4.5, Rotation2d.fromDegrees(180));
   private static final Pose2d kBotStartingPos = new Pose2d(1.9, 1.633, Rotation2d.fromDegrees(180));
