@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class AutoConfig {
   // Constraints
@@ -37,5 +38,9 @@ public class AutoConfig {
   public static Pose2d mirror(Pose2d pose) {
     return new Pose2d(16.54175 - pose.getX(), pose.getY(),
         new Rotation2d(Math.PI).minus(pose.getRotation()));
+  }
+
+  public static Pose2d adjustPoseForAlliance(Pose2d pose, DriverStation.Alliance alliance) {
+    return alliance == DriverStation.Alliance.Red ? mirror(pose) : pose;
   }
 }

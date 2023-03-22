@@ -29,6 +29,10 @@ public class DriveTrajectory extends CommandBase {
   // Trajectory
   private Trajectory traj_;
 
+  public DriveTrajectory(Drivetrain drivetrain, PoseEstimator pose_estimator, Trajectory t) {
+    this(drivetrain, pose_estimator, () -> t);
+  }
+
   public DriveTrajectory(Drivetrain drivetrain, PoseEstimator pose_estimator,
                          Supplier<Trajectory> trajectory) {
 

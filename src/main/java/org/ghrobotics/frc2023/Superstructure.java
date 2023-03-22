@@ -82,6 +82,10 @@ public class Superstructure {
     return state;
   }
 
+  public Command setGrabber(double percent, boolean open) {
+    return setGrabber(() -> percent, open);
+  }
+
   // Grabber Setter
   public Command setGrabber(DoubleSupplier percent, boolean open) {
     return new FunctionalCommand(
