@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveTrajectory;
+import org.ghrobotics.frc2023.commands.TurnToDegreesProfiled;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
@@ -27,8 +29,12 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 
 public class ScoreBackwardThenPickup extends SequentialCommandGroup {
   // Starting Positions (on blue side)
-  private static final Pose2d kBotStartingPos = new Pose2d(1.900, 1.071, new Rotation2d());
-  private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, new Rotation2d());
+  private static final Pose2d kBotStartingPos = new Pose2d(1.900, 1.071, Rotation2d.fromDegrees(180));
+  private static final Pose2d kTopStartingPos = new Pose2d(1.900, 4.424, Rotation2d.fromDegrees(180));
+
+  //Traj Start Position (on blue side)
+  private static final Pose2d kBotTrajPos = new Pose2d(2.00, 1.071, Rotation2d.fromDegrees(0));
+  private static final Pose2d kTopTrajPos = new Pose2d(2.00, 4.424, Rotation2d.fromDegrees(0));
 
   // Cube Positions (on blue side)
   private static final Pose2d kBotCube = new Pose2d(6.541, 0.922, new Rotation2d());
@@ -46,6 +52,7 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
     //Assign top or bottom position
     Pose2d start_pos = grid_selection == AutoSelector.Grid.TOP ? kTopStartingPos : kBotStartingPos;
     Pose2d cube_pos = grid_selection == AutoSelector.Grid.TOP ? kTopCube : kBotCube;
+    Pose2d traj_pos = grid_selection == AutoSelector.Grid.TOP ? kTopTrajPos : kBotTrajPos;
 
     // Check if we need to mirror poses
     boolean should_mirror = alliance == DriverStation.Alliance.Red;
@@ -53,13 +60,14 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
     // Get starting, cube, and charge station positions
     Pose2d start_pos_ = should_mirror ? AutoConfig.mirror(start_pos) : start_pos;
     cube_pos = should_mirror ? AutoConfig.mirror(cube_pos) : cube_pos;
+    Pose2d traj_pos_ = should_mirror ? AutoConfig.mirror(traj_pos) : traj_pos;
     Pose2d charge_station_w_pos = should_mirror ? AutoConfig.mirror(
         kBotChargeStationWaypoint) : kBotChargeStationWaypoint;
     Pose2d charge_station_pos = should_mirror ? AutoConfig.mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
     Trajectory t1 = TrajectoryGenerator.generateTrajectory(
-        start_pos_, new ArrayList<>(), cube_pos,
+        traj_pos_, new ArrayList<>(), cube_pos,
         AutoConfig.kForwardConfig);
 
     // Generate trajectory from cube pos to charge station
@@ -73,8 +81,10 @@ public class ScoreBackwardThenPickup extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.BACK_EXHAUST).withTimeout(2),
-        superstructure.setGrabber(() -> 0.67, true).withTimeout(0.5),
+        superstructure.setPosition(Superstructure.Position.CONE_L2).withTimeout(2),
+        superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
+        new RunCommand(() -> drivetrain.setPercent(-0.1, -0.1), drivetrain).withTimeout(0.5),
+        new TurnToDegreesProfiled(Math.toRadians(-40), drivetrain, pose_estimator),
 
         // Drive to cube pickup while intaking
         new ParallelDeadlineGroup(
