@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.ghrobotics.frc2023.Superstructure;
 import org.ghrobotics.frc2023.commands.DriveBalance;
@@ -34,8 +35,8 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
   private static final Pose2d kTopCubeWaypoint = new Pose2d(5.5, 4.589, Rotation2d.fromDegrees(180));
 
   // Charge Station Positions
-  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.900, new Rotation2d());
-  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, new Rotation2d());
+  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.900, Rotation2d.fromDegrees(0));
+  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, Rotation2d.fromDegrees(0));
 
   // Constructor
   public ScoreForwardExitBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,
@@ -57,32 +58,36 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
     Pose2d charge_station_pos = should_mirror ? mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
-    /*Trajectory t1 = TrajectoryGenerator.generateTrajectory(
+    Trajectory t1 = TrajectoryGenerator.generateTrajectory(
         start_pos_, new ArrayList<>(), cube_pos,
-        AutoConfig.kReverseConfig);*/
+        AutoConfig.kReverseConfig);
 
     // Generate trajectory from cube pos to charge station
-    Trajectory t1 = TrajectoryGenerator.generateTrajectory(
+  /*   Trajectory t1 = TrajectoryGenerator.generateTrajectory(
         start_pos, List.of(cube_pos.getTranslation(), charge_station_w_pos.getTranslation()), charge_station_pos,
         AutoConfig.kReverseToBalanceConfig);
-
+    */
+        Trajectory t2 = TrajectoryGenerator.generateTrajectory(
+          cube_pos, List.of(charge_station_w_pos.getTranslation()), charge_station_pos,
+          AutoConfig.kReverseToBalanceConfig);
+  
     // Add commands
     addCommands(
         // Reset pose estimator to starting position
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.CONE_L2),
+        superstructure.setPosition(Superstructure.Position.CUBE_L3),
         superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
 
         new ParallelCommandGroup(
-        new TurnToAngle(180, drivetrain, pose_estimator),
+        //new TurnToAngle(180, drivetrain, pose_estimator),
           superstructure.setPosition(Superstructure.Position.STOW)
         ),
 
         new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
 
-        //new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+        new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         // Balance
         new DriveBalance(drivetrain)
     );
