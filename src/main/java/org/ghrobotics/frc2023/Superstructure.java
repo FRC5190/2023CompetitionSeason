@@ -133,10 +133,10 @@ public class Superstructure {
     BACK_EXHAUST(29, 0, 120, "BACK_EXHAUST"),
 
     // Pick up from substation
-    SUBSTATION(29, 0, 15, "SUBSTATION"),
+    SUBSTATION(29, 0, 12, "SUBSTATION"),
 
     // Cube scoring
-    CUBE_L2(20, 6, 10, "CUBE_L2"),
+    CUBE_L2(25, 0, 10, "CUBE_L2"),
     CUBE_L3(27, 6, 20, "CUBE_L3"),
 
     // Cone scoring

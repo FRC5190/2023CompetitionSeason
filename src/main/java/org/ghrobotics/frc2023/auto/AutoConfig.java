@@ -15,6 +15,7 @@ public class AutoConfig {
   public static final double kMaxVelocity = 3.1;
   public static final double kMaxAcceleration = 2.0;
   public static final double kMaxCentripetalAcceleration = 2.5;
+  public static final double kRampMaxAcceleration = 0.3;
 
   public static final double kBalanceRampApproachAcceleration = 0.3;
   public static final double kBalanceRampApproachSpeed = 0.25;
@@ -28,6 +29,9 @@ public class AutoConfig {
   public static final TrajectoryConfig kReverseConfig = new TrajectoryConfig(kMaxVelocity,
       kMaxAcceleration).setReversed(true).addConstraint(
       new CentripetalAccelerationConstraint(kMaxCentripetalAcceleration));
+
+  public static final TrajectoryConfig kReversedRampConfig = new TrajectoryConfig(
+      kMaxVelocity, kRampMaxAcceleration).setReversed(true);
 
   public static final TrajectoryConfig kReverseToBalanceConfig = new TrajectoryConfig(kMaxVelocity,
       kBalanceRampApproachAcceleration).setReversed(true).addConstraint(

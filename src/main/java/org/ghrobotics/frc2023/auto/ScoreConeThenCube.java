@@ -64,7 +64,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
 
     // Add commands
     addCommands(
-        new WaitCommand(0.5), // TODO: figure out why this is needed
+        new WaitCommand(0.3), // TODO: figure out why this is needed
 
         // Score cone in L2:
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos)),
