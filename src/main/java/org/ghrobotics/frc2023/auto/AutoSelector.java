@@ -23,12 +23,12 @@ public class AutoSelector {
     //Intialize routine chooser
     routine_chooser_ = new SendableChooser<>();
     routine_chooser_.setDefaultOption("Score Cone Then Cube", Routine.SCORE_CONE_THEN_CUBE);
-    routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
-    routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
     routine_chooser_.addOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
-    routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
-    routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
-    routine_chooser_.addOption("Score Coop Exit Balance", Routine.SCORECOOPEXITBALANCE);
+    routine_chooser_.addOption("Score Coop Balance", Routine.SCORECOOPBALANCE);
+    //routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
+    //routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
+    //routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
+    //routine_chooser_.addOption("Score Backward then Pickup and Balance", Routine.SCOREBACKWARDPICKUPBALANCE);
     //routine_chooser_.addOption("Score Backward and Balance", Routine.SCOREBACKWARDBALANCE);
 
     //Initialize grid chooser
@@ -87,28 +87,12 @@ public class AutoSelector {
 
   // Run Auto
   public Command run(Drivetrain drivetrain, PoseEstimator pose_estimator, Superstructure superstructure, DriverStation.Alliance alliance) {
-    if (routine_chooser_.getSelected() == Routine.SCOREBACKWARDPICKUPBALANCE) {
-      autonomous_command_ = new ScoreBackwardThenPickup(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
-      return autonomous_command_;
-    }
-    else if (routine_chooser_.getSelected() == Routine.SCOREONETAXI) {
-      autonomous_command_ = new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
-      return autonomous_command_;
-    }
-    else if (routine_chooser_.getSelected() == Routine.SCORETWOTAXI) {
-      autonomous_command_ = new ScoreTwoAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
-      return autonomous_command_;
-    }
-    else if (routine_chooser_.getSelected() == Routine.SCOREFORWARDBALANCEBACKWARD){
-      autonomous_command_ = new ScoreForwardBalanceBackward(drivetrain, superstructure, pose_estimator, alliance);
-      return autonomous_command_;
-    }
-    else if (routine_chooser_.getSelected() == Routine.SCOREFORWARDEXITBALANCEBACKWARD) {
+    if (routine_chooser_.getSelected() == Routine.SCOREFORWARDEXITBALANCEBACKWARD) {
       autonomous_command_ = new ScoreForwardExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
       return autonomous_command_;
     }
-    else if (routine_chooser_.getSelected() == Routine.SCORECOOPEXITBALANCE) {
-      autonomous_command_ = new ScoreCoopertitionExitBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance);
+    else if (routine_chooser_.getSelected() == Routine.SCORECOOPBALANCE) {
+      autonomous_command_ = new ScoreCoopertitionBalanceBackwards(drivetrain, superstructure, pose_estimator, alliance);
       return autonomous_command_;
     }
     else if (routine_chooser_.getSelected() == Routine.SCORE_CONE_THEN_CUBE) {
@@ -116,18 +100,15 @@ public class AutoSelector {
       return autonomous_command_;
     }
     else {
-      return new ScoreOneAndTaxi(drivetrain, superstructure, pose_estimator, alliance, grid_chooser_.getSelected());
+      return new ScoreConeThenCube(drivetrain, superstructure, pose_estimator, alliance);
     }
     /*new ScoreOne(drivetrain, pose_estimator, side_chooser_.getSelected(),
         height_chooser_.getSelected(), balance_chooser_.getSelected()).schedule();*/
   }
 
   public enum Routine {
-    SCOREONETAXI, SCOREBACKWARDPICKUPBALANCE,
-    SCORETWOTAXI,
-    SCOREFORWARDBALANCEBACKWARD,
     SCOREFORWARDEXITBALANCEBACKWARD,
-    SCORECOOPEXITBALANCE,
+    SCORECOOPBALANCE,
     SCORE_CONE_THEN_CUBE
   }
 

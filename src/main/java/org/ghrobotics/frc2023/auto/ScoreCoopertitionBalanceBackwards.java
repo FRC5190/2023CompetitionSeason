@@ -30,7 +30,7 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 // * move backwards
 // * run balance command
 
-public class ScoreCoopertitionExitBalanceBackwards extends SequentialCommandGroup {
+public class ScoreCoopertitionBalanceBackwards extends SequentialCommandGroup {
   // Start location (middle)
   private static final Pose2d kStartPos = new Pose2d(1.9, 3.32, Rotation2d.fromDegrees(180));
 
@@ -41,7 +41,7 @@ public class ScoreCoopertitionExitBalanceBackwards extends SequentialCommandGrou
   /**
    * Creates a new ScoreCoopertitionExitBalanceBackwards.
    */
-  public ScoreCoopertitionExitBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,
+  public ScoreCoopertitionBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,
                                                PoseEstimator pose_estimator,
                                                DriverStation.Alliance alliance) {
     // Add your commands in the addCommands() call, e.g.
