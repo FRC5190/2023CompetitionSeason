@@ -6,16 +6,10 @@ package org.ghrobotics.frc2023;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
-import org.ghrobotics.frc2023.auto.ScoreBackwardThenPickup;
-import org.ghrobotics.frc2023.auto.ScoreForwardBalanceBackward;
-import org.ghrobotics.frc2023.auto.ScoreForwardExitBalanceBackwards;
-import org.ghrobotics.frc2023.auto.ScoreOneAndTaxi;
-import org.ghrobotics.frc2023.commands.DriveBalance;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.subsystems.Arm;
@@ -141,7 +135,7 @@ public class Robot extends TimedRobot {
     driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
     //  * LT: Outtake Cone
     driver_controller_.leftTrigger(0.2).whileTrue(
-      superstructure_.setGrabber(() -> 0, true));
+        superstructure_.setGrabber(() -> 0, true));
     //  * RB: Intake Cube
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube and Cone L3
@@ -188,7 +182,7 @@ public class Robot extends TimedRobot {
     } else if (limelight_.hasTarget()) {
       // System.out.println("LEDs: Intake");
       led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
-    } else{
+    } else {
       led_.setOutput(LED.StandardLEDOutput.BLANK);
     }
   }
