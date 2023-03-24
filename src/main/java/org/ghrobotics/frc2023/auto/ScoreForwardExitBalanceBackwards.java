@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,12 +74,14 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
   
     // Add commands
     addCommands(
+      new WaitCommand(0.3),
+
         // Reset pose estimator to starting position
         new InstantCommand(() -> pose_estimator.resetPosition(start_pos_)),
 
         // Exhaust cube
         superstructure.setPosition(Superstructure.Position.CUBE_L3),
-        superstructure.setGrabber(() -> 0, true).withTimeout(0.5),
+        superstructure.setGrabber(() -> 0.3, false).withTimeout(0.5),
 
         new ParallelCommandGroup(
         //new TurnToAngle(180, drivetrain, pose_estimator),

@@ -45,9 +45,16 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
     Pose2d cube_score_pos = AutoConfig.adjustPoseForAlliance(kCubeScorePos, alliance);
     Pose2d intermediate_pos = AutoConfig.adjustPoseForAlliance(kIntermediatePos, alliance);
 
+    // Check if we need to mirror poses
+    boolean should_mirror = alliance == DriverStation.Alliance.Red;
+
+    //Calculate drive velocities 
+    double LDTVelocity = should_mirror ? -0.3 : -0.1;
+    double RDTVelocity = should_mirror ? -0.1 : -0.3;
+
     // Calculate angles to turn to
-    double angle1 = alliance == DriverStation.Alliance.Red ? 160 : 20;
-    double angle2 = alliance == DriverStation.Alliance.Red ? 0 : 180;
+    double angle1 = should_mirror ? 160 : 20;
+    double angle2 = should_mirror ? 0 : 180;
 
     // Create 180 deg transform
     Transform2d turn_transform = new Transform2d(new Translation2d(), new Rotation2d(Math.PI));
@@ -74,7 +81,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
         // Pickup cube:
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(() -> drivetrain.setPercent(-0.1, -0.3), drivetrain)
+                new RunCommand(() -> drivetrain.setPercent(LDTVelocity, RDTVelocity), drivetrain)
                     .withTimeout(0.5),
                 new TurnToAngle(Math.toRadians(angle1), drivetrain, pose_estimator),
                 new DriveTrajectory(drivetrain, pose_estimator, t1)

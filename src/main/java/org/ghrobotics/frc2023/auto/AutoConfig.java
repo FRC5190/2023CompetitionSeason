@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class AutoConfig {
   // Constraints
-  public static final double kMaxVelocity = 3.1;
-  public static final double kMaxAcceleration = 2.0;
+  public static final double kMaxVelocity = 3.1; //3.1
+  public static final double kMaxAcceleration = 2.0; //2.0
   public static final double kMaxCentripetalAcceleration = 2.5;
   public static final double kRampMaxAcceleration = 0.3;
 
