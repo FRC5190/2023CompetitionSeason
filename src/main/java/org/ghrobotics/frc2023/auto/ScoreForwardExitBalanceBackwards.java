@@ -36,7 +36,7 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
   private static final Pose2d kTopCubeWaypoint = new Pose2d(5.5, 4.589, Rotation2d.fromDegrees(180));
 
   // Charge Station Positions
-  private static final Pose2d kBotChargeStationWaypoint = new Pose2d(6.294, 2.900, Rotation2d.fromDegrees(0));
+  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.800, Rotation2d.fromDegrees(0));
   private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, Rotation2d.fromDegrees(0));
 
   // Constructor
@@ -55,13 +55,13 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
     Pose2d start_pos_ = should_mirror ? mirror(start_pos) : start_pos;
     cube_pos = should_mirror ? mirror(cube_pos) : cube_pos;
     Pose2d charge_station_w_pos = should_mirror ? mirror(
-        kBotChargeStationWaypoint) : kBotChargeStationWaypoint;
+        kChargeStationWaypoint) : kChargeStationWaypoint;
     Pose2d charge_station_pos = should_mirror ? mirror(kChargeStation) : kChargeStation;
 
     // Generate trajectory from start pos to cube pos
     Trajectory t1 = TrajectoryGenerator.generateTrajectory(
-        start_pos_, new ArrayList<>(), cube_pos,
-        AutoConfig.kReverseConfig);
+        start_pos_, List.of(cube_pos.getTranslation(), charge_station_w_pos.getTranslation()), 
+        charge_station_pos, AutoConfig.kReverseConfig);
 
     // Generate trajectory from cube pos to charge station
   /*   Trajectory t1 = TrajectoryGenerator.generateTrajectory(
@@ -85,12 +85,11 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
 
         new ParallelCommandGroup(
         //new TurnToAngle(180, drivetrain, pose_estimator),
+          new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
           superstructure.setPosition(Superstructure.Position.STOW)
         ),
 
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t1),
-
-        new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
+        //new DriveTrajectory(drivetrain, pose_estimator, () -> t2),
         // Balance
         new DriveBalance(drivetrain)
     );
