@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
+import org.ghrobotics.frc2023.commands.ManualElevator;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.Elevator;
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot {
   private final Arm arm_ = new Arm();
   private final Grabber grabber_ = new Grabber();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
-  private final LED led_ = new LED();
+  private final LED led_ = new LED(); 
 
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_,
@@ -141,6 +142,10 @@ public class Robot extends TimedRobot {
     //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
+    //  * POV 0: Manual Elevator Up
+    driver_controller_.pov(0).whileTrue(superstructure_.setManualElevator(true));
+    // * POV 180: Manual Elevator Down
+    driver_controller_.pov(180).whileTrue(superstructure_.setManualElevator(false));
 
     // Operator Controller
     //  * Y:       L3 Cone
