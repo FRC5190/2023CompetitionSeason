@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2023;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
+import org.ghrobotics.frc2023.commands.DriveTowardPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
@@ -130,6 +133,8 @@ public class Robot extends TimedRobot {
   private void setupTeleopControls() {
 
     // Driver Controller
+    driver_controller_.a().whileTrue(new DriveTowardPosition(drivetrain_, pose_estimator_,
+        driver_controller_, new Pose2d(15.7, 7, new Rotation2d())));
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
