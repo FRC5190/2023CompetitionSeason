@@ -145,7 +145,7 @@ public class ZeroSuperstructure extends CommandBase {
     // Percent Values
     public static final double kElevatorPct = -0.2;
     public static final double kExtenderPct = -0.2;
-    public static final double kArmPct = -0.2;
+    public static final double kArmPct = 0.2;
 
     // Current Thresholds
     public static final double kElevatorCurrentThreshold = 5;
