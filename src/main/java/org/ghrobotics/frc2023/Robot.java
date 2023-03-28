@@ -140,7 +140,7 @@ public class Robot extends TimedRobot {
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
-        superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
+        superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.3, false));
 
     // Operator Controller
     //  * Y:       L3 Cone

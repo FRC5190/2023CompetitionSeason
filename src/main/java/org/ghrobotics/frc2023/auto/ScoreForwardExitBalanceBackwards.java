@@ -30,15 +30,15 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
       Rotation2d.fromDegrees(180));
 
   // Cube Positions (on blue side)
-  private static final Pose2d kBotCubeWaypoint = new Pose2d(5.5, 0.922,
+  private static final Pose2d kBotCubeWaypoint = new Pose2d(5.5, 0.800,
       Rotation2d.fromDegrees(180));
-  private static final Pose2d kTopCubeWaypoint = new Pose2d(5.5, 4.589,
+  private static final Pose2d kTopCubeWaypoint = new Pose2d(5.5, 4.350,
       Rotation2d.fromDegrees(180));
 
   // Charge Station Positions
-  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.800,
+  private static final Pose2d kChargeStationWaypoint = new Pose2d(6.294, 2.900,
       Rotation2d.fromDegrees(0));
-  private static final Pose2d kChargeStation = new Pose2d(4.594, 2.900, Rotation2d.fromDegrees(0));
+  private static final Pose2d kChargeStation = new Pose2d(4.094, 2.900, Rotation2d.fromDegrees(0));
 
   // Constructor
   public ScoreForwardExitBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,
@@ -74,7 +74,7 @@ public class ScoreForwardExitBalanceBackwards extends SequentialCommandGroup {
         new InstantCommand(() -> pose_estimator.resetPosition(final_start_pos)),
 
         // Exhaust cube
-        superstructure.setPosition(Superstructure.Position.CUBE_L3),
+        //superstructure.setPosition(Superstructure.Position.CUBE_L3),
         superstructure.setGrabber(() -> 0.3, false).withTimeout(0.5),
 
         new ParallelCommandGroup(

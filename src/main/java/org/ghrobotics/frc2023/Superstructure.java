@@ -63,7 +63,7 @@ public class Superstructure {
         new InstantCommand(() -> this.state = pos.posname),
         // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
         // Also, bring extension back in. End this when we reach the desired elevator height.
-        new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height),
+        new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height).withTimeout(2),
             new ExtendToPosition(extender_, Constants.kExtenderStowPosition),
             new ArmToPosition(arm_, arm_elev_mvmt_pos)
         ),
@@ -136,7 +136,7 @@ public class Superstructure {
     SUBSTATION(29, 0, 12, "SUBSTATION"),
 
     // Cube scoring
-    CUBE_L2(25, 0, 10, "CUBE_L2"),
+    CUBE_L2(24, 0, 10, "CUBE_L2"),
     CUBE_L3(27, 6, 20, "CUBE_L3"),
 
     // Cone scoring

@@ -23,7 +23,7 @@ import org.ghrobotics.frc2023.subsystems.PoseEstimator;
 public class ScoreCoopertitionBalanceBackwards extends SequentialCommandGroup {
   // Poses (assuming origin on blue side)
   private static final Pose2d kStartPos = new Pose2d(1.9, 3.32, Rotation2d.fromDegrees(180));
-  private static final Pose2d kChargeStation = new Pose2d(3.4, 3.32, Rotation2d.fromDegrees(180));
+  private static final Pose2d kChargeStation = new Pose2d(3.5, 3.32, Rotation2d.fromDegrees(180));
 
   // Constructor
   public ScoreCoopertitionBalanceBackwards(Drivetrain drivetrain, Superstructure superstructure,

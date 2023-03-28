@@ -24,9 +24,9 @@ public class AutoConfig {
 
   // Charge Station Regions
   public static final Translation2d kBlueChargeStationBL = new Translation2d(2.41, 1.52);
-  public static final Translation2d kBlueChargeStationTR = new Translation2d(5.80, 3.89);
-  public static final Translation2d kRedChargeStationBL = new Translation2d(10.72, 1.52);
-  public static final Translation2d kRedChargeStationTR = new Translation2d(14.06, 3.89);
+  public static final Translation2d kBlueChargeStationTR = new Translation2d(5.20, 3.89);
+  public static final Translation2d kRedChargeStationBL = new Translation2d(11.12, 1.52);
+  public static final Translation2d kRedChargeStationTR = new Translation2d(14.36, 3.89);
 
   // Constraints
   public static final RectangularRegionConstraint kBlueCSConstraint =

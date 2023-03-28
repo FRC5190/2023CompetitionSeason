@@ -22,9 +22,9 @@ public class AutoSelector {
   public AutoSelector() {
     //Intialize routine chooser
     routine_chooser_ = new SendableChooser<>();
+    routine_chooser_.setDefaultOption("Score Coop Balance", Routine.SCORECOOPBALANCE);
     routine_chooser_.addOption("Score Cone Then Cube", Routine.SCORE_CONE_THEN_CUBE);
-    routine_chooser_.setDefaultOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
-    routine_chooser_.addOption("Score Coop Balance", Routine.SCORECOOPBALANCE);
+    routine_chooser_.addOption("Score Forward Exit Balance Backwards", Routine.SCOREFORWARDEXITBALANCEBACKWARD);
     //routine_chooser_.addOption("Score One and Taxi", Routine.SCOREONETAXI);
     //routine_chooser_.addOption("Score Forward and Balance Backward", Routine.SCOREFORWARDBALANCEBACKWARD);
     //routine_chooser_.addOption("Score Two and Taxi", Routine.SCORETWOTAXI);
