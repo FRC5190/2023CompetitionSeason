@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import java.util.function.DoubleSupplier;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
@@ -119,34 +118,6 @@ public class Superstructure {
 
         // Subsystem Requirement
         grabber_
-    );
-  }
-
-  // Moves Elevator Manually
-  public Command setManualElevator(boolean up) {
-    return new FunctionalCommand(
-        // Initialize
-        () -> {
-          // Move elevator up or down
-          double targetPosition = (up) ? 1.0 : -1.0;
-          elevator_.setPosition(elevator_.getPosition() + targetPosition);
-        },
-
-        // Execute
-        () -> {},
-
-        // End
-        (interrupted) -> {
-          elevator_.setPosition(elevator_.getPosition());
-        },
-
-        // Is Finished
-        () -> {
-          return Math.abs(elevator_.getPosition() - targetPosition) < Constants.kTolerance;
-        },
-
-        // Subsystem Requirement
-        elevator_
     );
   }
 
