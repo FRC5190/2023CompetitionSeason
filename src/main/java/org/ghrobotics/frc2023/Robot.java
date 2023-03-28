@@ -141,6 +141,10 @@ public class Robot extends TimedRobot {
     //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(driver_controller_::getRightTriggerAxis, false));
+    //  * POV 0: Manual Elevator Up
+    driver_controller_.pov(0).whileTrue(new ElevateToPosition(elevator_, elevator_.getPosition() + 0.0254));
+    // * POV 180: Manual Elevator Down
+    driver_controller_.pov(180).whileTrue(new ElevateToPosition(elevator_, elevator_.getPosition() - 0.0254));
 
     // Operator Controller
     //  * Y:       L3 Cone
