@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
-import org.ghrobotics.frc2023.commands.ManualElevator;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.Elevator;
@@ -40,7 +39,7 @@ public class Robot extends TimedRobot {
   private final Arm arm_ = new Arm();
   private final Grabber grabber_ = new Grabber();
   private final PoseEstimator pose_estimator_ = new PoseEstimator(drivetrain_, limelight_);
-  private final LED led_ = new LED(); 
+  private final LED led_ = new LED();
 
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(elevator_, extender_, arm_,
