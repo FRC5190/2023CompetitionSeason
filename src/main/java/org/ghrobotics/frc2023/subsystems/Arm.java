@@ -71,11 +71,9 @@ public class Arm extends SubsystemBase {
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
-    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
 
     // Reset encoder
-    encoder_.setPosition(Constants.kMaxAngle);
+    zero();
     physics_sim_.setState(VecBuilder.fill(Constants.kMaxAngle, 0));
   }
 
@@ -84,6 +82,12 @@ public class Arm extends SubsystemBase {
     // Read inputs
     io_.angle = encoder_.getPosition();
     io_.angular_velocity = encoder_.getVelocity();
+    io_.current = leader_.getOutputCurrent();
+
+    if (io_.wants_zero) {
+      io_.wants_zero = false;
+      encoder_.setPosition(Constants.kMaxAngle);
+    }
 
     // Reset controller if we have to
     if (reset_pid_) {
@@ -141,6 +145,15 @@ public class Arm extends SubsystemBase {
     reset_pid_ = true;
   }
 
+  public void enableSoftLimits(boolean value) {
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
+  }
+
+  public void zero() {
+    io_.wants_zero = true;
+  }
+
   // Position Getter
   public double getAngle() {
     return io_.angle;
@@ -154,6 +167,10 @@ public class Arm extends SubsystemBase {
     return fb_.getSetpoint().velocity;
   }
 
+  public double getCurrent() {
+    return io_.current;
+  }
+
   // Output Type
   private enum OutputType {
     PERCENT, ANGLE
@@ -164,8 +181,10 @@ public class Arm extends SubsystemBase {
     //Inputs
     double angle;
     double angular_velocity;
+    double current;
 
     //Outputs
+    boolean wants_zero;
     double demand;
   }
 

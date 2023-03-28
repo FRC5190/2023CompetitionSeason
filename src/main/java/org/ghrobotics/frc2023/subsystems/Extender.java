@@ -70,9 +70,10 @@ public class Extender extends SubsystemBase {
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinLength);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxLength);
+    enableSoftLimits(true);
 
     // Reset encoder position
-    encoder_.setPosition(0);
+    zero();
   }
 
   @Override
@@ -80,6 +81,12 @@ public class Extender extends SubsystemBase {
     // Read inputs
     io_.position = encoder_.getPosition();
     io_.velocity = encoder_.getVelocity();
+    io_.current = leader_.getOutputCurrent();
+
+    if (io_.wants_zero) {
+      io_.wants_zero = false;
+      encoder_.setPosition(0);
+    }
 
     // Reset controller if we have to
     if (reset_pid_) {
@@ -137,6 +144,15 @@ public class Extender extends SubsystemBase {
     io_.demand = position;
   }
 
+  public void enableSoftLimits(boolean value) {
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
+  }
+
+  public void zero() {
+    io_.wants_zero = true;
+  }
+
   // Position Getter
   public double getPosition() {
     return io_.position;
@@ -150,6 +166,10 @@ public class Extender extends SubsystemBase {
     return fb_.getSetpoint().velocity;
   }
 
+  public double getCurrent() {
+    return io_.current;
+  }
+
   // Output Type
   private enum OutputType {
     PERCENT, POSITION
@@ -160,8 +180,10 @@ public class Extender extends SubsystemBase {
     // Inputs
     double position;
     double velocity;
+    double current;
 
     // Outputs
+    boolean wants_zero;
     double demand;
   }
 

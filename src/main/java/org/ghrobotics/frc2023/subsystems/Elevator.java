@@ -75,9 +75,10 @@ public class Elevator extends SubsystemBase {
     leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinHeight);
     leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxHeight);
+    enableSoftLimits(true);
 
     // Reset encoder position
-    encoder_.setPosition(0);
+    zero();
     fb_.reset(0);
   }
 
@@ -86,6 +87,13 @@ public class Elevator extends SubsystemBase {
     // Read inputs
     io_.position = encoder_.getPosition();
     io_.velocity = encoder_.getVelocity();
+    io_.voltage = leader_.getAppliedOutput() * 12;
+    io_.current = leader_.getOutputCurrent();
+
+    if (io_.wants_zero) {
+      io_.wants_zero = false;
+      encoder_.setPosition(0);
+    }
 
     if (!DriverStation.isEnabled()) {
       reset_pid_ = true;
@@ -147,6 +155,15 @@ public class Elevator extends SubsystemBase {
     fb_.setGoal(position);
   }
 
+  public void enableSoftLimits(boolean value) {
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
+    leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
+  }
+
+  public void zero() {
+    io_.wants_zero = true;
+  }
+
   public double getVoltage() {
     return io_.voltage;
   }
@@ -163,6 +180,10 @@ public class Elevator extends SubsystemBase {
     return fb_.getSetpoint().velocity;
   }
 
+  public double getCurrent() {
+    return io_.current;
+  }
+
   // Output Type
   private enum OutputType {
     PERCENT, POSITION
@@ -174,8 +195,10 @@ public class Elevator extends SubsystemBase {
     double position;
     double velocity;
     double voltage;
+    double current;
 
     // Outputs
+    boolean wants_zero;
     double demand;
   }
 
