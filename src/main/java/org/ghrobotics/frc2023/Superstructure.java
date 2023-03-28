@@ -124,17 +124,25 @@ public class Superstructure {
 
   // Moves Elevator Manually
   public Command setManualElevator(boolean up) {
-    return new StartEndCommand(
+    return new FunctionalCommand(
         // Initialize
         () -> {
           // Move elevator up or down
-          double percent = (up) ? 0.1 : -0.1;
-          elevator_.setPercent(percent);
+          double targetPosition = (up) ? 1.0 : -1.0;
+          elevator_.setPosition(elevator_.getPosition() + targetPosition);
         },
 
+        // Execute
+        () -> {},
+
         // End
+        (interrupted) -> {
+          elevator_.setPosition(elevator_.getPosition());
+        },
+
+        // Is Finished
         () -> {
-          elevator_.setPercent(0);
+          return Math.abs(elevator_.getPosition() - targetPosition) < Constants.kTolerance;
         },
 
         // Subsystem Requirement
