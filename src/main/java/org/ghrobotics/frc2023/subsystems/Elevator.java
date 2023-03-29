@@ -95,23 +95,16 @@ public class Elevator extends SubsystemBase {
       encoder_.setPosition(0);
     }
 
-    if (!DriverStation.isEnabled()) {
-      reset_pid_ = true;
-      return;
-    }
-
     // Reset controller if we have to
     if (reset_pid_) {
       reset_pid_ = false;
       fb_.reset(io_.position, io_.velocity);
-      System.out.println("Reset to " + io_.position + "," + io_.velocity);
     }
 
     // Write outputs
     switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
-
         // Set simulated inputs
         if (RobotBase.isSimulation())
           leader_sim_.getDouble("Applied Output").set(io_.demand * 12);
@@ -225,7 +218,7 @@ public class Elevator extends SubsystemBase {
 
     // Control
     public static double kMaxVelocity = 0.6;
-    public static double kMaxAcceleration = 1.2;
+    public static double kMaxAcceleration = 0.8;
     public static double kP = 0.0001;
   }
 }

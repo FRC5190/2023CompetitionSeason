@@ -11,11 +11,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.ghrobotics.frc2023.auto.AutoSelector;
 import org.ghrobotics.frc2023.commands.DriveBrakeMode;
 import org.ghrobotics.frc2023.commands.DriveTeleop;
 import org.ghrobotics.frc2023.commands.DriveTowardPosition;
-import org.ghrobotics.frc2023.commands.ElevateToPosition;
+import org.ghrobotics.frc2023.commands.HomeSuperstructure;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Drivetrain;
 import org.ghrobotics.frc2023.subsystems.Elevator;
@@ -102,6 +103,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
+    pose_estimator_.resetPosition(new Pose2d(10.6, 6.5, new Rotation2d()));
   }
 
   @Override
@@ -147,16 +149,21 @@ public class Robot extends TimedRobot {
     //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.3, false));
-    //  * POV 0: Manual Elevator Up
-    driver_controller_.pov(0).whileTrue(new ElevateToPosition(elevator_, elevator_.getPosition() + 0.0254));
-    // * POV 180: Manual Elevator Down
-    driver_controller_.pov(180).whileTrue(new ElevateToPosition(elevator_, elevator_.getPosition() - 0.0254));
+
+    // Operator Cube Modifier
+    Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
 
     // Operator Controller
-    //  * Y:       L3 Cone
-    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.CONE_L3));
-    //  * B:       L2 Cone
-    operator_controller_.b().onTrue(superstructure_.setPosition(Superstructure.Position.CONE_L2));
+    //  * Y:       L3 Cone / Cube
+    operator_controller_.y().and(cube_modifier).onTrue(superstructure_.setPosition(
+        Superstructure.Position.CUBE_L3));
+    operator_controller_.y().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+        Superstructure.Position.CONE_L2));
+    //  * B:       L2 Cone / Cube
+    operator_controller_.b().and(cube_modifier).onTrue(superstructure_.setPosition(
+        Superstructure.Position.CUBE_L2));
+    operator_controller_.b().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+        Superstructure.Position.CONE_L2));
     //  * A:       L1 Cone / Cube / Intake
     operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
     //  * X:       Stow
@@ -164,15 +171,12 @@ public class Robot extends TimedRobot {
     //  * LB:      Substation
     operator_controller_.leftBumper().onTrue(
         superstructure_.setPosition(Superstructure.Position.SUBSTATION));
-    //  * POV 0:   L3 Cube
-    operator_controller_.pov(0).onTrue(
-        superstructure_.setPosition(Superstructure.Position.CUBE_L3));
-    //  * POV 90:  L2 Cube
-    operator_controller_.pov(90).onTrue(
-        superstructure_.setPosition(Superstructure.Position.CUBE_L2));
-    //  * POV 270: Backward Cube
-    operator_controller_.pov(270).onTrue(
-        superstructure_.setPosition(Superstructure.Position.BACK_EXHAUST));
+    //  * Back:    Superstructure Reset
+    operator_controller_.back().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
+    //  * POV 0: Manual Elevator Up
+    operator_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.15));
+    // * POV 180: Manual Elevator Down
+    operator_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.1));
   }
 
   /**

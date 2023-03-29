@@ -6,9 +6,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import java.util.function.DoubleSupplier;
 import org.ghrobotics.frc2023.commands.ArmToPosition;
 import org.ghrobotics.frc2023.commands.ElevateToPosition;
@@ -55,24 +54,13 @@ public class Superstructure {
 
   // Position Setter
   public Command setPosition(Position pos) {
-    // Find the arm's "elevator movement" position -- where the arm should be when the
-    // elevator is moving. This is max(kElevatorMovementPosition, desired arm position).
-    double arm_elev_mvmt_pos = Math.max(pos.angle, Constants.kElevatorMovementArmPosition);
-
     return new SequentialCommandGroup(
         new InstantCommand(() -> this.state = pos.posname),
-        // Take elevator to desired height while keeping the arm at the "elevator movement" pos.
-        // Also, bring extension back in. End this when we reach the desired elevator height.
-        new ParallelDeadlineGroup(new ElevateToPosition(elevator_, pos.height).withTimeout(2),
-            new ExtendToPosition(extender_, Constants.kExtenderStowPosition),
-            new ArmToPosition(arm_, arm_elev_mvmt_pos)
-        ),
-
-        // Take extender and arm to final position.
         new ParallelCommandGroup(
-            //new PrintCommand("Inside Parallel Command Group"),
+            new ElevateToPosition(elevator_, pos.height),
             new ExtendToPosition(extender_, pos.extension),
-            new ArmToPosition(arm_, pos.angle))
+            new ArmToPosition(arm_, pos.angle)
+        ).withTimeout(4)
     );
   }
 
@@ -80,6 +68,15 @@ public class Superstructure {
   public String getState() {
     //System.out.println(state);
     return state;
+  }
+
+  // Elevator Jog
+  public Command jogElevator(double percent) {
+    return new StartEndCommand(
+        () -> elevator_.setPercent(percent),
+        () -> elevator_.setPercent(0.2793 / 12),
+        elevator_
+    );
   }
 
   public Command setGrabber(double percent, boolean open) {

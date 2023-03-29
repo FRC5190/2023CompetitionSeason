@@ -28,7 +28,7 @@ public class LED extends SubsystemBase {
     om_ = new AddressableLED(Constants.kPortId);
     om_.setLength(led_buffer_.getLength());
     om_.start();
-    
+
   }
 
   /**
@@ -114,17 +114,17 @@ public class LED extends SubsystemBase {
       int hue = (rainbow_first_pixel_hue_ + (i * 180 / Constants.kBufferSize)) % 180;
 
       // Set the value.
-       //led_buffer_.setHSV(i, hue, 255, 128);
+       led_buffer_.setHSV(i, hue, 255, 128);
        //System.out.println("hue: "+hue);
-      //led_buffer_.setHSV(i, 180, 255, 128);
-      led_buffer_.setRGB(i, 255, 0, 0);
+      // led_buffer_.setHSV(i, 180, 255, 128);
+      //led_buffer_.setRGB(i, 0, 255, 0);
     }
 
     // Increase by 3 to make the rainbow move.
-     //rainbow_first_pixel_hue_ += 3;
+     rainbow_first_pixel_hue_ += 3;
 
     // Check bounds.
-     //rainbow_first_pixel_hue_ %= 180;
+     rainbow_first_pixel_hue_ %= 180;
   }
 
   /**
@@ -188,7 +188,7 @@ public class LED extends SubsystemBase {
 
   public static class Constants {
     public static final int kPortId = 0;
-    public static final int kBufferSize = 29;
+    public static final int kBufferSize = 25;
 
     public static final int kSnakeOnLEDs = 3;
   }

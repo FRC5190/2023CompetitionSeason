@@ -55,6 +55,7 @@ public class PoseEstimator extends SubsystemBase {
         new Rotation2d(drivetrain_.getAngle()), drivetrain_.getLeftPosition(),
         drivetrain_.getRightPosition(),
         new Pose2d(), stateStdDevs, visionMeasurementStdDevs);
+    resetPosition(new Pose2d());
   }
 
   @Override
@@ -80,7 +81,7 @@ public class PoseEstimator extends SubsystemBase {
 
       // Extract 3d pose from double[]
       Pose3d robot_pose = new Pose3d(raw_pose[0], raw_pose[1], raw_pose[2],
-          new Rotation3d(raw_pose[3], raw_pose[4], raw_pose[5]));
+          new Rotation3d(Math.toRadians(raw_pose[3]), Math.toRadians(raw_pose[4]), Math.toRadians(raw_pose[5])));
 
       // Check whether we want to reset position from vision
       if (reset_position_from_vision_) {

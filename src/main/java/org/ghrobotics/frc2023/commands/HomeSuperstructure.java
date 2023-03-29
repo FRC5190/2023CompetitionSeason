@@ -2,12 +2,13 @@ package org.ghrobotics.frc2023.commands;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.ghrobotics.frc2023.subsystems.Arm;
 import org.ghrobotics.frc2023.subsystems.Elevator;
 import org.ghrobotics.frc2023.subsystems.Extender;
 
-public class ZeroSuperstructure extends CommandBase {
+public class HomeSuperstructure extends CommandBase {
   // Subsystems
   private final Elevator elevator_;
   private final Extender extender_;
@@ -27,7 +28,7 @@ public class ZeroSuperstructure extends CommandBase {
   private final Timer timer_;
 
   // Constructor
-  public ZeroSuperstructure(Elevator elevator, Extender extender, Arm arm) {
+  public HomeSuperstructure(Elevator elevator, Extender extender, Arm arm) {
     // Assign member variables
     elevator_ = elevator;
     extender_ = extender;
@@ -114,6 +115,13 @@ public class ZeroSuperstructure extends CommandBase {
     } else {
       arm_.setPercent(0);
     }
+
+    SmartDashboard.putBoolean("Elevator Zero", elevator_zeroed_);
+    SmartDashboard.putBoolean("Extender Zero", extender_zeroed_);
+    SmartDashboard.putBoolean("Arm Zero", arm_zeroed_);
+    SmartDashboard.putNumber("Arm Current", arm_.getCurrent());
+    SmartDashboard.putNumber("Extender Current", extender_.getCurrent());
+    SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
   }
 
   @Override
@@ -129,6 +137,10 @@ public class ZeroSuperstructure extends CommandBase {
       extender_.zero();
       arm_.zero();
     }
+
+    elevator_.setPercent(0);
+    extender_.setPercent(0);
+    arm_.setPercent(0);
 
     // Stop timer
     timer_.stop();
@@ -148,9 +160,9 @@ public class ZeroSuperstructure extends CommandBase {
     public static final double kArmPct = 0.2;
 
     // Current Thresholds
-    public static final double kElevatorCurrentThreshold = 5;
-    public static final double kArmCurrentThreshold = 5;
-    public static final double kExtenderCurrentThreshold = 5;
+    public static final double kElevatorCurrentThreshold = 12;
+    public static final double kArmCurrentThreshold = 30;
+    public static final double kExtenderCurrentThreshold = 12;
 
     // Filter Size
     public static final int kFilterSize = 25;

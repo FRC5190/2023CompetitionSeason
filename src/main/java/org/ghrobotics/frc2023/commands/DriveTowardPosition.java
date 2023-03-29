@@ -72,7 +72,7 @@ public class DriveTowardPosition extends CommandBase {
     public static final double kAngleTolerance = Math.toRadians(45);
 
     // Feedback (values from Crossfire 2019)
-    public static final double kP = 0.8;
+    public static final double kP = 0.3;
     public static final double kD = 0.0;
   }
 }
