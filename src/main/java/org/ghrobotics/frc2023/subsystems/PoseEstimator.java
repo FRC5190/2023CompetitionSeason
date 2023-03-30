@@ -14,7 +14,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PoseEstimator extends SubsystemBase {
@@ -40,6 +42,9 @@ public class PoseEstimator extends SubsystemBase {
 
   // Primary Tag ID
   private int primary_tag_id_ = -1;
+
+  //Alliance
+  DriverStation.Alliance alliance = DriverStation.getAlliance();
 
   // Constructor
   public PoseEstimator(Drivetrain drivetrain, Limelight limelight) {
@@ -75,8 +80,11 @@ public class PoseEstimator extends SubsystemBase {
 
       // Update primary tag id
       primary_tag_id_ = limelight_.getID();
+      boolean red_alliance_ = alliance == DriverStation.Alliance.Red;
+      boolean blue_alliance_ = alliance == DriverStation.Alliance.Blue;
 
-      // Use the robot pose with blue alliance origin
+      if (((primary_tag_id_ == 4 && blue_alliance_) || (primary_tag_id_ == 5 && red_alliance_)) && !DriverStation.isAutonomous()) {
+              // Use the robot pose with blue alliance origin
       double[] raw_pose = limelight_.getBlueBotPose();
 
       // Extract 3d pose from double[]
@@ -90,6 +98,7 @@ public class PoseEstimator extends SubsystemBase {
       } else {
         // Add vision measurement to estimator
         pose_estimator_.addVisionMeasurement(robot_pose.toPose2d(), timestamp);
+      }
       }
     }
 

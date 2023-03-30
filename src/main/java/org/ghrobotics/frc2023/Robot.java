@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,6 +26,7 @@ import org.ghrobotics.frc2023.subsystems.Grabber;
 import org.ghrobotics.frc2023.subsystems.LED;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
+import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -56,6 +58,13 @@ public class Robot extends TimedRobot {
   // Xbox Controllers
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+
+  // Operator Cube Modifier
+  Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
+
+  // Drive to Position
+  Command drive_pos_ = new DriveTowardPosition(drivetrain_, pose_estimator_,
+        driver_controller_, Arena.getTagPosition(4).toPose2d());
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
@@ -103,7 +112,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
-    pose_estimator_.resetPosition(new Pose2d(10.6, 6.5, new Rotation2d()));
+    pose_estimator_.resetPosition(Arena.getTagPosition(4).toPose2d());
   }
 
   @Override
@@ -135,8 +144,7 @@ public class Robot extends TimedRobot {
   private void setupTeleopControls() {
 
     // Driver Controller
-    driver_controller_.a().whileTrue(new DriveTowardPosition(drivetrain_, pose_estimator_,
-        driver_controller_, new Pose2d(15.7, 7, new Rotation2d())));
+    driver_controller_.a().whileTrue(drive_pos_);
     //  * B:  Balance Mode
     driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
@@ -150,11 +158,10 @@ public class Robot extends TimedRobot {
     driver_controller_.rightTrigger(0.15).whileTrue(
         superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.3, false));
 
-    // Operator Cube Modifier
-    Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
 
     // Operator Controller
     //  * Y:       L3 Cone / Cube
+    cube_modifier.onTrue(new InstantCommand(() -> led_.setOutput(LED.StandardLEDOutput.CUBE)));
     operator_controller_.y().and(cube_modifier).onTrue(superstructure_.setPosition(
         Superstructure.Position.CUBE_L3));
     operator_controller_.y().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
@@ -190,12 +197,24 @@ public class Robot extends TimedRobot {
     if (isDisabled()) {
       //System.out.println("LEDs: Robot is disabled");
       led_.setOutput(LED.OutputType.DISABLED_READY);
-    } else if (isEnabled()) {
-      // System.out.println("LEDs: Robot is enabled");
-      led_.setOutput(LED.OutputType.ENABLED_READY);
-    } else if (limelight_.hasTarget()) {
+    }
+    else if (isEnabled() && !cube_modifier.getAsBoolean()) {
+      if (drive_pos_.isScheduled()) {
+        led_.setOutput(StandardLEDOutput.CONE_ALIGNING);
+      } else {
+        led_.setOutput(LED.StandardLEDOutput.CONE);
+      }
+    }
+    else if (isEnabled() && cube_modifier.getAsBoolean()) {
+      if (drive_pos_.isScheduled()) {
+        led_.setOutput(StandardLEDOutput.CUBE_ALIGNING);
+      } else {
+        led_.setOutput(LED.StandardLEDOutput.CUBE);
+      }
+    }
+    else if (limelight_.getID() == 4 || limelight_.getID() == 5) {
       // System.out.println("LEDs: Intake");
-      led_.setOutput(LED.StandardLEDOutput.LIMELIGHT_ERROR);
+      led_.setOutput(LED.OutputType.TRACKING_TARGET);
     } else {
       led_.setOutput(LED.StandardLEDOutput.BLANK);
     }

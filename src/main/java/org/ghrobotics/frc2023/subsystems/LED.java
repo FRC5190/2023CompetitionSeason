@@ -64,6 +64,10 @@ public class LED extends SubsystemBase {
         setSnake(Color.kGreen);
         break;
 
+      case TRACKING_TARGET:
+        setSnake(Color.kRoyalBlue);
+        break;
+
       /**
        case AUTOBALANCING:
        setSnake(Color.kDeepPink);
@@ -152,7 +156,8 @@ public class LED extends SubsystemBase {
   }
 
   public enum OutputType {
-    STANDARD, DISABLED_READY, ENABLED_READY, //AUTOBALANCING, ERROR, LIMELIGHT_ERROR
+    STANDARD, DISABLED_READY, ENABLED_READY, TRACKING_TARGET
+    //AUTOBALANCING, ERROR, LIMELIGHT_ERROR
   }
 
   public enum StandardLEDOutput {
@@ -163,7 +168,11 @@ public class LED extends SubsystemBase {
     // ENABLED_READY(Color.kGreen, 1.0, 0.0),
     AUTOBALANCING(Color.kDeepPink, 1.0, 0.0),
     ERROR(Color.kRed, 1.0, 0.0),
-    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0);
+    LIMELIGHT_ERROR(Color.kOrange, 1.0, 0.0),
+    CUBE(Color.kPurple, 1.0, 0.0),
+    CONE(Color.kYellow, 1.0, 0.0),
+    CUBE_ALIGNING(Color.kPurple, 0.0625, 0.0625),
+    CONE_ALIGNING(Color.kYellow, 0.0625, 0.0625);
 
 
     // Stores the color and on percentage for the current output.
@@ -187,8 +196,8 @@ public class LED extends SubsystemBase {
   }
 
   public static class Constants {
-    public static final int kPortId = 0;
-    public static final int kBufferSize = 25;
+    public static final int kPortId = 9;
+    public static final int kBufferSize = 30;
 
     public static final int kSnakeOnLEDs = 3;
   }
