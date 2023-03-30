@@ -4,8 +4,6 @@
 
 package org.ghrobotics.frc2023;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,9 +22,9 @@ import org.ghrobotics.frc2023.subsystems.Elevator;
 import org.ghrobotics.frc2023.subsystems.Extender;
 import org.ghrobotics.frc2023.subsystems.Grabber;
 import org.ghrobotics.frc2023.subsystems.LED;
+import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
 import org.ghrobotics.frc2023.subsystems.Limelight;
 import org.ghrobotics.frc2023.subsystems.PoseEstimator;
-import org.ghrobotics.frc2023.subsystems.LED.StandardLEDOutput;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -64,7 +62,7 @@ public class Robot extends TimedRobot {
 
   // Drive to Position
   Command drive_pos_ = new DriveTowardPosition(drivetrain_, pose_estimator_,
-        driver_controller_, Arena.getTagPosition(4).toPose2d());
+      driver_controller_, Arena.getTagPosition(4).toPose2d());
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
@@ -194,29 +192,25 @@ public class Robot extends TimedRobot {
   // For future reference, find a way to detect errors and add them to the requirement for LED
   // change
   public void updateLEDs() {
+    // Disabled State
     if (isDisabled()) {
-      //System.out.println("LEDs: Robot is disabled");
-      led_.setOutput(LED.OutputType.DISABLED_READY);
-    }
-    else if (isEnabled() && !cube_modifier.getAsBoolean()) {
-      if (drive_pos_.isScheduled()) {
-        led_.setOutput(StandardLEDOutput.CONE_ALIGNING);
+      // Limelight Not Connected
+      if (!pose_estimator_.isVisionAlive()) {
+        led_.setOutput(StandardLEDOutput.LIMELIGHT_ERROR);
       } else {
-        led_.setOutput(LED.StandardLEDOutput.CONE);
+        // Ready
+        led_.setOutput(LED.OutputType.DISABLED_READY);
       }
-    }
-    else if (isEnabled() && cube_modifier.getAsBoolean()) {
-      if (drive_pos_.isScheduled()) {
-        led_.setOutput(StandardLEDOutput.CUBE_ALIGNING);
-      } else {
-        led_.setOutput(LED.StandardLEDOutput.CUBE);
-      }
-    }
-    else if (limelight_.getID() == 4 || limelight_.getID() == 5) {
-      // System.out.println("LEDs: Intake");
-      led_.setOutput(LED.OutputType.TRACKING_TARGET);
     } else {
-      led_.setOutput(LED.StandardLEDOutput.BLANK);
+      // Cube Modifier
+      if (cube_modifier.getAsBoolean()) {
+        led_.setOutput(
+            drive_pos_.isScheduled() ? StandardLEDOutput.CUBE_ALIGNING : StandardLEDOutput.CUBE);
+      } else {
+        // Default
+        led_.setOutput(
+            drive_pos_.isScheduled() ? StandardLEDOutput.CONE_ALIGNING : StandardLEDOutput.CONE);
+      }
     }
   }
 }
