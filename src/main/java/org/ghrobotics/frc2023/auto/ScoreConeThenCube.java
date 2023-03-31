@@ -103,7 +103,7 @@ public class ScoreConeThenCube extends SequentialCommandGroup {
                 superstructure.setPosition(Superstructure.Position.STOW).withTimeout(0.1),
                 new WaitCommand(t2.getTotalTimeSeconds() - 0.5),
                 superstructure.setPosition(Superstructure.Position.CUBE_L3),
-                superstructure.setGrabber(0.75, false).withTimeout(0.5)
+                superstructure.setGrabber(0.3, false).withTimeout(0.5)
             )
         ),
 

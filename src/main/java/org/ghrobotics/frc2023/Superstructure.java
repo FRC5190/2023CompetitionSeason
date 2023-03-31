@@ -60,7 +60,7 @@ public class Superstructure {
             new ElevateToPosition(elevator_, pos.height),
             new ExtendToPosition(extender_, pos.extension),
             new ArmToPosition(arm_, pos.angle)
-        ).withTimeout(4)
+        ).withTimeout(6)
     );
   }
 
@@ -134,7 +134,7 @@ public class Superstructure {
 
     // Cube scoring
     CUBE_L2(24, 0, 10, "CUBE_L2"),
-    CUBE_L3(27, 6, 20, "CUBE_L3"),
+    CUBE_L3(28, 6, 20, "CUBE_L3"),
 
     // Cone scoring
     CONE_L2(27, 9, 35, "CONE_L2"),

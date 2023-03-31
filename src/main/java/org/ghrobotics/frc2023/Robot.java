@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
-    pose_estimator_.resetPosition(Arena.getTagPosition(4).toPose2d());
+    // pose_estimator_.resetPosition(Arena.getTagPosition(4).toPose2d());
   }
 
   @Override
@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
     driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube and Cone L3
     driver_controller_.rightTrigger(0.15).whileTrue(
-        superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.3, false));
+        superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.15, false));
 
 
     // Operator Controller
@@ -179,9 +179,9 @@ public class Robot extends TimedRobot {
     //  * Back:    Superstructure Reset
     operator_controller_.back().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
     //  * POV 0: Manual Elevator Up
-    operator_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.15));
+    operator_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.25));
     // * POV 180: Manual Elevator Down
-    operator_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.1));
+    operator_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.25));
   }
 
   /**
@@ -195,12 +195,9 @@ public class Robot extends TimedRobot {
     // Disabled State
     if (isDisabled()) {
       // Limelight Not Connected
-      if (!pose_estimator_.isVisionAlive()) {
-        led_.setOutput(StandardLEDOutput.LIMELIGHT_ERROR);
-      } else {
-        // Ready
-        led_.setOutput(LED.OutputType.DISABLED_READY);
-      }
+      led_.setOutput(LED.OutputType.DISABLED_READY);
+    } else if (isAutonomous()) {
+      led_.setOutput(StandardLEDOutput.AUTO);
     } else {
       // Cube Modifier
       if (cube_modifier.getAsBoolean()) {
