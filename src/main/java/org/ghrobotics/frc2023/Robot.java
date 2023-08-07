@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.ghrobotics.frc2023.auto.AutoSelector;
@@ -55,10 +56,12 @@ public class Robot extends TimedRobot {
 
   // Xbox Controllers
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
-  private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+  // private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+  private final CommandPS4Controller operator_controller_ = new CommandPS4Controller(1);
 
   // Operator Cube Modifier
-  Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
+  // Trigger cube_modifier = operator_controller_.R2(0.4);
+  Trigger cube_modifier = operator_controller_.R2();
 
   // Drive to Position
   Command drive_pos_ = new DriveTowardPosition(drivetrain_, pose_estimator_,
@@ -160,24 +163,24 @@ public class Robot extends TimedRobot {
     // Operator Controller
     //  * Y:       L3 Cone / Cube
     cube_modifier.onTrue(new InstantCommand(() -> led_.setOutput(LED.StandardLEDOutput.CUBE)));
-    operator_controller_.y().and(cube_modifier).onTrue(superstructure_.setPosition(
+    operator_controller_.triangle().and(cube_modifier).onTrue(superstructure_.setPosition(
         Superstructure.Position.CUBE_L3));
-    operator_controller_.y().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+    operator_controller_.triangle().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
         Superstructure.Position.CONE_L2));
     //  * B:       L2 Cone / Cube
-    operator_controller_.b().and(cube_modifier).onTrue(superstructure_.setPosition(
+    operator_controller_.circle().and(cube_modifier).onTrue(superstructure_.setPosition(
         Superstructure.Position.CUBE_L2));
-    operator_controller_.b().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+    operator_controller_.circle().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
         Superstructure.Position.CONE_L2));
     //  * A:       L1 Cone / Cube / Intake
-    operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
+    operator_controller_.cross().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
     //  * X:       Stow
-    operator_controller_.x().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
+    operator_controller_.square().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
     //  * LB:      Substation
-    operator_controller_.leftBumper().onTrue(
+    operator_controller_.L1().onTrue(
         superstructure_.setPosition(Superstructure.Position.SUBSTATION));
     //  * Back:    Superstructure Reset
-    operator_controller_.back().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
+    operator_controller_.R3().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
     //  * POV 0: Manual Elevator Up
     operator_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.25));
     // * POV 180: Manual Elevator Down
