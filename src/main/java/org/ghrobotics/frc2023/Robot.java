@@ -55,10 +55,13 @@ public class Robot extends TimedRobot {
 
   // Xbox Controllers
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
-  private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+  // private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+
+  // Toggle Operator mode
+  Trigger operator_mode = new Trigger(() -> false);
 
   // Operator Cube Modifier
-  Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
+  Trigger cube_modifier = driver_controller_.rightTrigger(0.4);
 
   // Drive to Position
   Command drive_pos_ = new DriveTowardPosition(drivetrain_, pose_estimator_,
@@ -140,48 +143,55 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {}
 
   private void setupTeleopControls() {
+    // Operator Mode Revert
+    if(driver_controller_.leftTrigger(04).getAsBoolean() && driver_controller_.rightTrigger(0.4).getAsBoolean())
+      operator_mode = (operator_mode.getAsBoolean()) ? new Trigger(() -> false) : new Trigger(() -> true);
 
-    // Driver Controller
-    driver_controller_.a().whileTrue(drive_pos_);
-    //  * B:  Balance Mode
-    driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
-    //  * LB: Intake Cone
-    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
-    //  * LT: Outtake Cone
-    driver_controller_.leftTrigger(0.2).whileTrue(
-        superstructure_.setGrabber(() -> 0, true));
-    //  * RB: Intake Cube
-    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
-    //  * RT: Outtake Cube and Cone L3
-    driver_controller_.rightTrigger(0.15).whileTrue(
-        superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.15, false));
+    if (!operator_mode.getAsBoolean()) {
+      // Driver Controller
+      driver_controller_.a().whileTrue(drive_pos_);
+      //  * B:  Balance Mode
+      driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
+      //  * LB: Intake Cone
+      driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
+      //  * LT: Outtake Cone
+      driver_controller_.leftTrigger(0.2).whileTrue(
+          superstructure_.setGrabber(() -> 0, true));
+      //  * RB: Intake Cube
+      driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
+      //  * RT: Outtake Cube and Cone L3
+      driver_controller_.rightTrigger(0.15).whileTrue(
+          superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.15, false));
+    }
 
+    if (operator_mode.getAsBoolean()) {
+      // Operator Controller
+      //  * Y:       L3 Cone / Cube
+      cube_modifier.onTrue(new InstantCommand(() -> led_.setOutput(LED.StandardLEDOutput.CUBE)));
+      driver_controller_.y().and(cube_modifier).onTrue(superstructure_.setPosition(
+          Superstructure.Position.CUBE_L3));
+      driver_controller_.y().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+          Superstructure.Position.CONE_L2));
+      //  * B:       L2 Cone / Cube
+      driver_controller_.b().and(cube_modifier).onTrue(superstructure_.setPosition(
+          Superstructure.Position.CUBE_L2));
+      driver_controller_.b().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
+          Superstructure.Position.CONE_L2));
+      //  * A:       L1 Cone / Cube / Intake
+      driver_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
+      //  * X:       Stow
+      driver_controller_.x().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
+      //  * LB:      Substation
+      driver_controller_.leftBumper().onTrue(
+          superstructure_.setPosition(Superstructure.Position.SUBSTATION));
+      //  * Back:    Superstructure Reset
+      driver_controller_.back().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
+      //  * POV 0: Manual Elevator Up
+      driver_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.25));
+      // * POV 180: Manual Elevator Down
+      driver_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.25));
+    }
 
-    // Operator Controller
-    //  * Y:       L3 Cone / Cube
-    cube_modifier.onTrue(new InstantCommand(() -> led_.setOutput(LED.StandardLEDOutput.CUBE)));
-    operator_controller_.y().and(cube_modifier).onTrue(superstructure_.setPosition(
-        Superstructure.Position.CUBE_L3));
-    operator_controller_.y().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
-        Superstructure.Position.CONE_L2));
-    //  * B:       L2 Cone / Cube
-    operator_controller_.b().and(cube_modifier).onTrue(superstructure_.setPosition(
-        Superstructure.Position.CUBE_L2));
-    operator_controller_.b().and(cube_modifier.negate()).onTrue(superstructure_.setPosition(
-        Superstructure.Position.CONE_L2));
-    //  * A:       L1 Cone / Cube / Intake
-    operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.INTAKE));
-    //  * X:       Stow
-    operator_controller_.x().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
-    //  * LB:      Substation
-    operator_controller_.leftBumper().onTrue(
-        superstructure_.setPosition(Superstructure.Position.SUBSTATION));
-    //  * Back:    Superstructure Reset
-    operator_controller_.back().onTrue(new HomeSuperstructure(elevator_, extender_, arm_));
-    //  * POV 0: Manual Elevator Up
-    operator_controller_.pov(0).whileTrue(superstructure_.jogElevator(0.25));
-    // * POV 180: Manual Elevator Down
-    operator_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.25));
   }
 
   /**
