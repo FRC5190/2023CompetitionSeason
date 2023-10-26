@@ -27,8 +27,8 @@ public class DriveTeleop extends CommandBase {
 
   @Override
   public void execute() {
-    double forward = -controller_.getLeftY();
-    double curvature = -controller_.getLeftX();
+    double forward = -controller_.getLeftY * Constants.sensitivity();
+    double curvature = -controller_.getLeftX * Constants.sensitivity();
     boolean quick_turn = controller_.x().getAsBoolean();
 
     DifferentialDrive.WheelSpeeds speeds = DifferentialDrive.curvatureDriveIK(
@@ -37,4 +37,7 @@ public class DriveTeleop extends CommandBase {
     drivetrain_.setPercent(speeds.left, speeds.right);
   }
 
+  public static class Constants {
+    public static final double sensitivity = 0.2;
+  }
 }
