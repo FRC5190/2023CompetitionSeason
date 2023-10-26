@@ -38,6 +38,8 @@ public class Robot extends TimedRobot {
 
   // Subsystems
   private final Drivetrain drivetrain_ = new Drivetrain(() -> balance_mode_);
+  
+  /*
   private final Limelight limelight_ = new Limelight("limelight");
   private final Elevator elevator_ = new Elevator();
   private final Extender extender_ = new Extender();
@@ -53,10 +55,12 @@ public class Robot extends TimedRobot {
   // Auto Selector
   private final AutoSelector auto_selector_ = new AutoSelector();
 
+  */
   // Xbox Controllers
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
-  private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+  //private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
+  /*
   // Operator Cube Modifier
   Trigger cube_modifier = operator_controller_.rightTrigger(0.4);
 
@@ -68,6 +72,7 @@ public class Robot extends TimedRobot {
   private final Telemetry telemetry_ = new Telemetry(drivetrain_, elevator_, extender_, arm_,
       pose_estimator_, limelight_, auto_selector_);
 
+      */
   @Override
   public void robotInit() {
     // Set default commands
@@ -83,14 +88,15 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // Run telemetry periodic functions
-    telemetry_.periodic();
+    //telemetry_.periodic();
     //superstructure_.periodic();
     //System.out.println(superstructure_.position_);
-    updateLEDs();
+    //updateLEDs();
   }
 
   @Override
   public void autonomousInit() {
+    /*
     // Set drivetrain brake mode
     drivetrain_.setBrakeMode(true);
 
@@ -101,6 +107,7 @@ public class Robot extends TimedRobot {
 
     // Calibrate drivetrain pitch
 //    drivetrain_.calibratePitch();
+*/
   }
 
   @Override
@@ -142,21 +149,21 @@ public class Robot extends TimedRobot {
   private void setupTeleopControls() {
 
     // Driver Controller
-    driver_controller_.a().whileTrue(drive_pos_);
+    //driver_controller_.a().whileTrue(drive_pos_);
     //  * B:  Balance Mode
-    driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
+    //driver_controller_.b().onTrue(new InstantCommand(() -> balance_mode_ = !balance_mode_));
     //  * LB: Intake Cone
-    driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
+    //driver_controller_.leftBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, false));
     //  * LT: Outtake Cone
-    driver_controller_.leftTrigger(0.2).whileTrue(
-        superstructure_.setGrabber(() -> 0, true));
+    //driver_controller_.leftTrigger(0.2).whileTrue(
+    //    superstructure_.setGrabber(() -> 0, true));
     //  * RB: Intake Cube
-    driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
+    //driver_controller_.rightBumper().whileTrue(superstructure_.setGrabber(() -> -0.25, true));
     //  * RT: Outtake Cube and Cone L3
-    driver_controller_.rightTrigger(0.15).whileTrue(
-        superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.15, false));
+    //driver_controller_.rightTrigger(0.15).whileTrue(
+    //    superstructure_.setGrabber(() -> driver_controller_.getRightTriggerAxis() * 0.15, false));
 
-
+/*
     // Operator Controller
     //  * Y:       L3 Cone / Cube
     cube_modifier.onTrue(new InstantCommand(() -> led_.setOutput(LED.StandardLEDOutput.CUBE)));
@@ -183,6 +190,7 @@ public class Robot extends TimedRobot {
     // * POV 180: Manual Elevator Down
     operator_controller_.pov(180).whileTrue(superstructure_.jogElevator(-0.25));
   }
+  */
 
   /**
    * Updates the status of the LEDs periodically based on the various states of the robot (e.g.
@@ -191,6 +199,7 @@ public class Robot extends TimedRobot {
 
   // For future reference, find a way to detect errors and add them to the requirement for LED
   // change
+  /*
   public void updateLEDs() {
     // Disabled State
     if (isDisabled()) {
@@ -209,5 +218,6 @@ public class Robot extends TimedRobot {
             drive_pos_.isScheduled() ? StandardLEDOutput.CONE_ALIGNING : StandardLEDOutput.CONE);
       }
     }
+    */
   }
 }
